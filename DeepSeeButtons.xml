@@ -1088,7 +1088,7 @@ LogHeader(cubeList,getLogs)
 	Write !,"<br>"
 		*/
 	///Server Details section
-	Do WriteParagraph("servedetails","Server Details",0)
+	Do WriteParagraph("serverdetails","Server Details",0)
 	//Write !,"<br>"
 	///The old "Configuration" section
 	Do WriteHeader4("Configuration")
@@ -1427,7 +1427,8 @@ WriteParagraph(name,title,flag)
 	Use LogFile	
 	If '$D(flag) Set flag = 1
 	If flag Write !,"<hr noshade size=""4"">"
-	Write !,"<h2 name="""_name_""">"_title_"</h2>"
+	Write !,"<a name="""_name_"""></a>"
+	Write !,"<h2>"_title_"</h2>"
 	
 WriteHeader4(header)
 	Use LogFile
@@ -1599,7 +1600,7 @@ cconsole
 	; Processes cconsole.log
 	New cconsoleFile,cconsoleSize,x
 	Do WriteParagraph("cconsole","cconsole.log")
-	Write "<div class=""scrollable"" style=""width:1200px;height:400px;"">"
+	Write !,"<div class=""scrollable"" style=""width:1200px;height:400px;"">"
 	Write !,?2,"<pre>"
 	Use PDev
 	If $Data(NoRun("cconsole")) Do  Quit
@@ -2293,9 +2294,6 @@ Journal
 	If ('sc) Do DisplayError^%apiOBJ(sc)
 	Write !,?2,"</tbody>"
 	Write !,"</table>"
-	Write !,"<br>"
-	
-	
 	
 	Do WriteParagraph("Journaling","Journaling")
 	ZN "%SYS"
@@ -2318,7 +2316,6 @@ Journal
 		}
 		ZN namespace
 		Use LogFile
-		Write !,"<br>"
 		Do WriteHeader4("Primary Directory")
 		Write !,"<p>",pdir,"</p>"
 		Do WriteHeader4("Alternative Directory")
@@ -2329,7 +2326,6 @@ Journal
 		Write !,"<p>",stateString,"</p>"	
 		If $D(Row(1)) {
 			Do WriteHeader4("Journal Files")
-			Write !,"<br>"
 			Write !,"<table id=""journalTable"" border=""0"" cellpadding=""7"" cellspacing=""3"" class=""zebraStriped"">"
 			Write !,?2,"<tbody>"
 			Write !,?4,"<tr align=""left"">"
@@ -2349,13 +2345,11 @@ Journal
 			}
 			Write !,?2,"</tbody>"
 			Write !,"</table>"
-			Write !,"<br>"
 		}
 	} Catch {
 		Write !,"<p>An error occurred</p>"
 	}
-	Write !,"<br>"
-	quit
+	Quit
 	
 JournalErr
 	Set $ZTrap=""
