@@ -1,7 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-
+  <title>
+    Caché Diagnostic Log. Filename: /home/amarin/Desktop/DSbuttons.html
+  </title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <script type="text/javascript">
     function openNav() {
       document.getElementById("mySidenav").style.width = "250px";
@@ -15,53 +18,59 @@
   </script>
 
   <style>
+    #main {
+      background-color: rgb(220,231,210);
+    }
     .sidenav {
-        height: 100%;
-        width: 0;
-        position: fixed;
-        z-index: 1;
-        top: 0;
-        left: 0;
-        background-color: rgb(220,231,241);
-        overflow-x: hidden;
-        transition: 0.5s;
-        padding-top: 60px;
+      height: 100%;
+      width: 0;
+      position: fixed;
+      z-index: 1;
+      top: 0;
+      left: 0;
+      background-color: rgb(220,231,241);
+      overflow-x: hidden;
+      transition: 0.5s;
+      padding-top: 60px;
     }
 
     .sidenav a {
-        //border: 1px solid;
+      //border: 1px solid;
 
-        font-family: Arial, Helvetica, sans-serif;
-        font-weight: bold;
-        padding: 8px 8px 8px 8px;
-        text-decoration: none;
-        font-size: 20px;
-        color: blue;
-        display: block;
-        transition: 0.3s;
+      font-family: Arial, Helvetica, sans-serif;
+      font-weight: bold;
+      padding: 8px 8px 8px 8px;
+      text-decoration: none;
+      font-size: 20px;
+      color: blue;
+      display: block;
+      transition: 0.3s;
     }
 
     .sidenav a:hover, .offcanvas a:focus{
-        color: rgb(104,30,30);
+      font-size: large;
+      font-family: Arial, Helvetica, sans-serif;
+      color: rgb(104,30,30);
     }
 
     .sidenav .closebtn {
-        position: absolute;
-        top: 0;
-        right: 0px;
-        font-size: 36px;
-        margin-left: 50px;
+      position: absolute;
+      top: 0;
+      right: 0px;
+      font-size: 36px;
+      margin-left: 50px;
     }
 
     #main {
-        transition: margin-left .5s;
-        padding: 16px;
+      transition: margin-left .5s;
+      padding: 16px;
     }
 
     @media screen and (max-height: 450px) {
       .sidenav {padding-top: 15px;}
       .sidenav a {font-size: 18px;}
     }
+
 
     .trapezoid {
       top: 0px;
@@ -83,17 +92,12 @@
       color: blue;
     }
     .trapezoid span:hover, .offcanvas a:focus{
-        color: rgb(104,30,30);
-        opacity: 1.0;
+      color: rgb(104,30,30);
+      opacity: 1.0;
     }
 
 
-
-
-
-
-
-.zebraStriped tbody tr:nth-child(odd) {
+    .zebraStriped tbody tr:nth-child(odd) {
       background-color: #ccc;
       border-right: 2px solid #D0D0D0;
       border-left: 2px solid #D0D0D0;
@@ -142,154 +146,83 @@
       overflow: hidden;
       background: white;
     }
-
-
   </style>
 </head>
-<body>
+<body bgcolor="#FFFFFF" text="#000000">
 
-  <div class="trapezoid">
-    <!--<span>Trapezoid Button</span>-->
-    <span class="closebtn"  onclick="openNav()"> &#9776; </span>
-  </div>
+<div class="trapezoid">
+  <span class="closebtn" onclick="openNav()"> &#9776; </span>
+</div>
 
+<div id="mySidenav" class="sidenav">
+  <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+  <a href="#serverdetails">Server Details</a>
+  <a href="#deepseeinfo">DeepSee Information</a>
+  <a href="#cubelist">Cubes in SAMPLES</a>
+  <a href="#cuberegistry">Cube Registry</a>
+  <a href="#cubeinfo">Cube Info</a>
+  <a href="#querylog">Query Log</a>
+  <a href="#dslog">DeepSee Log</a>
+  <a href="#cpf">cache.cpf</a>
+  <a href="#cconsole">cconsole.log</a>
+  <a href="#LocalDB">Local Databases</a>
+  <a href="#Journaling">Journaling</a>
+</div>
 
-
-  <div id="mySidenav" class="sidenav">
-    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-    <!--<font face="Arial, Helvetica, sans-serif" size="10" color="#ff3300">
-      <b>BETA:</b>
-    </font>
-    <font face="Arial, Helvetica, sans-serif" size="5" color="black">
-      <b>DeepSee Diagnostic for the SAMPLES Namespace</b>
-    </font> 
-    -->
-    <a href="#serverdetails">Server Details</a>
-    <a href="#deepseeinfo">DeepSee Information</a>
-    <a href="#cubelist">Cubes in SAMPLES</a>
-    <a href="#cuberegistry">Cube Registry</a>
-    <a href="#cubeinfo">Cube Info</a>
-    <a href="#querylog">Query Log</a>
-    <a href="#dslog">DeepSee Log</a>
-    <a href="#cpf">cache.cpf</a>
-    <a href="#cconsole">cconsole.log</a>
-    <a href="#LocalDB">Local Databases</a>
-    <a href="#Journaling">Journaling</a>
-  </div>
-
-  <div id="main">
-    <!--<h2>Sidenav Push Example</h2>
-    <span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776; open</span>
-    -->
-
+<div id="main">
 <a name="top"></a>
-<table align="center" width="100%" border="1" bordercolor="#999999" bgcolor="#CCCCCC">
-  <tr bgcolor="#FFFFFF" bordercolor="#CCCCCC">
-    <td colspan="13" height="40" align="center">
-      <font face="Arial, Helvetica, sans-serif" size="10" color="#ff3300"><b>BETA:</b>
-      </font>
-      <font face="Arial, Helvetica, sans-serif" size="5" color="black"><b>DeepSee Diagnostic for the SAMPLES Namespace</b>
-      </font>
-    </td>
-  </tr>
-</table>
-<br>
-<br>
-<p style="font-size:0;">
-  <span style="width:50%; display:inline-block;">
-    <font size="4" face="Arial, Helvetica, sans-serif" color="black">
-      <b><a name="servedetails"></a>Server Details</b>
-    </font>
-  </span>
-  <span style="text-align:left;width:50%; display:inline-block;">
-    <font size="2" face="Arial, Helvetica, sans-serif" color="black">
-      <a href="#top" align="right" style="text-decoration: none">Back to top</a>
-    </font>
-  </span>
-</p>
-<br>
-<b><font face="Arial, Helvetica, sans-serif" size="2" color="black">Configuration</font></b>
+<font face="Arial, Helvetica, sans-serif" size="10" color="#ff3300">
+  <b>BETA</b>
+</font>
+<h1>DeepSeeButtons: DeepSee Diagnostic for the SAMPLES Namespace</h1>
+<a name="serverdetails"></a>
+<h2>Server Details</h2>
+<h4>Configuration</h4>
 <p>C173 on Machine "amarin-Latitude-E7470"</p>
-<b><font face="Arial, Helvetica, sans-serif" size="2" color="black">Customer Name</font></b>
-
+<h4>Customer Name</h4>
 <p>ISC Development</p>
-<b><font face="Arial, Helvetica, sans-serif" size="2" color="black">License Order Number</font></b>
-
+<h4>License Order Number</h4>
 <p>54321</p>
-<b><font face="Arial, Helvetica, sans-serif" size="2" color="black">Fully Qualified Host Name</font></b>
+<h4>Fully Qualified Host Name</h4>
 <p>amarin-Latitude-E7470 with IP Address: 127.0.1.1</p>
-<b><font face="Arial, Helvetica, sans-serif" size="2" color="black">Log created by User</font></b>
-<p>amarin on Jun 06 2017 at  4:20 PM</p>
-
-<div><b><font face="Arial, Helvetica, sans-serif" size="2" color="black">Log created by User:</font></b> amarin on Jun 06 2017 at  4:20 PM</div>
-<br>
-
-<b><font face="Arial, Helvetica, sans-serif" size="2" color="black">Last Caché Started</font></b>
-
-<p>06/02/2017 15:04:36. As of this report Caché has been up for 4 days 1 hours 16 minutes 17 seconds</p>
-<b><font face="Arial, Helvetica, sans-serif" size="2" color="black">Caché Version String</font></b>
-
+<h4>Log created by User</h4>
+<p>amarin on Jun 07 2017 at  5:14 PM</p>
+<h4>Last Caché Startup</h4>
+<p>06/07/2017 08:55:15. As of this report Caché has been up for 0 days 8 hours 18 minutes 52 seconds</p>
+<h4>Caché Version String</h4>
 <p>Cache for UNIX (SUSE Linux Enterprise Server for x86-64) 2017.3 (Build 587) Mon May 8 2017 01:37:27 EDT</p>
 
 
-<b><font face="Arial, Helvetica, sans-serif" size="2" color="black">Current Locale</font></b>
-
+<h4>Current Locale</h4>
 <p>enu8 (English, United States, Latin1 (ISO 8859-1))<p>
 
-<b><font face="Arial, Helvetica, sans-serif" size="2" color="black">Operating System Version</font></b>
-<p>
-Linux amarin-Latitude-E7470 4.4.0-78-generic #99-Ubuntu SMP Thu Apr 27 15:29:09 UTC 2017 x86_64 x86_64 x86_64 GNU/Linux
+<h4>Operating System Version</h4><p>
+Linux amarin-Latitude-E7470 4.4.0-79-generic #100-Ubuntu SMP Wed May 17 19:58:14 UTC 2017 x86_64 x86_64 x86_64 GNU/Linux
 </p>
 
 <hr noshade size="4">
-<br>
-<p style="font-size:0;">
-  <span style="width:50%; display:inline-block;">
-    <font size="4" face="Arial, Helvetica, sans-serif" color="black">
-      <b><a name="deepseeinfo"></a>DeepSee Information for SAMPLES</b>
-    </font>
-  </span>
-  <span style="text-align:left;width:50%; display:inline-block;">
-    <font size="2" face="Arial, Helvetica, sans-serif" color="black">
-      <a href="#top" align="right" style="text-decoration: none">Back to top</a>
-    </font>
-  </span>
-</p>
-<br>
-<b><font face="Arial, Helvetica, sans-serif" size="2" color="black">Agent Count</font></b>
+<a name="deepseeinfo"></a>
+<h2>DeepSee Information for SAMPLES</h2>
+<h4>Agent Count</h4>
 <p>Default agent count: 4 x number of cores = 8 high-priority agents</p>
-<b><font face="Arial, Helvetica, sans-serif" size="2" color="black">Audit</font></b>
-<p>^DeepSee.AuditCode is undefined</p>
+
+<h4>Audit</h4><p>^DeepSee.AuditCode is undefined</p>
 <p>^DeepSee.AuditQueryCode is undefined</p>
 
-<b><font face="Arial, Helvetica, sans-serif" size="2" color="black">Most Recent Activity in Cube Manager</font></b>
-<p>Build events:  12,744 facts built on 2017-06-01 09:14:23 in 3 seconds for the CITYRAINFALL cube.</p>
-<p>Synch events:  0 facts synched on 2017-06-06 09:06:20 in 0 seconds for the CITYRAINFALL cube.</p>
+<h4>Most Recent Activity in Cube Manager</h4><p>Build events:  12,744 facts built on 2017-06-01 09:14:23 in 3 seconds for the CITYRAINFALL cube.</p>
+<p>Synch events:  0 facts synched on 2017-06-07 08:56:00 in 0 seconds for the CITYRAINFALL cube.</p>
 <p>Update events: CITYRAINFALL on 2017-05-23 14:54:37</p>
 
-<b><font face="Arial, Helvetica, sans-serif" size="2" color="black">Config section of cpf file</font></b>
-<p>globals=0,0,0,0,0,0</p><p>routines=0</p><p>bbsiz=262144</p>
-<b><font face="Arial, Helvetica, sans-serif" size="2" color="black">Important Mappings</font></b>
-<p>There are no mappings defined for ^OBJ.DSTIME</p>
+<h4>Config section of cpf file</h4><p>globals=0,0,0,0,0,0</p><p>routines=0</p><p>bbsiz=262144</p>
+<h4>Important Mappings</h4><p>There are no mappings defined for ^OBJ.DSTIME</p>
 <p>Global_DeepSee.Cache.*=APP-CACHE</p>
 
-<b><font face="Arial, Helvetica, sans-serif" size="2" color="black">Server Initialization Code</font></b>
+<h4>Server Initialization Code</h4>
 <p>^DeepSee.InitCode is undefined
 </p>
 <hr noshade size="4">
-<br>
-<p style="font-size:0;">
-  <span style="width:50%; display:inline-block;">
-    <font size="4" face="Arial, Helvetica, sans-serif" color="black">
-      <b><a name="cubelist"></a>Cubes in SAMPLES</b>
-    </font>
-  </span>
-  <span style="text-align:left;width:50%; display:inline-block;">
-    <font size="2" face="Arial, Helvetica, sans-serif" color="black">
-      <a href="#top" align="right" style="text-decoration: none">Back to top</a>
-    </font>
-  </span>
-</p>
+<a name="cubelist"></a>
+<h2>Cubes in SAMPLES</h2>
 <p>A value of 'N/A' for BuildTime and BuildRate means the cube has not been built from Cube Manager.</p>
 <table id="CubeTable" border="0" cellpadding="7" cellspacing="3" class="zebraStriped">
   <tbody>
@@ -389,7 +322,7 @@ Linux amarin-Latitude-E7470 4.4.0-78-generic #99-Ubuntu SMP Thu Apr 27 15:29:09 
       <td>05/08/2017 05:42:23</td>
       <td>DeepSee.Study.CityRainfall</td>
       <td>DeepSee.Model.RainfallCube</td>
-      <td>06/06/2017 13:06:20</td>
+      <td>06/07/2017 12:56:00</td>
       <td>-</td>
     </tr>
     <tr>
@@ -730,38 +663,15 @@ Linux amarin-Latitude-E7470 4.4.0-78-generic #99-Ubuntu SMP Thu Apr 27 15:29:09 
     </tr>
   </tbody>
 </table>
-<br>
-<b><font face="Arial, Helvetica, sans-serif" size="2" color="black">Abstract Cube List</font></b>
-<br>
-<br>
-ALEABSTRACT
-<br>
-<br>
-<b><font face="Arial, Helvetica, sans-serif" size="2" color="black">Cubes with Source Classes Based on SQL Storage</font></b>
-<br>
-<br>
-<b><font face="Arial, Helvetica, sans-serif" size="2" color="black">Cubes Based on Data Connectors</font></b>
-<br>
-<br>
-CONNECTORCUBE
-<br>
-PATIENTSQUERYCUBE
-<br>
+<h4>Abstract Cube List</h4>
+<p>ALEABSTRACT</p>
+<h4>Cubes with Source Classes Based on SQL Storage</h4>
+<h4>Cubes Based on Data Connectors</h4>
+<p>CONNECTORCUBE</p>
+<p>PATIENTSQUERYCUBE</p>
 <hr noshade size="4">
-<br>
-<p style="font-size:0;">
-  <span style="width:50%; display:inline-block;">
-    <font size="4" face="Arial, Helvetica, sans-serif" color="black">
-      <b><a name="cuberegistry"></a>Cube Registry</b>
-    </font>
-  </span>
-  <span style="text-align:left;width:50%; display:inline-block;">
-    <font size="2" face="Arial, Helvetica, sans-serif" color="black">
-      <a href="#top" align="right" style="text-decoration: none">Back to top</a>
-    </font>
-  </span>
-</p>
-<br>
+<a name="cuberegistry"></a>
+<h2>Cube Registry</h2>
 <table id="RegistryMap" cellpadding="7" cellspacing="3" class="tableWithBorders">
   <tbody>
     <tr align="left">
@@ -795,89 +705,41 @@ PATIENTSQUERYCUBE
   </tbody>
 </table>
 <hr noshade size="4">
-<br>
-<p style="font-size:0;">
-  <span style="width:50%; display:inline-block;">
-    <font size="4" face="Arial, Helvetica, sans-serif" color="black">
-      <b><a name="cubeinfo"></a>Cube Info</b>
-    </font>
-  </span>
-  <span style="text-align:left;width:50%; display:inline-block;">
-    <font size="2" face="Arial, Helvetica, sans-serif" color="black">
-      <a href="#top" align="right" style="text-decoration: none">Back to top</a>
-    </font>
-  </span>
-</p>
 <a name="cubeinfo"></a>
-<br>
-<b><font face="Arial, Helvetica, sans-serif" size="2" color="black">
+<h2>Cube Info</h2>
+<a name="cubeinfo"></a>
+<b><font face="Arial, Helvetica, sans-serif" size="2" color="#0000FF">
 <a href="#cubeinfoPATIENTS">
 PATIENTS</a>
 </font></b>
 <br>
-<b><font face="Arial, Helvetica, sans-serif" size="4" color="black"><a name="PATIENTS"></a></font></b>
+<b><font face="Arial, Helvetica, sans-serif" size="4" color="#0000FF"><a name="PATIENTS"></a></font></b>
 <hr size="4" noshade>
-<br>
-<p style="font-size:0;">
-  <span style="width:50%; display:inline-block;">
-    <font size="4" face="Arial, Helvetica, sans-serif" color="black">
-      <b><a name="cubeinfoPATIENTS">Cube Info for PATIENTS</a></b>
-    </font>
-  </span>
-  <span style="text-align:left;width:50%; display:inline-block;">
-    <font size="2" face="Arial, Helvetica, sans-serif" color="black">
-      <a href="#cubeinfo" align="right" style="text-decoration: none">Back to Cube Info</a>
-    </font>
-  </span>
-</p>
-<br>
-<b><font face="Arial, Helvetica, sans-serif" size="2" color="black">Cube Display name</font></b>
-
+<h2 name="cubeinfoPATIENTS" >Cube Info for PATIENTS</h2>
+<h4>Cube Display Name</h4>
 <p>Patients</p>
-<b><font face="Arial, Helvetica, sans-serif" size="2" color="black">Cube Type</font></b>
-
+<h4>Cube Type</h4>
 <p>Not a subject area, abstract, or a compound cube</p>
-<b><font face="Arial, Helvetica, sans-serif" size="2" color="black">Cube Class</font></b>
-
+<h4>Cube Class</h4>
 <p>DeepSee.Model.PatientsCube</p>
-<b><font face="Arial, Helvetica, sans-serif" size="2" color="black">Inherits from</font></b>
-
+<h4>Inherits from</h4>
 <p></p>
-<b><font face="Arial, Helvetica, sans-serif" size="2" color="black">Source Class</font></b>
-
+<h4>Source Class</h4>
       <p>DeepSee.Study.Patient</p>
-<b><font face="Arial, Helvetica, sans-serif" size="2" color="black">SQL table name</font></b>
-
+<h4>SQL Table Name </h4>
 <p>DeepSee_Study.Patient</p>
-<b><font face="Arial, Helvetica, sans-serif" size="2" color="black">Fact Class</font></b>
-
+<h4>Fact Class</h4>
 <p>DeepSee.Model.PatientsCube.Fact</p>
-<b><font face="Arial, Helvetica, sans-serif" size="2" color="black">Fact Count</font></b>
-
+<h4>Fact Count</h4>
 <p>1000</p>
-<b><font face="Arial, Helvetica, sans-serif" size="2" color="black">Last Modified</font></b>
-
+<h4>Last Modified</h4>
 <p>06/05/2017 17:50:33</p>
-<b><font face="Arial, Helvetica, sans-serif" size="2" color="black">Build Errors</font></b>
+<h4>Build Errors</h4>
 <pre>0 build error(s) for 'PATIENTS'
 </pre>
 <hr size="4" noshade>
-<br>
-<p style="font-size:0;">
-  <span style="width:50%; display:inline-block;">
-    <font size="4" face="Arial, Helvetica, sans-serif" color="black">
-      <b><a name="dimensions"></a>Dimensions for PATIENTS</b>
-    </font>
-  </span>
-  <span style="text-align:left;width:50%; display:inline-block;">
-    <font size="2" face="Arial, Helvetica, sans-serif" color="black">
-      <a href="#cubeinfo" align="right" style="text-decoration: none">Back to Cube Info</a>
-    </font>
-  </span>
-</p>
-<br>
-<b><font face="Arial, Helvetica, sans-serif" size="2" color="black">Dimension List</font></b>
-<br>
+<h2 name="dimensions">Dimensions for PATIENTS</h2>
+<h4>Dimension List</h4>
 <table id="DimensionTable" border="0" class="tableWithBorders" cellpadding="3" cellspacing="3">
   <tbody>
     <tr align="left">
@@ -1124,7 +986,7 @@ PATIENTS</a>
     </tr>
   </tbody>
 </table>
-<br><b><font face="Arial, Helvetica, sans-serif" size="2" color="black">Analyze</font></b>
+<h4>Analyze</h4>
 <table border="0" cellpadding="5" cellspacing="5">
   <tbody>
     <tr align="left">
@@ -1133,6 +995,7 @@ PATIENTS</a>
 
 ----------------------------------------------------------------
     Index                         Approx. Size       Cardinality
+1   1                                      518                 4
 2   DxAgeGroup                             388                 3
 3   DxAgeBucket                          1,155                 9
 4   DxAge                                2,974                97
@@ -1170,7 +1033,7 @@ Mx3 Mx3510953892ISearch                      6                 1
 Mx9 Mx949945609ISearch                     652                 6
 MxT MxTestScoreSearch                    2,484                51
 ----------------------------------------------------------------
-    Total:                              53,225 bytes        2483
+    Total:                              53,743 bytes        2487
 
     Fact Table:                         92,417 bytes in 1,000 fact(s)
     Cell Cache:                              0 cell(s) in 0 bucket(s)
@@ -1267,22 +1130,8 @@ Lvl [ProfD].[H1].[Profession]                                    550   55.00%
 </table>
 
 <hr noshade size="4">
-<br>
-<p style="font-size:0;">
-  <span style="width:50%; display:inline-block;">
-    <font size="4" face="Arial, Helvetica, sans-serif" color="black">
-      <b><a name="otherelements">Other Elements for PATIENTS</a></b>
-    </font>
-  </span>
-  <span style="text-align:left;width:50%; display:inline-block;">
-    <font size="2" face="Arial, Helvetica, sans-serif" color="black">
-      <a href="#cubeinfo" align="right" style="text-decoration: none">Back to Cube Info</a>
-    </font>
-  </span>
-</p>
-<br>
-<b><font face="Arial, Helvetica, sans-serif" size="2" color="black">Pivot Variables</font></b>
-<br>
+<h2 name="otherelements">Other Elements for PATIENTS</h2>
+<h4>Pivot Variables</h4>
 <table id="PivotVarTable" cellpadding="5" cellspacing="5" class="tableWithBorders">
   <tbody>
     <tr align="left">
@@ -1296,9 +1145,7 @@ Lvl [ProfD].[H1].[Profession]                                    550   55.00%
     </tr>
   </tbody>
 </table>
-<br>
-<b><font face="Arial, Helvetica, sans-serif" size="2" color="black">Named Sets</font></b>
-<br><table id="NamedSetsTable" cellpadding="5" cellspacing="5" class="tableWithBorders">
+<h4>Named Sets</h4><table id="NamedSetsTable" cellpadding="5" cellspacing="5" class="tableWithBorders">
   <tbody>
     <tr align="left">
       <th>Name</th><th>Set Expression</th>
@@ -1313,12 +1160,8 @@ Lvl [ProfD].[H1].[Profession]                                    550   55.00%
     </tr>
   </tbody>
 </table>
-<br>
-<b><font face="Arial, Helvetica, sans-serif" size="2" color="black">Listing Fields</font></b>
-<br>
-<br>
-<b><font face="Arial, Helvetica, sans-serif" size="2" color="black">Listings</font></b>
-<br>
+<h4>Listing Fields</h4>
+<h4>Listings</h4>
 <table id="ListingTable" cellpadding="5" cellspacing="5" class="tableWithBorders">
   <tbody>
     <tr align="left">
@@ -1417,47 +1260,25 @@ Lvl [ProfD].[H1].[Profession]                                    550   55.00%
 </table>
 
 <hr noshade size="4">
-<br>
-<p style="font-size:0;">
-  <span style="width:50%; display:inline-block;">
-    <font size="4" face="Arial, Helvetica, sans-serif" color="black">
-      <b><a name="querylog"></a>Query Log</b>
-    </font>
-  </span>
-  <span style="text-align:left;width:50%; display:inline-block;">
-    <font size="2" face="Arial, Helvetica, sans-serif" color="black">
-      <a href="#top" align="right" style="text-decoration: none">Back to top</a>
-    </font>
-  </span>
-</p><br>
-<b><font face="Arial, Helvetica, sans-serif" size="2" color="black">Last query</font></b>
-<pre> WITH  MEMBER [AgeD].[testTermList] AS '%OR(%TERMLIST("test"))' SELECT NON EMPTY [AGED].[TESTTERMLIST] ON 1 FROM [PATIENTS]
+<a name="querylog"></a>
+<h2>Query Log</h2>
+<h4>Last query</h4>
+<pre> WITH  MEMBER [AgeD].[testTermList] AS '%OR(%TERMLIST("test"))' SELECT  FROM [PATIENTS]
 
 </pre>
-<b><font face="Arial, Helvetica, sans-serif" size="2" color="black">MDX queries by user</font></b>
-<pre class="wrapped">Last 5 of 159 MDX queries by User: UnknownUser
-  1)  WITH  MEMBER [AgeD].[testTermList] AS '%OR(%TERMLIST("test"))' SELECT NON EMPTY [AGED].[TESTTERMLIST] ON 1 FROM [PATIENTS]
+<h4>MDX queries by user</h4>
+<pre class="wrapped">Last 5 of 162 MDX queries by User: UnknownUser
+  1)  WITH  MEMBER [AgeD].[testTermList] AS '%OR(%TERMLIST("test"))' SELECT  FROM [PATIENTS]
   2)  WITH  MEMBER [AgeD].[testTermList] AS '%OR(%TERMLIST("test"))' SELECT  FROM [PATIENTS]
   3)  WITH  MEMBER [AgeD].[testTermList] AS '%OR(%TERMLIST("test"))' SELECT  FROM [PATIENTS]
-  4) SELECT  FROM [PATIENTS]
-  5) SELECT  FROM [PATIENTS]
+  4)  WITH  MEMBER [AgeD].[testTermList] AS '%OR(%TERMLIST("test"))' SELECT NON EMPTY [AGED].[TESTTERMLIST] ON 1 FROM [PATIENTS]
+  5)  WITH  MEMBER [AgeD].[testTermList] AS '%OR(%TERMLIST("test"))' SELECT  FROM [PATIENTS]
 
 
 </pre>
 <hr noshade size="4">
-<br>
-<p style="font-size:0;">
-  <span style="width:50%; display:inline-block;">
-    <font size="4" face="Arial, Helvetica, sans-serif" color="black">
-      <b><a name="dslog"></a>DeepSee Log</b>
-    </font>
-  </span>
-  <span style="text-align:left;width:50%; display:inline-block;">
-    <font size="2" face="Arial, Helvetica, sans-serif" color="black">
-      <a href="#top" align="right" style="text-decoration: none">Back to top</a>
-    </font>
-  </span>
-</p>
+<a name="dslog"></a>
+<h2>DeepSee Log</h2>
 <div class="scrollable" style="width:1200px;height:400px;">
   <pre>DeepSee Log File /home/amarin/intersystems/cache20173/mgr/DeepSeeTasks_SAMPLES.log:
 
@@ -1467,19 +1288,8 @@ Lvl [ProfD].[H1].[Profession]                                    550   55.00%
   </pre>
 </div>
 <hr noshade size="4">
-<br>
-<p style="font-size:0;">
-  <span style="width:50%; display:inline-block;">
-    <font size="4" face="Arial, Helvetica, sans-serif" color="black">
-      <b><a name="cpf"></a>cache.cpf file</b>
-    </font>
-  </span>
-  <span style="text-align:left;width:50%; display:inline-block;">
-    <font size="2" face="Arial, Helvetica, sans-serif" color="black">
-      <a href="#top" align="right" style="text-decoration: none">Back to top</a>
-    </font>
-  </span>
-</p>
+<a name="cpf"></a>
+<h2>cache.cpf file</h2>
 <pre>Caché Configuration File /home/amarin/intersystems/cache20173/cache.cpf:</pre>
 <div class="scrollable" style="width:1200px;height:400px;">
   <pre>
@@ -1853,20 +1663,10 @@ LastConvertTime=2017-05-08 01:37:15
   </pre>
 </div>
 <hr noshade size="4">
-<br>
-<p style="font-size:0;">
-  <span style="width:50%; display:inline-block;">
-    <font size="4" face="Arial, Helvetica, sans-serif" color="black">
-      <b><a name="cconsole"></a>cconsole.log</b>
-    </font>
-  </span>
-  <span style="text-align:left;width:50%; display:inline-block;">
-    <font size="2" face="Arial, Helvetica, sans-serif" color="black">
-      <a href="#top" align="right" style="text-decoration: none">Back to top</a>
-    </font>
-  </span>
-</p><div class="scrollable" style="width:1200px;height:400px;">
-  <pre>Caché cconsole.log on Jun 06 2017 at  4:20 PM:
+<a name="cconsole"></a>
+<h2>cconsole.log</h2>
+<div class="scrollable" style="width:1200px;height:400px;">
+  <pre>Caché cconsole.log on Jun 07 2017 at  5:14 PM:
 
 05/19/17-21:07:53:412 (1252) 2 Cache license file (cache.key) missing or unreadable.
 05/19/17-21:07:53:437 (1252) 0 Allocated 165MB shared memory: 2MB global buffers, 35MB routine buffers
@@ -3637,21 +3437,114 @@ Journaling switched to: /home/amarin/intersystems/cache20173/mgr/journal/2017060
 06/06/17-09:06:20:209 (29438) 0 Purging old application errors
 06/06/17-09:36:31:533 (3360) 0 [SYSTEM MONITOR] Alert state cleared....(repeated 1 times)
 
+
+
+*** Recovery started at Wed Jun  7 08:55:14 2017
+     Current default directory: /home/amarin/intersystems/cache20173/mgr
+     Log file directory: /home/amarin/intersystems/cache20173/mgr/
+     WIJ file spec: ./CACHE.WIJ
+Recovering local (./CACHE.WIJ) image journal file...
+Starting WIJ recovery for &#39;./CACHE.WIJ&#39;.
+  0 blocks pending in this WIJ.
+WIJ pass # is 0.
+Starting fast WIJ compare
+Finished comparing 4 blocks in 0 seconds
+Exiting with status 3 (Success)
+06/07/17-08:55:14:724 (2462) 0 Automatically configuring buffers
+06/07/17-08:55:14:858 (2462) 0 Allocated 1236MB shared memory: 1024MB global buffers, 35MB routine buffers
+06/07/17-08:55:14:862 (2462) 0 Intel Sandy Bridge AES-NI instructions detected.
+06/07/17-08:55:15:054 (2462) 0 Jrn info from prior WIJ (imflags: 0):
+  wdpass: 0
+  jrnwdpass: 6242
+  fspec: /home/amarin/intersystems/cache20173/mgr/journal/20170606.001
+  filecnt: 20
+  fileoff: 976700
+  prevfcnt: 20
+  prevfileoeff: 976700
+  min trans cnt: 20
+  min trans index: 976700
+06/07/17-08:55:15:055 (2462) 0 
+CSTART of Cache for UNIX (SUSE Linux Enterprise Server for x86-64) 2017.3 (Build 587) Mon May 8 2017 01:37:27 EDT.
+  in /home/amarin/intersystems/cache20173/mgr
+  with wij: /home/amarin/intersystems/cache20173/mgr/CACHE.WIJ
+  from: /home/amarin/intersystems/cache20173/mgr/
+  OS=[Linux], version=[#100-Ubuntu SMP Wed May 17 19:58:14 UTC 2017], release=[4.4.0-79-generic], machine=[x86_64]
+  nodename=[amarin-Latitude-E7470].
+  numasyncwijbuf: 0, swdwrtmax: 0, wijdirectio: off, synctype: 3
+  System Initialized.
+06/07/17-08:55:15:082 (2526) 0 Write daemon started.
+06/07/17-08:55:15:107 (2541) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/ (SFN 0) read-write.
+06/07/17-08:55:15:118 (2541) 0 Instance &#39;C173&#39; starting on node amarin-Latitude-E7470 by user cacheusr
+06/07/17-08:55:15:118 (2541) 0 Using parameters from file &#39;/home/amarin/intersystems/cache20173/cache.cpf&#39;
+06/07/17-08:55:15:119 (2541) 0 Loading DLLs
+06/07/17-08:55:15:119 (2541) 0 Switching to temporary %SYS Namespace
+06/07/17-08:55:15:120 (2541) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/cachelib/ (SFN 1) read-write.
+06/07/17-08:55:15:137 (2541) 0 Loading Locale enu8 (English, United States, Latin1 (ISO 8859-1)) from objects
+06/07/17-08:55:15:157 (2541) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/cachetemp/ (SFN 2) read-write.
+06/07/17-08:55:15:162 (2541) 0 /home/amarin/intersystems/cache20173/mgr/cachetemp/ initialized as CACHETEMP
+06/07/17-08:55:15:163 (2541) 0 Switching to default %SYS Namespace
+06/07/17-08:55:15:174 (2541) 0 Added ethernet device enp0s31f6,wlp1s0 to default list
+06/07/17-08:55:15:194 (2554) 0 Cache MONITOR Started
+06/07/17-08:55:15:294 (2541) 2 Previous system shutdown was abnormal, system forced down or crashed
+06/07/17-08:55:15:295 (2541) 0 Enabling long strings
+06/07/17-08:55:15:318 (2570) 0 Clean Daemon Started
+06/07/17-08:55:15:319 (2541) 0 Updating configuration information from /home/amarin/intersystems/cache20173/cache.cpf
+06/07/17-08:55:15:410 (2541) 0 Performing Journal Recovery
+06/07/17-08:55:16:497 (2541) 0 Restoring from journal /home/amarin/intersystems/cache20173/mgr/journal/20170606.001
+06/07/17-08:55:16:498 (2541) 0 Performing Transaction Rollback if necessary
+06/07/17-08:55:16:498 (2541) 0   Scanning /home/amarin/intersystems/cache20173/mgr/journal/20170606.001
+06/07/17-08:55:16:499 (2541) 0 No open transactions to roll back
+06/07/17-08:55:16:501 (2541) 0 START: /home/amarin/intersystems/cache20173/mgr/journal/20170607.001
+06/07/17-08:55:16:501 (2541) 1 Warning: Alternate and primary journal directories are the same
+06/07/17-08:55:16:523 (2541) 0 CACHE JOURNALING SYSTEM MESSAGE
+Journaling started to: /home/amarin/intersystems/cache20173/mgr/journal/20170607.001
+06/07/17-08:55:16:524 (2541) 0 Journaling to /home/amarin/intersystems/cache20173/mgr/journal/20170607.001 started.
+06/07/17-08:55:16:524 (2541) 0 Processing Startup section
+06/07/17-08:55:16:536 (2742) 0 Purging old application errors
+06/07/17-08:55:16:547 (2541) 0 Initializing Security system
+06/07/17-08:55:16:560 (2541) 0 Processing Network section
+06/07/17-08:55:16:561 (2541) 0 Activating Network
+06/07/17-08:55:16:564 (2742) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/cache/ (SFN 3) read-write.
+06/07/17-08:55:16:776 (2541) 0 Processing Databases section
+06/07/17-08:55:16:785 (2541) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/cacheaudit/ (SFN 4) read-write.
+06/07/17-08:55:16:786 (2541) 0 Processing Namespaces section
+06/07/17-08:55:16:786 (2541) 0 Namespaces are up to date
+06/07/17-08:55:16:786 (2541) 0 Activating namespaces
+06/07/17-08:55:16:786 (2541) 0 Activating new namespace map
+06/07/17-08:55:16:988 (2541) 0 Namespace changes have been activated
+06/07/17-08:55:16:996 (2541) 0 Auditing to /home/amarin/intersystems/cache20173/mgr/cacheaudit/
+06/07/17-08:55:17:016 (2541) 0 Starting Super Server on port 1972
+06/07/17-08:55:17:022 (2541) 0 Network Lock Upload Phase Starting
+06/07/17-08:55:17:023 (2541) 0 Lock Upload Phase Complete
+06/07/17-08:55:17:023 (2541) 0 Processing Miscellaneous section
+06/07/17-08:55:17:043 (2804) 0 LMF Info:  Licensed for 50000 users.
+06/07/17-08:55:17:065 (2806) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/samples/ (SFN 5) read-write.
+06/07/17-08:55:17:070 (2541) 0 init_gcr_seed:  gen_crypt_rand seeded from /dev/urandom:  64 bytes.
+06/07/17-08:55:17:070 (2541) 0 Processing Devices section
+06/07/17-08:55:17:070 (2541) 0 Processing DeviceSubTypes section
+06/07/17-08:55:17:070 (2541) 0 Processing MagTape section
+06/07/17-08:55:17:070 (2541) 0 Processing IO section
+06/07/17-08:55:17:070 (2541) 0 Processing SQL section
+06/07/17-08:55:17:081 (2541) 0 Executing ^ZSTU routine
+06/07/17-08:55:17:083 (2541) 0 Executing ^%ZSTART routine
+06/07/17-08:55:17:095 (2541) 0 Enabling logons
+06/07/17-08:55:17:358 (2805) 0 Private webserver started on 57772
+06/07/17-08:55:17:391 (2805) 0 Processing Shadows section (this system as shadow)
+06/07/17-08:55:17:391 (2805) 0 Processing Monitor section
+06/07/17-08:55:17:658 (3073) 0 [SYSTEM MONITOR] System Monitor started in %SYS
+06/07/17-08:55:19:050 (2804) 0 LMF Info:  License server started on port 4001
+06/07/17-08:55:21:357 (2804) 0 LMF Info:  Connected to license server 127.0.0.1,4001
+06/07/17-08:56:00:060 (5513) 0 Purging old application errors
+06/07/17-08:56:00:066 (5514) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/app-data/ (SFN 6) read-write.
+06/07/17-08:56:00:096 (5514) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/docbook/ (SFN 7) read-write.
+06/07/17-08:56:00:103 (5517) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/app/ (SFN 8) read-write.
+06/07/17-08:56:00:131 (5514) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/user/ (SFN 9) read-write.
+06/07/17-09:25:18:337 (3073) 0 [SYSTEM MONITOR] Alert state cleared.
+
 </pre></div>
 <hr noshade size="4">
-<br>
-<p style="font-size:0;">
-  <span style="width:50%; display:inline-block;">
-    <font size="4" face="Arial, Helvetica, sans-serif" color="black">
-      <b><a name="LocalDB"></a>Local Databases</b>
-    </font>
-  </span>
-  <span style="text-align:left;width:50%; display:inline-block;">
-    <font size="2" face="Arial, Helvetica, sans-serif" color="black">
-      <a href="#top" align="right" style="text-decoration: none">Back to top</a>
-    </font>
-  </span>
-</p>
+<a name="LocalDB"></a>
+<h2>Local Databases</h2>
 
 <br>
 <table id="journalTable" border="0" cellpadding="7" cellspacing="3" class="zebraStriped">
@@ -3771,34 +3664,18 @@ Journaling switched to: /home/amarin/intersystems/cache20173/mgr/journal/2017060
 </table>
 <br>
 <hr noshade size="4">
+<a name="Journaling"></a>
+<h2>Journaling</h2>
 <br>
-<p style="font-size:0;">
-  <span style="width:50%; display:inline-block;">
-    <font size="4" face="Arial, Helvetica, sans-serif" color="black">
-      <b><a name="Journaling"></a>Journaling</b>
-    </font>
-  </span>
-  <span style="text-align:left;width:50%; display:inline-block;">
-    <font size="2" face="Arial, Helvetica, sans-serif" color="black">
-      <a href="#top" align="right" style="text-decoration: none">Back to top</a>
-    </font>
-  </span>
-</p>
-<br>
-<b><font face="Arial, Helvetica, sans-serif" size="2" color="black">Primary Directory</font></b>
-
+<h4>Primary Directory</h4>
 <p>/home/amarin/intersystems/cache20173/mgr/journal/</p>
-<b><font face="Arial, Helvetica, sans-serif" size="2" color="black">Alternative Directory</font></b>
-
+<h4>Alternative Directory</h4>
 <p>/home/amarin/intersystems/cache20173/mgr/journal/</p>
-<b><font face="Arial, Helvetica, sans-serif" size="2" color="black">Free Space</font></b>
-
-<p>167,737 MB </p>
-<b><font face="Arial, Helvetica, sans-serif" size="2" color="black">State</font></b>
-
+<h4>Free Space</h4>
+<p>167,421 MB </p>
+<h4>State</h4>
 <p>Normal</p>
-<b><font face="Arial, Helvetica, sans-serif" size="2" color="black">Journal Files</font></b>
-
+<h4>Journal Files</h4>
 <br>
 <table id="journalTable" border="0" cellpadding="7" cellspacing="3" class="zebraStriped">
   <tbody>
@@ -3806,8 +3683,14 @@ Journaling switched to: /home/amarin/intersystems/cache20173/mgr/journal/2017060
       <th>Name</th><th>Size in KB</th><th>Creation Time</th><th>Reason</th>
     </tr>
     <tr>
+      <td>/home/amarin/intersystems/cache20173/mgr/journal/20170607.001</td>
+      <td style="text-align:right">35,008</td>
+      <td>2017-06-07 08:55:16</td>
+      <td>by backup</td>
+    </tr>
+    <tr>
       <td>/home/amarin/intersystems/cache20173/mgr/journal/20170606.001</td>
-      <td style="text-align:right">384</td>
+      <td style="text-align:right">960</td>
       <td>2017-06-06 09:06:20</td>
       <td>by backup</td>
     </tr>
@@ -3822,19 +3705,9 @@ Journaling switched to: /home/amarin/intersystems/cache20173/mgr/journal/2017060
 <br>
 <br>
 <hr noshade size="4">
-<br>
-<p style="font-size:0;">
-  <span style="width:50%; display:inline-block;">
-    <font size="4" face="Arial, Helvetica, sans-serif" color="black">
-      <b><a name="end"></a>End of Caché Diagnostic Log</b>
-    </font>
-  </span>
-  <span style="text-align:left;width:50%; display:inline-block;">
-    <font size="2" face="Arial, Helvetica, sans-serif" color="black">
-      <a href="#top" align="right" style="text-decoration: none">Back to top</a>
-    </font>
-  </span>
-</p>
+<a name="end"></a>
+<h2>End of Caché Diagnostic Log</h2>
 <p>C173 on Machine "amarin-Latitude-E7470"</p>
+</div>
 </body>
-</html> 
+</html>
