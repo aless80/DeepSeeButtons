@@ -920,7 +920,6 @@ LogHeader(cubeList,getLogs)
 	Write !,?6,"transition: 0.3s;"
 	Write !,?4,"}"
 	Write !,?4,".sidenav a:hover, .offcanvas a:focus{"
-	Write !,?6,"font-size: large;"
 	Write !,?6,"font-family: Arial, Helvetica, sans-serif;"
 	Write !,?6,"color: rgb(104,30,30);"
 	Write !,?4,"}"
