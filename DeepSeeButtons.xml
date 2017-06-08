@@ -14,7 +14,8 @@ GetCubeInfo
 	Use LogFile
 	ZN namespace
 	Write !,"<hr size=""4"" noshade>"	
-	Write !,"<h2 name=""cubeinfo"_cube_""" >"_"Cube Info for "_cube_"</h2>"
+	Write !,"<a name=""cubeinfo"_cube_"""></a>"
+	Write !,"<h2>Cube Info for "_cube_"</h2>"
 	Set cubeclass=##class(%DeepSee.Utils).%GetCubeClass(cube)
 	Set factclass=##class(%DeepSee.Utils).%GetCubeFactClass(cube)
 	Set cubecaption=##class(%DeepSee.Utils).%GetCubeCaption(cube)
@@ -43,7 +44,13 @@ GetCubeInfo
 	Write !,"<h4>Cube Class</h4>"
 	Write !,"<p>",cubeclass,"</p>"
 	Write !,"<h4>Inherits from</h4>"
-	Write !,"<p>",##class(%DeepSee.Utils).%GetModel(cube).inheritsFrom,"</p>"
+	Set model = ##class(%DeepSee.Utils).%GetModel(cube)
+	If model="" {
+		Set inheritsfrom = ""
+	} Else {
+		Set inheritsfrom = ##class(%DeepSee.Utils).%GetModel(cube).inheritsFrom
+	}
+	Write !,"<p>",inheritsfrom,"</p>"
 	Write !,"<h4>Source Class</h4>"
 	//Get the source class. All code is repeated here from DeepSeeButtons
 	Try{
@@ -82,8 +89,9 @@ GetCubeInfo
 Dimensions
 	Use LogFile
 	ZN namespace
-	Write "<hr size=""4"" noshade>"
-	Write !,"<h2 name=""dimensions"">Dimensions for "_cube_"</h2>"
+	Write "<hr size=""4"" noshade>"	
+	Write !,"<a name=""dimensions"_cube_"""></a>"
+	Write !,"<h2>Dimensions for "_cube_"</h2>"
 	If ##class(%DeepSee.Utils).%IsCubeAbstract(cube) {
 		Write !,?6,"<p>No dimensions because the cube is abstract</p>"
 		Quit
@@ -196,8 +204,9 @@ Dimensions
 OtherElements
 	Use LogFile
 	ZN namespace
-	Write !,"<hr noshade size=""4"">"
-	Write !,"<h2 name=""otherelements"">Other Elements for "_cube_"</h2>"
+	Write !,"<hr noshade size=""4"">"	
+	Write !,"<a name=""otherelements""></a>"
+	Write !,"<h2>Other Elements for "_cube_"</h2>"
 	If ##class(%DeepSee.Utils).%IsCubeAbstract(cube) {
 		Write !,?6,"<p>Not available because the cube is abstract</p>"
 		ZN "%SYS"
@@ -206,7 +215,12 @@ OtherElements
 	Do ##class(%DeepSee.Utils).%GetPivotVariables(cube,.pivotvars)
 	Do ##class(%DeepSee.Utils).%GetCubeListingFields(cube,.listingfields)
 	Do ##class(%DeepSee.Utils).%GetCubeListings(cube,.listings)
-	Set defaultListingName = ##class(%DeepSee.Utils).%GetModel(cube).defaultListing
+	Set model = ##class(%DeepSee.Utils).%GetModel(cube)
+	If model="" {
+		Set defaultListingName = ""
+	} Else {
+		Set defaultListingName = model.defaultListing
+	}
 	/// Pivot Variabled
 	Write !,"<h4>Pivot Variables</h4>"
 	If $d(pivotvars){
@@ -437,14 +451,19 @@ DeepSeeButtons(namespace="",cubeString="", LogFile="") ;;;Collect Evidence and L
 	//This routine calls out to CubeSpec.mac
 
 	;DeepSee Buttons includes the following general information 
-	;	1) Server Details
-	;	2) DeepSee Information
-	;		-Agent Count
+	;	1) DeepSee Setup
+	;		-Agent Count and cores
 	;		-DeepSee.AuditCode, DeepSee.AuditQueryCode
 	;		-Most recent activity in  Cube manager
 	;		-Important mappings
 	;		-ECP Servers
 	;		-Server Initialization Code
+	;	2) Server Details
+	;		-Customer name
+	;		-License
+	;		-Cache startup 
+	;		-$ZV
+	;		-Operating system
 	;	3) Cube List
 	;		-Name
 	;		-Fact Count
@@ -477,7 +496,7 @@ ReadLogType
 	Write !,"This reporting tool provides the information required for"
 	Write !,"InterSystems Technical Support to analyze DeepSee issues. "
  	
-GetNamespaceAndCube
+GetNamespaceAndCubes
 	//Write #
 	Set namespace=$$ValidateNamespace(namespace)	//Make sure namespace exists
 	While namespace=""{		//User didn't enter a namespace when calling routine
@@ -488,20 +507,79 @@ GetNamespaceAndCube
 	}
 	Quit:namespace=""
 	Set namespace=$ZCONVERT(namespace, "U")
-	If cubeString=""{
-		Set cubeList=$$GetCubes(namespace)
+	If cubeString="" {
+		Set allcubeList=$$GetCubesToLog(namespace)
+	} ElseIf $LISTVALID(cubeString) {
+		Set allcubeList=cubeString
+	} ElseIf cubeString="ALL"{
+		Set cubeString=$$GetAllCubes(namespace)
+		Set allcubeList=$LFS(cubeString,",")
+	} Else {
+		Set allcubeList=$LFS(cubeString,",")
 	}
-	ElseIf $LISTVALID(cubeString){
-		Set cubeList=cubeString
-	}
-	Else{
-		Set cubeList=$LFS(cubeString,",")
-	}
-	Set cubeList=$$VerifyCubes(cubeList,namespace)
+	Set cubeList=$$VerifyInputCubes(allcubeList,namespace)
 	GoTo GetLogsConfirm
 
+GetCubesToLog(namespace) {
+	Set cubeString=""
+	ZN namespace
+	Do ##class(%DeepSee.Utils).%GetCubeList(.cubeList,,1)
+	If '$d(cubeList){
+		Write "There are no cubes in this namespace!"
+		Set cubeList=""
+		Quit cubeList
+	}
+	For i=1:1 {
+		Write !,"Give cube name for detailed cube info or press enter to continue: "
+		Read cube
+		If cube="?" {
+			Set cube=$$ListCubes()
+		} ElseIf cube="ALL" { //Secreat ALL keyword
+			/*Set cubetmp=""
+			Set cubeString=""			
+			For i=1:1 {
+				Set cubetmp=$order(cubeList(cubetmp))
+				Quit:cubetmp=""
+				Set cubeString=cubeString_","_cubetmp
+			}
+			Set cubeString=$P(cubeString,",",2,*)		*/
+			Set cubeString=$$GetAllCubes(namespace)
+			Set cube="QUIT"
+		}
+		Quit:(cube="")||(cube="QUIT")||(cube="Q")
+		If ##class(%DeepSee.Utils).%CubeExists(cube,.status)'=1 {
+			Write !,cube," is an invalid cube selection: "
+			Do $system.OBJ.DisplayError(status)
+			Write !,"Enter '?' to see list of cubes in the "_namespace_" namespace",!
+			Set cube=""
+		}
+		If cube'="" {
+			Set cube=$ZCONVERT(cube,"t")		//Make cube name uppercase to normalize names
+			Set cubeString=cubeString_","_cube
+		}
+	}
+	Set cubeString=$p(cubeString,",",2,*)		//Eliminate leading comma
+	Set cubeSelection=$LFS(cubeString,",")			//Create list
+	ZN "%SYS"
+	Quit cubeSelection
+}
 
-VerifyCubes(cubeList,namespace){
+GetAllCubes(namespace)
+	Set cubeString=""
+	ZN namespace
+	Do ##class(%DeepSee.Utils).%GetCubeList(.cubeList,,1)
+	Set cubetmp=""
+	Set cubeString=""			
+	For i=1:1 {
+		Set cubetmp=$order(cubeList(cubetmp))
+		Quit:cubetmp=""
+		Set cubeString=cubeString_","_cubetmp
+	}
+	Set cubeString=$P(cubeString,",",2,*)
+	ZN "%SYS"
+	Quit cubeString
+
+VerifyInputCubes(cubeList,namespace){
 	Set len=$LISTLENGTH(cubeList)
 	For i=1:1:len{
 		Set cube=$LG(cubeList,i)
@@ -517,49 +595,124 @@ VerifyCubes(cubeList,namespace){
 	ZN "%SYS"
 	Quit cubeList
 }
-	
-GetCubes(namespace){
-	Set cubeString=""
-	ZN namespace
-	Do ##class(%DeepSee.Utils).%GetCubeList(.cubeList,,1)
-	If '$d(cubeList){
-		Write "There are no cubes in this namespace!"
-		Set cubeList=""
-		Quit cubeList
-	}
-	For i=1:1{
-		Write !,"Give cube name for detailed cube info or press enter to continue: "
-		Read cube
-		If cube="?"{
-			Set cube=$$ListCubes()
-		}
-		Quit:(cube="")||(cube="QUIT")||(cube="Q")
-		If ##class(%DeepSee.Utils).%CubeExists(cube,.status)'=1{
-			Write !, cube, " is an invalid cube selection: "
-			Do $system.OBJ.DisplayError(status)
-			Write !, "Enter '?' to see list of cubes in the "_namespace_" namespace",!
-			Set cube=""
-		}
-		If cube'=""{
-			Set cube=$ZCONVERT(cube,"t")		//Make cube name uppercase to normalize names
-			Set cubeString=cubeString_","_cube
-		}
-	}
-	Set cubeString=$p(cubeString,",",2,*)		//Eliminate leading comma
-	Set cubeSelection=$LFS(cubeString,",")			//Create list
+
+GetLogsConfirm
 	ZN "%SYS"
-	Quit cubeSelection
+	Write !, "Include cconsole.log, Query Log, and DeepSee log? [Y] "  Read getLogs
+	If getLogs=""{
+		Set getLogs=1		//If they don't make a selection, add console and query logs
+	}
+	Else{
+		Set getLogs=$ZCONVERT(getLogs,"U")
+		If (getLogs'="Y")&(getLogs'="YES")&(getLogs'="N")&(getLogs'="NO") Write !,"Please enter Y or N"	Goto GetLogsConfirm
+		If (getLogs="N")||(getLogs="NO"){
+			Set getLogs=0
+		}
+		If (getLogs="Y")||(getLogs="YES"){
+			Set getLogs=1
+		}
+	}
+	
+ReadLogTypeConfirm	
+	Write !,"Continue? [Y]" Read LogType
+	Set LogType=$ZCONVERT(LogType,"U")
+	If LogType="NO"!(LogType="N")!(LogType="Q")!(LogType="QUIT")    Quit
+	If LogType'=""&(LogType'="Y")&(LogType'="YES") Write !,"Please enter Y or N" Goto ReadLogTypeConfirm	
+ 	Set Dir="", CacheDir="",Body=0,Big=0
+	Do LaunchLogs(Dir,0,,Big,CacheDir,Body,namespace,cubeList,getLogs)
+	Quit
 
-}
+LaunchLogs(LogDirectory,Quiet,Debug,Big,CacheDir,Body,namespace,cubeList,getLogs)
+	Set Body=$Get(Body,0)
+	Set CacheVerNumber=$$CacheVerNumber()
+	If +CacheVerNumber<5 Do  Quit Return
+	.	Set Message="*** Wrong version of Diagnostic Report utility ! ***"_$Char(13,10)_$Char(13,10)_"You are running on Cache "_CacheVerNumber_" and this is the code for Cache 5.0 and later"
+	.	If 'Quiet Use PDev Write:$X ! Write !,Message
+	.	Set Return="0|"_Message
+	.	Quit	
+	If 'Quiet Use PDev Write:$X ! Write !,"Collecting information, please do not interrupt this process.",!,"Do not close terminal until the process has completed"
+ 	Break 0
+	Set $ZTrap="MainErr"
+	Set EOF=$ZUtil(68,40)	
+	///Start logging with the DeepSee Setup section
+	Set LogFile=$$StartLogging(cubeList,getLogs,LogFile)
+	Set rc=$$$OK
+	If $ZUtil(68,40,EOF) ; Reset $ZEOF to the original setting
+	Break 1 
+	Do DbgLog("Begin got rc="_$System.Status.GetErrorText(rc))
+	If $$$ISOK(rc) {
+		Set Return="1|"_LogFile
+	} Else {
+		Set Return="0|"_LogFile_"|"_$System.Status.GetErrorText(rc)
+	}
+	If LogFile="" Do  Quit Return
+	.	Set Message="*** Log file could not be created in "_LogDirectory_". Check directory permissions. ***"
+	.	If 'Quiet Use PDev Write:$X ! Write !,Message
+	.	Set Return="0|"_Message
+	.	Quit
+	If 'Quiet {
+		Use PDev
+		Write:$X ! Write !,"Log file saved to: ",LogFile
+		Write !,"Send the file(s) above to InterSystems Support."
+		Quit
+	}
+	Quit Return
+ 
+StartLogging(cubeList,getLogs,LogFile)
+	New (Debug,LogDirectory,Quiet,namespace,cubeList,getLogs,LogFile)
+	Do Init
+	If OS?1"***".e Quit ""
+	If LogFile="" Quit ""
+	Do LogHeader(cubeList,getLogs)
+	Do LogDeepSeeSetupSection
+	Do LogServerSetup
+	Do CubeData
+	Do GetCubeRegistry
+	If (($D(cubeList)'=0) && (cubeList'="")){   
+		Do WriteParagraph("cubeinfo","Cube Info")
+		Set cubeListLength=$ll(cubeList)
+ 		For i=1:1:cubeListLength{
+			Set cube=$lg(cubeList,i)
+			If cube'=""{
+				//Set cube=$ZCONVERT(cube,"t")				
+				Write !,"<a href=""#cubeinfo"_cube_""">",cube_"</a>"
+				Write !,"<br>"
+			}
+		}
+		For i=1:1:cubeListLength{
+			Set cube=$lg(cubeList,i)
+			If cube'=""{
+				
+				Do ^CubeSpec(namespace,cube,PDev,LogFile) //PDev eg "/dev/pts/5"
+			}
+		}
+	}
+	If getLogs=1{
+		Do QueryLog
+	}
+	If getLogs=1{
+		Do DSLog
+	}
+	Do CPF
+	If getLogs=1{
+		Do cconsole
+	}
+	Do Journal
+	Do LogTrailer 
+	ZN "%SYS"
+	Close LogFile
+	Quit LogFile 
 
+
+ ///Helper functions for the functions above
 ListCubes(){
 	Do ##class(%DeepSee.Utils).%GetCubeList(.cubeList,,1)
 	Write !, "Cubes in this namespace: ",!!
-	Set cube=""
+	Set cubetmp=""
 	For i=1:1{
-		Set cube=$order(cubeList(cube))
-		Quit:cube=""
-		Write i_") "_cube,!	
+		Set cubetmp=$order(cubeList(cube))
+		Quit:cubetmp=""
+		Write i_") "_cubetmp,!	
 	}
 	Write !, "Select a cube name: "
 	Read cube
@@ -592,129 +745,11 @@ ValidateNamespace(namespace) [namespace]{
 	}
 }
 
-GetLogsConfirm
-	ZN "%SYS"
-	Write !, "Include cconsole.log, Query Log, and DeepSee log? [Y] "  Read getLogs
-	If getLogs=""{
-		Set getLogs=1		//If they don't make a selection, add console and query logs
-	}
-	Else{
-		Set getLogs=$ZCONVERT(getLogs,"U")
-		If (getLogs'="Y")&(getLogs'="YES")&(getLogs'="N")&(getLogs'="NO") Write !,"Please enter Y or N"	Goto GetLogsConfirm
-		If (getLogs="N")||(getLogs="NO"){
-			Set getLogs=0
-		}
-		If (getLogs="Y")||(getLogs="YES"){
-			Set getLogs=1
-		}
-	}
-	
-ReadLogTypeConfirm	
-	Write !,"Continue? [Y]" Read LogType
-	Set LogType=$ZCONVERT(LogType,"U")
-	If LogType="NO"!(LogType="N")!(LogType="Q")!(LogType="QUIT")    Quit
-	If LogType'=""&(LogType'="Y")&(LogType'="YES") Write !,"Please enter Y or N" Goto ReadLogTypeConfirm	
- 	Set Dir="", CacheDir="",Body=0,Big=0
-	Do Begin(Dir,0,,Big,CacheDir,Body,namespace,cubeList,getLogs)
-	Quit
- 
-
-#;CFL1520+	
-Begin(LogDirectory,Quiet,Debug,Big,CacheDir,Body,namespace,cubeList,getLogs)
-	Set Body=$Get(Body,0)
-	Set CacheVerNumber=$$CacheVerNumber()
-	If +CacheVerNumber<5 Do  Quit Return
-	.	Set Message="*** Wrong version of Diagnostic Report utility ! ***"_$Char(13,10)_$Char(13,10)_"You are running on Cache "_CacheVerNumber_" and this is the code for Cache 5.0 and later"
-	.	If 'Quiet Use PDev Write:$X ! Write !,Message
-	.	Set Return="0|"_Message
-	.	Quit
-	
-	If 'Quiet Use PDev Write:$X ! Write !,"Collecting information, please do not interrupt this process.",!,"Do not close terminal until the process has completed"
- 
-	Break 0
- 
-	Set $ZTrap="MainErr"
-	Set EOF=$ZUtil(68,40)
-	Set LogFile=$$GatherCubeInfo(cubeList,getLogs,LogFile)
-	Set rc=$$$OK
-	If $ZUtil(68,40,EOF) ; Reset $ZEOF to the original setting
-	
-	Break 1
- 
-	Do DbgLog("Begin got rc="_$System.Status.GetErrorText(rc))
-	If $$$ISOK(rc) {
-		Set Return="1|"_LogFile
-	} Else {
-		Set Return="0|"_LogFile_"|"_$System.Status.GetErrorText(rc)
-	}
-	If LogFile="" Do  Quit Return
-	.	Set Message="*** Log file could not be created in "_LogDirectory_". Check directory permissions. ***"
-	.	If 'Quiet Use PDev Write:$X ! Write !,Message
-	.	Set Return="0|"_Message
-	.	Quit
-	If 'Quiet {
-		Use PDev
-		Write:$X ! Write !,"Log file saved to: ",LogFile
-		Write !,"Send the file(s) above to InterSystems Support."
-		Quit
-	}
-	Quit Return
-
- 
 MainErr
 	Do ^%ET ; Process will Halt
 	Quit "0|"_$ZError
- 
-GatherCubeInfo(cubeList,getLogs,LogFile)
-	New (Debug,LogDirectory,Quiet,namespace,cubeList,getLogs,LogFile)
-	Do Init
-	If OS?1"***".e Quit ""
-	If LogFile="" Quit ""
-	Do LogHeader(cubeList,getLogs)
-	Do Utils
-	Do CubeData
-	Do GetCubeRegistry
-	If $d(cubeList)'=0{
-		Do WriteParagraph("cubeinfo","Cube Info")
-		Write !,"<a name=""cubeinfo""></a>"
-		Set cubeListLength=$ll(cubeList)
- 		For i=1:1:cubeListLength{
-			Set cube=$lg(cubeList,i)
-			If cube'=""{
-				//Set cube=$ZCONVERT(cube,"t")
-				//Do LogHeaderTag(cube,cube_"ZZZ","#0000FF")
-				Write !,"<b><font face=""Arial, Helvetica, sans-serif"" size=""2"" color=""#0000FF"">"
-				Write !,"<a href=""#cubeinfo"_cube_""">"
-				Write !,cube_"</a>"
-				Write !,"</font></b>"
-				Write !,"<br>"
-			}
-		}
-		For i=1:1:cubeListLength{
-			Set cube=$lg(cubeList,i)
-			If cube'=""{
-				//Set cube=$ZCONVERT(cube,"t")
-				Write !,"<b><font face=""Arial, Helvetica, sans-serif"" size=""4"" color=""#0000FF""><a name="""_cube_"""></a></font></b>"	
-				Do ^CubeSpec(namespace,cube,PDev,LogFile) //PDev eg "/dev/pts/5"
-			}
-		}
-	}
-	If getLogs=1{
-		Do QueryLog
-	}
-	If getLogs=1{
-		Do DSLog
-	}
-	Do CPF
-	If getLogs=1{
-		Do cconsole
-	}
-	Do Journal
-	Do LogTrailer 
-	ZN "%SYS"
-	Close LogFile
-	Quit LogFile 
- 
+	
+	
 Init
 	; Sets routine-wide variables
 	New i,LogFilePrefix,v,x
@@ -778,12 +813,9 @@ Init
 	If LogFile="" Do
 	.	Set LogFile=$$NewFile(LogFilePrefix,"html")
 #;RFA025-
-	//ALE+ open here!
 	Open LogFile:"RWNSK\UTF8\":FileOpenTimeOut
 	If '$Test Quit ""
-	//ALE-
-	Quit
- 
+	Quit 
 
 DbgLog(msg) PUBLIC {
 	Quit:'$Data(^%SYS("Buttons","Debug"))
@@ -804,7 +836,6 @@ LongName(x)
 	If x[Space Set x=Quote_x_Quote
 	; If x[Space Set x=$ZUtil(147,x)
 	Quit x
- 
  
 CacheVerNumber()
 	; Equivalent to $System.Version.GetNumber()
@@ -938,6 +969,11 @@ LogHeader(cubeList,getLogs)
 	Write !,?6,".sidenav {padding-top: 15px;}"
 	Write !,?6,".sidenav a {font-size: 18px;}"
 	Write !,?4,"}"
+	Write !,?4,".sidenav .cubelinks {"
+    Write !,?6,"font-size: 14px;"
+    Write !,?6,"text-decoration: none;"
+    Write !,?6,"margin-left: 30px;"
+    Write !,?4,"}"
 	Write !,?4,".trapezoid {"
 	Write !,?6,"top: 0px;"
 	Write !,?6,"width: 0px;"
@@ -1022,28 +1058,36 @@ LogHeader(cubeList,getLogs)
     Write !,?6,"background: white;"
     //Write !,?6,"font-size: 10pt;"
 	Write !,?4,"}"    
-    
-	Write !,?2,"</style>"
-	
+	Write !,?2,"</style>"	
 	Write !,"</head>"
-	Write !,"<body bgcolor=""#FFFFFF"" text=""#000000"">"
 	
-	
-	
+	//Begin body tag
+	Write !,"<body bgcolor=""#FFFFFF"" text=""#000000"">"	
 	Write !,"<div class=""trapezoid"">"
 	Write !,?2,"<span class=""closebtn"" onclick=""openNav()""> &#9776; </span>"
 	Write !,"</div>"
 	Write !,"<div id=""mySidenav"" class=""sidenav"">"
 	Write !,?2,"<a href=""javascript:void(0)"" class=""closebtn"" onclick=""closeNav()"">&times;</a>"
+	Write !,?2,"<a href=""#deepseesetup"">DeepSee Setup</a>"
 	Write !,?2,"<a href=""#serverdetails"">Server Details</a>"
-	Write !,?2,"<a href=""#deepseeinfo"">DeepSee Information</a>"
-	Write !,?2,"<a href=""#cubelist"">Cubes in SAMPLES</a>"
+	Write !,?2,"<a href=""#cubelist"">Cubes</a>"
 	Write !,?2,"<a href=""#cuberegistry"">Cube Registry</a>"
-	Write !,?2,"<a href=""#cubeinfo"">Cube Info</a>"
-	Write !,?2,"<a href=""#querylog"">Query Log</a>"
-	Write !,?2,"<a href=""#dslog"">DeepSee Log</a>"
-	Write !,?2,"<a href=""#cpf"">cache.cpf</a>"
-	Write !,?2,"<a href=""#cconsole"">cconsole.log</a>"
+	If (($D(cubeList)'=0) && (cubeList'="")) {
+		Write !,?2,"<a href=""#cubeinfo"">Cube Info</a>"
+		Set cubeListLength=$ll(cubeList)
+ 		For i=1:1:cubeListLength{
+			Set cube=$lg(cubeList,i)
+			If cube'="" {
+				Write !,?2,"<a class=""cubelinks"" href=""#cubeinfo"_cube_""">"_cube_"</a>"
+			}
+		}		
+	}
+	If getLogs{
+		Write !,?2,"<a href=""#querylog"">Query Log</a>"
+		Write !,?2,"<a href=""#dslog"">DeepSee Log</a>"
+		Write !,?2,"<a href=""#cconsole"">cconsole.log</a>"
+	}
+	Write !,?2,"<a href=""#cpf"">cache.cpf</a>"	
   	Write !,?2,"<a href=""#LocalDB"">Local Databases</a>"
   	Write !,?2,"<a href=""#Journaling"">Journaling</a>"
   	Write !,"</div>"
@@ -1053,42 +1097,11 @@ LogHeader(cubeList,getLogs)
 	Write !,?2,"<b>BETA</b>"
 	Write !,"</font>"
 	Write !,"<h1>DeepSeeButtons: DeepSee Diagnostic for the ",namespace," Namespace</h1>"
+	//Do LogServerSetup
 	
-	
-	/*Write !,?4,"<tr bgcolor=""#FFFFFF"" bordercolor=""#CCCCCC"">"
-	Do LogHeaderTagBasic("serverdetails","Server Details")		//Adds to header
-	Do LogHeaderTagBasic("deepseeinfo","DeepSee Information")
-	Do LogHeaderTagBasic("cubelist","Cubes in "_namespace_"")
-	Write !,?4,"</tr>"
-	Write !,?4,"<tr bgcolor=""#FFFFFF"" bordercolor=""#CCCCCC"">"
-	Do LogHeaderTagBasic("cuberegistry","Cube Registry")
-	If $d(cubeList)'=0{
-		Do LogHeaderTagBasic("cubeinfo","Cube Info")	
-	}
-	Else{
-		Do LogHeaderTagBasic("empty","")
-	}
-	If getLogs{
-		Do LogHeaderTagBasic("querylog","Query Log")
-		Write !,?4,"</tr>"
-		Write !,?4,"<tr bgcolor=""#FFFFFF"" bordercolor=""#CCCCCC"">"
-		Do LogHeaderTagBasic("dslog","DeepSee Log")
-		Do LogHeaderTagBasic("cpf","cache.cpf")
-	}
-	Do LogHeaderTagBasic("cconsole","cconsole.log")
-	
-	Write !,?4,"</tr>"
-	Write !,?4,"<tr bgcolor=""#FFFFFF"" bordercolor=""#CCCCCC"">"
-	Do LogHeaderTagBasic("LocalDB","Local Databases")
-	Do LogHeaderTagBasic("Journaling","Journaling")
-	Do LogHeaderTagBasic("","")
-	Write !,?4,"</tr>"
-	Write !,?2,"</table>"
-	Write !,"<br>"
-		*/
+LogServerSetup()
 	///Server Details section
-	Do WriteParagraph("serverdetails","Server Details",0)
-	//Write !,"<br>"
+	Do WriteParagraph("serverdetails","Server Details",1)
 	///The old "Configuration" section
 	Do WriteHeader4("Configuration")
 	Write !,"<p>",ConfigName," on Machine """,HostName,"""","</p>"
@@ -1097,20 +1110,13 @@ LogHeader(cubeList,getLogs)
 	Write !,"<p>",CustomerName,"</p>"
 	Do WriteHeader4("License Order Number")
 	Write !,"<p>",OrderNumber,"</p>"
-	
-	
-	//Write !,"<pre>"
-	//Do WriteLog(""),WriteLog("Fully Qualified Host Name: "_FullHostName_" with IP Address: "_IPAddr)
 	Do WriteHeader4("Fully Qualified Host Name")
 	Write !,"<p>"_FullHostName_" with IP Address: "_IPAddr,"</p>"
-	
 	Do INT^%D,INT^%T
 	//Do WriteLog(""),WriteLog("Log created by User """_CurUser_""" on "_%DAT_" at "_%TIM)
 	Do WriteHeader4("Log created by User")
 	Write !,"<p>"_CurUser_" on "_%DAT_" at "_%TIM,"</p>"
 	Use LogFile Do Timeup
-	
-	//Use PDev	
 	//Write !,"<p>Caché Version String: ",CacheVerStr,"</p>",!
 	Do WriteHeader4("Caché Version String")
 	Write !,"<p>",CacheVerStr,"</p>",!
@@ -1148,18 +1154,15 @@ HealthInsightTest(namespace){
 }
  
  //Adds stuff to the header that can link to sections
-LogHeaderTagBasic(HTMLtag,HTMLcaption)
-	Do LogHeaderTag(HTMLtag,HTMLcaption,"#0000FF")
-	Quit
- 
-LogHeaderTag(HTMLtag,HTMLcaption,HTMLcolor,PadLen) ;
+	/*LogHeaderTagBasic(HTMLtag,HTMLcaption)
+	Set HTMLcolor = "#0000FF"
 	Write !,?4,"<td align=""center"">"
 	Write !,?6,"<font size=""2"" face=""Arial, Helvetica, sans-serif"" color=""",HTMLcolor,""">"
 	Write !,?8,"<b><a href=""#",HTMLtag,""">",HTMLcaption,"</a></b>"
 	Write !,?6,"</font>"
 	Write !,?4,"</td>"
 	Quit
-
+	*/
  
 LogTrailer
 	; Records a Trailer record to LogFile
@@ -1639,11 +1642,9 @@ cconsoleErr
 	Quit 
  
  
- //////////DeepSee Stuff///////////
- 
-Utils
-	Do WriteParagraph("deepseeinfo","DeepSee Information for "_namespace)
-	//Write !,"<br>"
+ //////////DeepSee Setup section///////////
+LogDeepSeeSetupSection
+	Do WriteParagraph("deepseesetup","DeepSee Setup in "_namespace,0)
  	//Agent Count
  	ZN namespace
  	Set count=##class(%DeepSee.Utils).%GetAgentCount()
@@ -2177,6 +2178,7 @@ GetCubeRegistry
 		 	Write !,?2,"</tbody>"
 		 	Write !,"</table>"
 		}
+		Write !,"<br>"
 	}
 	ZN "%SYS"
 	Quit
