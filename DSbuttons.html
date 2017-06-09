@@ -1,0 +1,2479 @@
+<html>
+<meta charset="UTF-8">
+<meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+<head>
+  <title>
+    Caché Diagnostic Log. Filename: /home/amarin/Desktop/DSbuttons.html
+  </title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <script type="text/javascript">
+    function openNav() {
+      document.getElementById("mySidenav").style.width = "250px";
+      document.getElementById("main").style.marginLeft = "250px";
+    }
+    function closeNav() {
+      document.getElementById("mySidenav").style.width = "0px";
+      document.getElementById("main").style.marginLeft= "0px";
+    }
+    window.onload = openNav;
+  </script>
+  <style>
+    .sidenav {
+      height: 100%;
+      width: 0;
+      position: fixed;
+      z-index: 1;
+      top: 0;
+      left: 0;
+      background-color: rgb(220,231,241);
+      overflow-x: hidden;
+      transition: 0.5s;
+      padding-top: 60px;
+    }
+    .sidenav a {
+      //border: 1px solid;
+      font-family: Arial, Helvetica, sans-serif;
+      font-weight: bold;
+      padding: 8px 8px 8px 8px;
+      text-decoration: none;
+      font-size: 20px;
+      color: blue;
+      display: block;
+      transition: 0.3s;
+    }
+    .sidenav a:hover, .offcanvas a:focus{
+      font-family: Arial, Helvetica, sans-serif;
+      color: rgb(104,30,30);
+    }
+    .sidenav .closebtn {
+      position: absolute;
+      top: 0;
+      right: 0px;
+      font-size: 36px;
+      margin-left: 50px;
+    }
+    #main {
+      transition: margin-left .5s;
+      padding: 16px;
+    }
+    @media screen and (max-height: 450px) {
+      .sidenav {padding-top: 15px;}
+      .sidenav a {font-size: 18px;}
+    }
+    .sidenav .cubelinks {
+      font-size: 14px;
+      text-decoration: none;
+      margin-left: 30px;
+    }
+    .trapezoid {
+      top: 0px;
+      width: 0px;
+      left: 0px;
+      opacity: 0.5;
+      text-align: center;
+      height: 25px; 
+      position:fixed;
+      border-top: 20px solid transparent;
+      border-left: 25px solid rgb(185,207,227); // #2963BD;
+      border-bottom: 20px solid transparent;
+      box-sizing: content-box;
+    }
+    .trapezoid span { 
+      position: absolute;
+      left: -20px;
+      top: 15%;
+      color: blue;
+    }
+    .trapezoid span:hover, .offcanvas a:focus{
+      color: rgb(104,30,30);
+      opacity: 1.0;
+    }
+    .zebraStriped tbody tr:nth-child(odd) {
+      background-color: #ccc;
+      border-right: 2px solid #D0D0D0;
+      border-left: 2px solid #D0D0D0;
+      border-bottom: 2px solid #D0D0D0;
+      border-top: 2px solid #D0D0D0;
+    }
+    .scrollable {
+      overflow:auto;
+      resize:both;
+    }
+    .wrapped {
+    white-space: -moz-pre-wrap; /* Mozilla, supported since 1999 */
+      white-space: -pre-wrap; /* Opera */
+      white-space: -o-pre-wrap; /* Opera */
+      white-space: pre-wrap; /* CSS3 - Text module (Candidate Recommendation) http://www.w3.org/TR/css3-text/#white-space */
+      word-wrap: break-word; /* IE 5.5+ */
+    }
+    .zebraStriped td {
+      border-right: 2px solid #D0D0D0;
+      border-left: 2px solid #D0D0D0;
+      border-bottom: 2px solid #D0D0D0;
+      border-top: 2px solid #D0D0D0;
+    }
+    .tableWithBorders {
+      position: relative;
+      visibility: visible;
+      table-layout: fixed;
+      padding: 0px;
+      height: auto;
+      font-family: Arial;
+      border-collapse: collapse;
+      border-right: 2px solid #D0D0D0;
+      border-left: 2px solid #D0D0D0;
+      border-bottom: 2px solid #D0D0D0;
+      border-top: 2px solid #D0D0D0;
+    }
+    .tableWithBorders th {
+      height: 22px;
+      overflow: hidden;
+      vertical-align: middle;
+      border-bottom: 2px solid #D0D0D0;
+    }
+    .tableWithBorders td {
+      border-right: 1px solid #E8E8E8;
+      border-bottom: 1px solid #E8E8E8;
+      overflow: hidden;
+      background: white;
+    }
+  </style>
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<div class="trapezoid">
+  <span class="closebtn" onclick="openNav()"> &#9776; </span>
+</div>
+<div id="mySidenav" class="sidenav">
+  <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+  <a href="#deepseesetup">DeepSee Setup</a>
+  <a href="#serverdetails">Server Details</a>
+  <a href="#cubelist">Cubes</a>
+  <a href="#cuberegistry">Cube Registry</a>
+  <a href="#cubeinfo">Cube Info</a>
+  <a class="cubelinks" href="#cubeinfoPATIENTS">PATIENTS</a>
+  <a href="#querylog">Query Log</a>
+  <a href="#dslog">DeepSee Log</a>
+  <a href="#cconsole">cconsole.log</a>
+  <a href="#cpf">cache.cpf</a>
+  <a href="#LocalDB">Local Databases</a>
+  <a href="#Journaling">Journaling</a>
+</div>
+<div id="main">
+<a name="top"></a>
+<font face="Arial, Helvetica, sans-serif" size="10" color="#ff3300">
+  <b>BETA</b>
+</font>
+<h1>DeepSeeButtons: DeepSee Diagnostic for the SAMPLES Namespace</h1><a name="deepseesetup"></a>
+<h2>DeepSee Setup in SAMPLES</h2>
+<h4>Agent Count</h4>
+<p>Default agent count: 4 x number of cores = 8 high-priority agents</p>
+<h4>Audit</h4>
+<p>^DeepSee.AuditCode is undefined</p>
+<p>^DeepSee.AuditQueryCode is undefined</p>
+<h4>Recent Activity in Cube Manager</h4>
+<p>Build events:  Not found</p>
+<p>Synch events:  Not found</p>
+<p>Update events:  Not found</p>
+<h4>Config section of cpf file</h4>
+<p>globals=0,0,0,0,0,0</p>
+<p>routines=0</p>
+<p>bbsiz=262144</p>
+<h4>Important Mappings</h4>
+<p>^OBJ.DSTIME is mapped from APP namespace to the APP-DSTIME database</p>
+<p>Global_DeepSee.Cache.*=APP-CACHE</p>
+<p>Global_DeepSee.LastQuery=APP-CACHE</p>
+<p>Global_DeepSee.QueryLog=APP-CACHE</p>
+<p>Global_DeepSee.Update=APP-DSTIME</p>
+<p>Global_DeepSee.*=APP-DEEPSEE</p>
+<h4>Server Initialization Code</h4>
+<p>^DeepSee.InitCode is undefined</p>
+<hr noshade size="4">
+<a name="serverdetails"></a>
+<h2>Server Details</h2>
+<h4>Configuration</h4>
+<p>C173 on Machine "amarin-Latitude-E6440"</p>
+<h4>Customer Name</h4>
+<p>ISC Development</p>
+<h4>License Order Number</h4>
+<p>54321</p>
+<h4>Fully Qualified Host Name</h4>
+<p>amarin-Latitude-E6440 with IP Address: 127.0.1.1</p>
+<h4>Log created by User</h4>
+<p>amarin on Jun 09 2017 at  2:20 PM</p>
+<h4>Last Caché Startup</h4>
+<p>06/09/2017 10:52:37. As of this report Caché has been up for 0 days 3 hours 27 minutes 41 seconds</p>
+<h4>Caché Version String</h4>
+<p>Cache for UNIX (SUSE Linux Enterprise Server for x86-64) 2017.3 (Build 587) Mon May 8 2017 01:37:27 EDT</p>
+<h4>Current Locale</h4>
+<p>enu8 (English, United States, Latin1 (ISO 8859-1))</p>
+<h4>Operating System Version</h4>
+<p>
+Linux amarin-Latitude-E6440 4.4.0-78-generic #99-Ubuntu SMP Thu Apr 27 15:29:09 UTC 2017 x86_64 x86_64 x86_64 GNU/Linux
+</p>
+<hr noshade size="4">
+<a name="cubelist"></a>
+<h2>Cubes in SAMPLES</h2>
+<p>No active registry so BuildTime and BuildRate will not be populated.
+</p>
+<table id="CubeTable" border="0" cellpadding="7" cellspacing="3" class="zebraStriped">
+  <tbody>
+    <tr align="left">
+      <th>Cube Name</th><th>Display Name</th><th>Build Time [s]</th><th>Fact Count</th><th>Build Rate [Facts/s]</th><th>Last Compile</th><th>Source Class</th><th>Cube Class</th><th>Last Build/Synch</th><th>Related Cubes</th>
+    </tr>
+    <tr>
+      <td>Accession</td>
+      <td>Accession</td>
+      <td>N/A</td>
+      <td>0</td>
+      <td>N/A</td>
+      <td>05/25/2017 23:37:01</td>
+      <td>db.dsAccessionOrderResult</td>
+      <td>User.Accession</td>
+      <td>-</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td>AleAbstractChild</td>
+      <td>AleAbstractChild</td>
+      <td>N/A</td>
+      <td>0</td>
+      <td>N/A</td>
+      <td>05/26/2017 15:48:02</td>
+      <td>Not available</td>
+      <td>Ale.AbstractChild</td>
+      <td>-</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td>AsthmaPatients</td>
+      <td>AsthmaPatients</td>
+      <td>N/A</td>
+      <td>1000</td>
+      <td>N/A</td>
+      <td>05/08/2017 05:42:22</td>
+      <td>SA-PATIENTS</td>
+      <td>DeepSee.Model.SubjectAreas.AsthmaPatients</td>
+      <td>N/A</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td>AviationAircraft</td>
+      <td>Aviation Aircraft</td>
+      <td>N/A</td>
+      <td>0</td>
+      <td>N/A</td>
+      <td>05/08/2017 05:42:24</td>
+      <td>Aviation.Aircraft</td>
+      <td>Aviation.Cubes.Aircraft</td>
+      <td>-</td>
+      <td>AviationCrew, AviationEvents</td>
+    </tr>
+    <tr>
+      <td>AviationCrew</td>
+      <td>Aviation Crew</td>
+      <td>N/A</td>
+      <td>0</td>
+      <td>N/A</td>
+      <td>05/08/2017 05:42:27</td>
+      <td>Aviation.Crew</td>
+      <td>Aviation.Cubes.Crew</td>
+      <td>-</td>
+      <td>AviationAircraft</td>
+    </tr>
+    <tr>
+      <td>AviationEvents</td>
+      <td>Aviation Events</td>
+      <td>N/A</td>
+      <td>0</td>
+      <td>N/A</td>
+      <td>05/08/2017 05:42:22</td>
+      <td>Aviation.Event</td>
+      <td>Aviation.Cubes.Events</td>
+      <td>-</td>
+      <td>AviationAircraft</td>
+    </tr>
+    <tr>
+      <td>Cities</td>
+      <td>Cities</td>
+      <td>N/A</td>
+      <td>9</td>
+      <td>N/A</td>
+      <td>05/08/2017 05:42:22</td>
+      <td>DeepSee.Study.City</td>
+      <td>DeepSee.Model.CityCube</td>
+      <td>05/08/2017 05:43:15</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td>CityRainfall</td>
+      <td>City Rainfall Data</td>
+      <td>N/A</td>
+      <td>12744</td>
+      <td>N/A</td>
+      <td>05/08/2017 05:42:23</td>
+      <td>DeepSee.Study.CityRainfall</td>
+      <td>DeepSee.Model.RainfallCube</td>
+      <td>05/08/2017 05:43:08</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td>CompoundCube/CityRainfall</td>
+      <td>CompoundCube/CityRainfall</td>
+      <td>N/A</td>
+      <td>12744</td>
+      <td>N/A</td>
+      <td>05/08/2017 05:42:24</td>
+      <td>DeepSee.Study.CityRainfall</td>
+      <td>DeepSee.Model.CompoundCube.CityRainfall</td>
+      <td>05/08/2017 05:43:39</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td>CompoundCube/CompoundCube</td>
+      <td>CompoundCube/CompoundCube</td>
+      <td>N/A</td>
+      <td>1000</td>
+      <td>N/A</td>
+      <td>05/08/2017 05:42:22</td>
+      <td>SA-COMPOUNDCUBE/PATIENTS</td>
+      <td>DeepSee.Model.CompoundCube.CompoundCube</td>
+      <td>N/A</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>CompoundCube/Doctors</td>
+      <td>CompoundCube/Doctors</td>
+      <td>N/A</td>
+      <td>40</td>
+      <td>N/A</td>
+      <td>05/08/2017 05:42:24</td>
+      <td>DeepSee.Study.Doctor</td>
+      <td>DeepSee.Model.CompoundCube.Doctors</td>
+      <td>05/08/2017 05:43:41</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td>CompoundCube/Patients</td>
+      <td>CompoundCube/Patients</td>
+      <td>N/A</td>
+      <td>1000</td>
+      <td>N/A</td>
+      <td>05/08/2017 05:42:22</td>
+      <td>DeepSee.Study.Patient</td>
+      <td>DeepSee.Model.CompoundCube.Patients</td>
+      <td>05/08/2017 05:43:33</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td>ConnectorCube</td>
+      <td>ConnectorCube</td>
+      <td>N/A</td>
+      <td>1000</td>
+      <td>N/A</td>
+      <td>05/08/2017 05:42:23</td>
+      <td>DeepSee.Model.ConnectorExample</td>
+      <td>DeepSee.Model.ConnectorCube</td>
+      <td>05/08/2017 05:43:17</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td>DemoMDX</td>
+      <td>DemoMDX</td>
+      <td>N/A</td>
+      <td>1000</td>
+      <td>N/A</td>
+      <td>05/08/2017 05:42:22</td>
+      <td>SA-PATIENTS</td>
+      <td>DeepSee.Model.SubjectAreas.DemoMDX</td>
+      <td>N/A</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td>DSTIMECube</td>
+      <td>DSTIMECube</td>
+      <td>N/A</td>
+      <td>0</td>
+      <td>N/A</td>
+      <td>05/25/2017 23:37:02</td>
+      <td>Ale.DSTIME</td>
+      <td>Ale.DSTIMECube</td>
+      <td>-</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td>Erdbeben</td>
+      <td>Erdbeben</td>
+      <td>N/A</td>
+      <td>0</td>
+      <td>N/A</td>
+      <td>05/25/2017 23:36:59</td>
+      <td>Ale.Erdbeben</td>
+      <td>Ale.ErdbebenCube</td>
+      <td>-</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td>HoleFoods</td>
+      <td>HoleFoods Sales</td>
+      <td>N/A</td>
+      <td>1000</td>
+      <td>N/A</td>
+      <td>05/08/2017 05:42:23</td>
+      <td>HoleFoods.Transaction</td>
+      <td>HoleFoods.Cube</td>
+      <td>05/08/2017 05:42:59</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td>HoleFoods Asia</td>
+      <td>HoleFoods Asia</td>
+      <td>N/A</td>
+      <td>1000</td>
+      <td>N/A</td>
+      <td>05/08/2017 05:42:23</td>
+      <td>SA-HOLEFOODS</td>
+      <td>HoleFoods.SubjectAreaAsia</td>
+      <td>N/A</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td>HoleFoodsBudget</td>
+      <td>HoleFoods Budget</td>
+      <td>N/A</td>
+      <td>1030</td>
+      <td>N/A</td>
+      <td>05/08/2017 05:42:25</td>
+      <td>HoleFoods.Transaction</td>
+      <td>HoleFoods.BudgetCube</td>
+      <td>05/08/2017 05:43:02</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td>HoleFoodsCombined</td>
+      <td>HoleFoods Combined</td>
+      <td>N/A</td>
+      <td>1000</td>
+      <td>N/A</td>
+      <td>05/08/2017 05:42:23</td>
+      <td>SA-HOLEFOODS</td>
+      <td>HoleFoods.CombinedCube</td>
+      <td>N/A</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>IrisCube</td>
+      <td>Iris</td>
+      <td>N/A</td>
+      <td>0</td>
+      <td>N/A</td>
+      <td>05/08/2017 05:42:23</td>
+      <td>DataMining.IrisDataset</td>
+      <td>DataMining.IrisCube</td>
+      <td>-</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td>NamesUS</td>
+      <td>NamesUS</td>
+      <td>N/A</td>
+      <td>0</td>
+      <td>N/A</td>
+      <td>05/25/2017 23:36:56</td>
+      <td>Ale.NamesUS</td>
+      <td>Ale.NamesUSCube</td>
+      <td>-</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td>NewsArchive</td>
+      <td>News Archive</td>
+      <td>N/A</td>
+      <td>0</td>
+      <td>N/A</td>
+      <td>05/08/2017 05:41:54</td>
+      <td>News.DeepSee.NewsArticle</td>
+      <td>News.DeepSee.NewsCube</td>
+      <td>-</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td>Patients</td>
+      <td>Patients</td>
+      <td>N/A</td>
+      <td>1000</td>
+      <td>N/A</td>
+      <td>05/08/2017 05:42:22</td>
+      <td>DeepSee.Study.Patient</td>
+      <td>DeepSee.Model.PatientsCube</td>
+      <td>05/08/2017 05:43:12</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td>PatientsQueryCube</td>
+      <td>PatientsQueryCube</td>
+      <td>N/A</td>
+      <td>0</td>
+      <td>N/A</td>
+      <td>05/08/2017 05:42:22</td>
+      <td>DeepSee.Model.PatientsQuery</td>
+      <td>DeepSee.Model.PatientsQueryCube</td>
+      <td>-</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td>RelatedCubes/Allergies</td>
+      <td>RelatedCubes/Allergies</td>
+      <td>N/A</td>
+      <td>809</td>
+      <td>N/A</td>
+      <td>05/08/2017 05:42:29</td>
+      <td>DeepSee.Study.PatientAllergy1</td>
+      <td>DeepSee.Model.RelCubes.RAllergies</td>
+      <td>05/08/2017 05:43:31</td>
+      <td>RelatedCubes/Patients</td>
+    </tr>
+    <tr>
+      <td>RelatedCubes/Cities</td>
+      <td>RelatedCubes/Cities</td>
+      <td>N/A</td>
+      <td>9</td>
+      <td>N/A</td>
+      <td>05/08/2017 05:42:23</td>
+      <td>DeepSee.Study.City</td>
+      <td>DeepSee.Model.RelCubes.RCities</td>
+      <td>05/08/2017 05:43:19</td>
+      <td>RelatedCubes/Doctors</td>
+    </tr>
+    <tr>
+      <td>RelatedCubes/CityRainfall</td>
+      <td>RelatedCubes/CityRainfall</td>
+      <td>N/A</td>
+      <td>12744</td>
+      <td>N/A</td>
+      <td>05/08/2017 05:42:24</td>
+      <td>DeepSee.Study.CityRainfall</td>
+      <td>DeepSee.Model.RelCubes.RCityRainfall</td>
+      <td>05/08/2017 05:43:28</td>
+      <td>RelatedCubes/Cities</td>
+    </tr>
+    <tr>
+      <td>RelatedCubes/Doctors</td>
+      <td>RelatedCubes/Doctors</td>
+      <td>N/A</td>
+      <td>40</td>
+      <td>N/A</td>
+      <td>05/08/2017 05:42:24</td>
+      <td>DeepSee.Study.Doctor</td>
+      <td>DeepSee.Model.RelCubes.RDoctors</td>
+      <td>05/08/2017 05:43:22</td>
+      <td>RelatedCubes/Cities, RelatedCubes/Patients</td>
+    </tr>
+    <tr>
+      <td>RelatedCubes/Patients</td>
+      <td>RelatedCubes/Patients</td>
+      <td>N/A</td>
+      <td>1000</td>
+      <td>N/A</td>
+      <td>05/08/2017 05:42:27</td>
+      <td>DeepSee.Study.Patient</td>
+      <td>DeepSee.Model.RelCubes.RPatients</td>
+      <td>05/08/2017 05:43:25</td>
+      <td>RelatedCubes/Doctors, RelatedCubes/Cities, RelatedCubes/Allergies</td>
+    </tr>
+    <tr>
+      <td>SimpleSourceCube</td>
+      <td>SimpleSourceCube</td>
+      <td>N/A</td>
+      <td>0</td>
+      <td>N/A</td>
+      <td>05/25/2017 23:37:04</td>
+      <td>Ale.SimpleSource</td>
+      <td>Ale.SimpleSourceCube</td>
+      <td>-</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td>Versioned/Cities</td>
+      <td>Versioned/Cities</td>
+      <td>N/A</td>
+      <td>0</td>
+      <td>N/A</td>
+      <td>05/25/2017 23:37:10</td>
+      <td>DeepSee.Study.City</td>
+      <td>Ale.Versioned.Cities</td>
+      <td>-</td>
+      <td>Versioned/Patients, Versioned/Doctors</td>
+    </tr>
+    <tr>
+      <td>Versioned/Doctors</td>
+      <td>Versioned/Doctors</td>
+      <td>N/A</td>
+      <td>0</td>
+      <td>N/A</td>
+      <td>05/25/2017 23:37:11</td>
+      <td>DeepSee.Study.Doctor</td>
+      <td>Ale.Versioned.Doctors</td>
+      <td>-</td>
+      <td>Versioned/Cities, Versioned/Patients</td>
+    </tr>
+    <tr>
+      <td>Versioned/Patients</td>
+      <td>Versioned/Patients</td>
+      <td>N/A</td>
+      <td>0</td>
+      <td>N/A</td>
+      <td>05/25/2017 23:37:11</td>
+      <td>DeepSee.Study.Patient</td>
+      <td>Ale.Versioned.Patients</td>
+      <td>-</td>
+      <td>Versioned/Doctors, Versioned/Cities</td>
+    </tr>
+    <tr>
+      <td>YoungPatients</td>
+      <td>YoungPatients</td>
+      <td>N/A</td>
+      <td>1000</td>
+      <td>N/A</td>
+      <td>05/08/2017 05:42:22</td>
+      <td>SA-PATIENTS</td>
+      <td>DeepSee.Model.SubjectAreas.YoungPatients</td>
+      <td>N/A</td>
+      <td>-</td>
+    </tr>
+  </tbody>
+</table><h4>Abstract Cube List</h4>
+
+<p>ALEABSTRACT</p><h4>Cubes with Source Classes Based on SQL Storage</h4>
+<h4>Cubes Based on Data Connectors</h4>
+
+<p>CONNECTORCUBE</p>
+<p>PATIENTSQUERYCUBE</p><hr noshade size="4">
+<a name="cuberegistry"></a>
+<h2>Cube Registry</h2>
+No cube registry defined in this namespace<hr noshade size="4">
+<a name="cubeinfo"></a>
+<h2>Cube Info</h2>
+
+<a href="#cubeinfoPATIENTS">PATIENTS</a>
+<br>
+<hr size="4" noshade>
+<a name="cubeinfoPATIENTS"></a>
+<h2>Cube Info for PATIENTS</h2>
+<h4>Cube Display Name</h4>
+<p>Patients</p>
+<h4>Cube Type</h4>
+<p>Not a subject area, abstract, or a compound cube</p>
+<h4>Cube Class</h4>
+<p>DeepSee.Model.PatientsCube</p>
+<h4>Inherits from</h4>
+<p></p>
+<h4>Source Class</h4>
+      <p>DeepSee.Study.Patient</p>
+<h4>SQL Table Name </h4>
+<p>DeepSee_Study.Patient</p>
+<h4>Fact Class</h4>
+<p>DeepSee.Model.PatientsCube.Fact</p>
+<h4>Fact Count</h4>
+<p>1000</p>
+<h4>Last Modified</h4>
+<p>05/08/2017 05:42:22</p>
+<h4>Build Errors</h4>
+<pre>0 build error(s) for 'PATIENTS'
+</pre>
+<hr size="4" noshade>
+<a name="dimensionsPATIENTS"></a>
+<h2>Dimensions for PATIENTS</h2>
+<h4>Dimension List</h4>
+<table id="DimensionTable" border="0" class="tableWithBorders" cellpadding="3" cellspacing="3">
+  <tbody>
+    <tr align="left">
+      <th>Dimension</th>
+      <th>Hierarchy </th>
+      <th>Level</th>
+      <th></th>
+    </tr>
+    <tr>
+      <td>Measures</td>
+      <td>%COUNT</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>Age</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>Avg Age</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>Allergy Count</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>Avg Allergy Count</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>Encounter Count</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>Avg Enc Count</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>Test Score</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>Avg Test Score</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>AgeD</td>
+      <td>H1</td>
+      <td>All Patients</td>
+      <td>[All level]</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td></td>
+      <td>Age Group</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td></td>
+      <td>Age Bucket</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td></td>
+      <td>Age</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>AllerD</td>
+      <td>H1</td>
+      <td>Allergies</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>AllerSevD</td>
+      <td>H1</td>
+      <td>Allergy Severities</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>BirthD</td>
+      <td>H1</td>
+      <td>Decade</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td></td>
+      <td>Year</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td></td>
+      <td>Quarter Year</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td></td>
+      <td>Period</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td></td>
+      <td>Date</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>BirthQD</td>
+      <td>H1</td>
+      <td>Quarter</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td></td>
+      <td>Month</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>BirthTD</td>
+      <td>H1</td>
+      <td>Birth Time</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>BirthWeekdayD</td>
+      <td>H1</td>
+      <td>Weekday</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>ColorD</td>
+      <td>H1</td>
+      <td>Favorite Color</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>DiagD</td>
+      <td>H1</td>
+      <td>Diagnoses</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>DocD</td>
+      <td>H1</td>
+      <td>Doctor Group</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td></td>
+      <td>Doctor</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>
+      </td>
+      <td>H2</td>
+      <td>Doctor Type</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>GenD</td>
+      <td>H1</td>
+      <td>Gender</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>HomeD</td>
+      <td>H1</td>
+      <td>ZIP</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td></td>
+      <td>City</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>PatGrpD</td>
+      <td>H1</td>
+      <td>Tested</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td></td>
+      <td>Patient Group</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>ProfD</td>
+      <td>H1</td>
+      <td>Industry</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td></td>
+      <td>Profession</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>ComputedD</td>
+      <td>H1</td>
+      <td>Computed</td>
+      <td></td>
+    </tr>
+  </tbody>
+</table>
+<h4>Analyze</h4>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr align="left">
+      <td>
+        <pre>Do ##class(%DeepSee.Utils).%Analyze("PATIENTS","fic",0)
+
+----------------------------------------------------------------
+    Index                         Approx. Size       Cardinality
+1   1                                      518                 4
+2   DxAgeGroup                             388                 3
+3   DxAgeBucket                          1,155                 9
+4   DxAge                                2,974                97
+5   DxAllergies                          2,155                17
+6   DxAllergySeverities                    902                 7
+7   DxBirthDateFxDecade                  1,195                11
+8   DxBirthDateFxYear                    2,974                97
+9   DxBirthDateFxQuarterYear             3,280               320
+10  DxBirthDateFxMonthYear               4,516               629
+11  DxBirthDateFxDayMonthYea             5,924               981
+12  DxBirthDateFxQuarterNumb               516                 4
+13  DxBirthDateFxMonthNumber             1,543                12
+14  DxBirthTime                          3,056                24
+15  Dx1910845473                           902                 7
+16  DxColor                                904                 7
+17  DxDiagnoses                            560                 5
+18  DxDocGroup                             517                 4
+19  DxDoc                                2,784                41
+20  DxDocType                            1,262                12
+21  DxGender                               259                 2
+22  DxHomeZIP                              646                 5
+23  DxHomeCity                           1,157                 9
+24  DxTested                               259                 2
+25  DxPatGroup                             388                 3
+26  DxIndustry                           1,325                11
+27  DxProfession                         1,659                24
+$Fa Extent Index                             6                 0
+M1  MxAge                                  928                 8
+M2  Mx949945609I                           528                 5
+M3  Mx3510953892I                            6                 1
+M4  MxTestScore                          1,036                 8
+Mx3 Mx3510953892ISearch                      6                 1
+Mx9 Mx949945609ISearch                     652                 6
+MxT MxTestScoreSearch                    2,484                51
+----------------------------------------------------------------
+    Total:                              49,364 bytes        2427
+
+    Fact Table:                         92,417 bytes in 1,000 fact(s)
+    Cell Cache:                              0 cell(s) in 0 bucket(s)
+
+
+FieldNameToSpec("PATIENTS")
+
+    MxAge                                 [Measures].[Age]
+    MxAge                                 [Measures].[Avg Age]
+    Mx949945609I                          [Measures].[Allergy Count]
+    Mx949945609I                          [Measures].[Avg Allergy Count]
+    Mx3510953892I                         [Measures].[Encounter Count]
+    Mx3510953892I                         [Measures].[Avg Enc Count]
+    MxTestScore                           [Measures].[Test Score]
+    MxTestScore                           [Measures].[Avg Test Score]
+    DxAgeGroup                            [AgeD].[H1].[Age Group]
+    DxAgeBucket                           [AgeD].[H1].[Age Bucket]
+    DxAge                                 [AgeD].[H1].[Age]
+    DxAllergies                           [AllerD].[H1].[Allergies]
+    DxAllergySeverities                   [AllerSevD].[H1].[Allergy Severities]
+    DxBirthDateFxDecade                   [BirthD].[H1].[Decade]
+    DxBirthDateFxYear                     [BirthD].[H1].[Year]
+    DxBirthDateFxQuarterYear              [BirthD].[H1].[Quarter Year]
+    DxBirthDateFxMonthYear                [BirthD].[H1].[Period]
+    DxBirthDateFxDayMonthYear             [BirthD].[H1].[Date]
+    DxBirthDateFxQuarterNumber            [BirthQD].[H1].[Quarter]
+    DxBirthDateFxMonthNumber              [BirthQD].[H1].[Month]
+    DxBirthTime                           [BirthTD].[H1].[Birth Time]
+    Dx1910845473                          [BirthWeekdayD].[H1].[Weekday]
+    DxColor                               [ColorD].[H1].[Favorite Color]
+    DxDiagnoses                           [DiagD].[H1].[Diagnoses]
+    DxDocGroup                            [DocD].[H1].[Doctor Group]
+    DxDoc                                 [DocD].[H1].[Doctor]
+    DxDocType                             [DocD].[H2].[Doctor Type]
+    DxGender                              [GenD].[H1].[Gender]
+    DxHomeZIP                             [HomeD].[H1].[ZIP]
+    DxHomeCity                            [HomeD].[H1].[City]
+    DxTested                              [PatGrpD].[H1].[Tested]
+    DxPatGroup                            [PatGrpD].[H1].[Patient Group]
+    DxIndustry                            [ProfD].[H1].[Industry]
+    DxProfession                          [ProfD].[H1].[Profession]
+    DxComputed                            [ComputedD].[H1].[Computed]
+
+
+Do ##class(%DeepSee.Utils).%AnalyzeMissing("PATIENTS")
+
+-----------------------------------------------------------------------------
+    Level                                                   #Missing %Missing
+Lvl [AgeD].[H1].[Age]                                              0    0.00%
+Lvl [AgeD].[H1].[Age Bucket]                                       0    0.00%
+Lvl [AgeD].[H1].[Age Group]                                        0    0.00%
+Lvl [AllerD].[H1].[Allergies]                                    382   38.20%
+Lvl [AllerSevD].[H1].[Allergy Severities]                        382   38.20%
+Lvl [BirthD].[H1].[Date]                                           0    0.00%
+Lvl [BirthD].[H1].[Decade]                                         0    0.00%
+Lvl [BirthD].[H1].[Period]                                         0    0.00%
+Lvl [BirthD].[H1].[Quarter Year]                                   0    0.00%
+Lvl [BirthD].[H1].[Year]                                           0    0.00%
+Lvl [BirthQD].[H1].[Month]                                         0    0.00%
+Lvl [BirthQD].[H1].[Quarter]                                       0    0.00%
+Lvl [BirthTD].[H1].[Birth Time]                                    0    0.00%
+Lvl [BirthWeekdayD].[H1].[Weekday]                                 0    0.00%
+Lvl [ColorD].[H1].[Favorite Color]                               232   23.20%
+Lvl [DiagD].[H1].[Diagnoses]                                     827   82.70%
+Lvl [DocD].[H1].[Doctor]                                          75    7.50%
+Lvl [DocD].[H1].[Doctor Group]                                   325   32.50%
+Lvl [DocD].[H2].[Doctor Type]                                     75    7.50%
+Lvl [GenD].[H1].[Gender]                                           0    0.00%
+Lvl [HomeD].[H1].[City]                                            0    0.00%
+Lvl [HomeD].[H1].[ZIP]                                             0    0.00%
+Msr [Measures].[Age]                                               0    0.00%
+Msr [Measures].[Allergy Count]                                   382   38.20%
+Msr [Measures].[Avg Age]                                           0    0.00%
+Msr [Measures].[Avg Allergy Count]                               382   38.20%
+Msr [Measures].[Avg Enc Count]                                     0    0.00%
+Msr [Measures].[Avg Test Score]                                  205   20.50%
+Msr [Measures].[Encounter Count]                                   0    0.00%
+Msr [Measures].[Test Score]                                      205   20.50%
+Lvl [PatGrpD].[H1].[Patient Group]                                 0    0.00%
+Lvl [PatGrpD].[H1].[Tested]                                        0    0.00%
+Lvl [ProfD].[H1].[Industry]                                      550   55.00%
+Lvl [ProfD].[H1].[Profession]                                    550   55.00%
+
+    TOTAL FACTS                                                1,000
+        </pre>
+      </td>
+    </tr>
+  </tbody>
+
+</table>
+
+<hr noshade size="4">
+<a name="otherelements"></a>
+<h2>Other Elements for PATIENTS</h2>
+<h4>Pivot Variables</h4>
+<table id="PivotVarTable" cellpadding="5" cellspacing="5" class="tableWithBorders">
+  <tbody>
+    <tr align="left">
+      <th>Name</th><th>Description</th><th>Default Value</th><th>Type</th>
+    </tr>
+    <tr align="left">
+      <td>Year</td>
+      <td>Year</td>
+      <td>2012</td>
+      <td>literal</td>
+    </tr>
+  </tbody>
+</table>
+<h4>Named Sets</h4><table id="NamedSetsTable" width="80%" cellpadding="5" cellspacing="5" class="tableWithBorders">
+  <tbody>
+    <tr align="left">
+      <th>Name</th><th>Set Expression</th>
+    </tr>
+    <tr align="left">
+      <td>Sample Set</td>
+      <td>homed.h1.city.MEMBERS</td>
+    </tr>
+    <tr align="left">
+      <td>Sample Set 2</td>
+      <td>{colord.h1.[favorite color].red,allerd.h1.allergies.wheat,aged.h1.age.75}</td>
+    </tr>
+  </tbody>
+</table>
+<h4>Listing Fields</h4>
+<h4>Listings</h4>
+<table id="ListingTable" width="80%" cellpadding="5" cellspacing="5" class="tableWithBorders">
+  <tbody>
+    <tr align="left">
+      <th>Listing Name</th>
+      <th>Fields</th>
+      </tr>
+        <td>Custom SQL listing</td>
+        <td>*No Fields - Custom SQL Listing*</td>
+      </tr>
+      <tr>
+        <td>Doctor details</td>
+        <td>PatientID</td>
+      </tr>
+      <tr>
+      <tr>
+        <td></td>
+        <td>PrimaryCarePhysician->LastName As "Doctor Last Name"</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>PrimaryCarePhysician->FirstName AS "Doctor First Name"</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>PrimaryCarePhysician->DoctorType AS "Doctor Type"</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>PrimaryCarePhysician->DoctorGroup AS "Doctor Group"</td>
+      </tr>
+        <td>Patient details (default)</td>
+        <td>PatientID</td>
+      </tr>
+      <tr>
+      <tr>
+        <td></td>
+        <td>Age</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>Gender</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>HomeCity->Name AS "Home City"</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>TestScore AS "Test Score"</td>
+      </tr>
+        <td>Sample Listing 1</td>
+        <td>PatientID</td>
+      </tr>
+      <tr>
+      <tr>
+        <td></td>
+        <td>Gender</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>BirthDate</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>Age</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>HomeCity->PostalCode ZIP</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>HomeCity->Name City</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>PatientGroup</td>
+      </tr>
+        <td>Sample Listing 2</td>
+        <td>PatientID</td>
+      </tr>
+      <tr>
+      <tr>
+        <td></td>
+        <td>PatientGroup</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>DiagnosesAsString</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>TestScore</td>
+      </tr>
+  </tbody>
+</table>
+<br>
+<hr noshade size="4">
+<a name="querylog"></a>
+<h2>Query Log</h2>
+<h4>Last query</h4>
+
+<pre>SELECT  FROM [PATIENTS]
+
+</pre><h4>MDX queries by user</h4>
+
+<pre class="wrapped">Last 5 of 6 MDX queries by User: UnknownUser
+  1) SELECT  FROM [PATIENTS]
+  2) SELECT  FROM [PATIENTS]
+  3) SELECT  FROM [PATIENTS]
+  4) SELECT  FROM [PATIENTS]
+  5) SELECT  FROM [PATIENTS]
+
+
+</pre><hr noshade size="4">
+<a name="dslog"></a>
+<h2>DeepSee Log</h2>
+
+<div class="scrollable" style="width:100%;height:400px;">
+  <pre>DeepSee Log File /home/amarin/intersystems/cache20173/mgr/DeepSeeTasks_SAMPLES.log:
+
+2017-05-25 19:37:14.771       3813 TaskMaster Agent missing and removed from global: 5188
+2017-05-25 19:37:14.771       3813 TaskMaster Agent missing and removed from global: 4744
+2017-05-25 19:37:14.771       3813 TaskMaster Agent missing and removed from global: 3796
+2017-05-25 19:37:14.771       3813 TaskMaster Agent missing and removed from global: 5880
+2017-05-25 19:37:14.771       3813 TaskMaster Agent missing and removed from global: 4328
+2017-05-25 19:37:14.771       3813 TaskMaster Agent missing and removed from global: 4012
+2017-05-25 19:37:14.771       3813 TaskMaster Agent missing and removed from global: 3308
+2017-05-25 19:37:14.771       3813 TaskMaster Agent missing and removed from global: 4716
+2017-05-25 19:37:14.771       3813 TaskMaster Agent missing and removed from global: 5144
+2017-05-25 19:37:14.771       3813 TaskMaster Agent missing and removed from global: 4464
+2017-05-25 19:37:14.771       3813 TaskMaster Agent missing and removed from global: 5864
+2017-05-25 19:37:14.771       3813 TaskMaster Agent missing and removed from global: 5460
+2017-05-25 19:37:14.771       3813 TaskMaster Agent missing and removed from global: 4700
+2017-05-25 19:37:14.771       3813 TaskMaster Agent missing and removed from global: 4904
+2017-05-25 19:37:14.771       3813 TaskMaster Agent missing and removed from global: 4344
+2017-05-25 19:37:14.771       3813 TaskMaster Agent missing and removed from global: 6656
+2017-05-25 19:37:14.771       3813 TaskMaster Agent missing and removed from global: 7084
+2017-05-25 19:37:14.771       3813 TaskMaster Agent missing and removed from global: 2412
+2017-05-25 19:37:14.772       3813 TaskMaster Agent missing and removed from global: 7920
+2017-05-25 19:37:14.772       3813 TaskMaster Agent missing and removed from global: 5444
+2017-05-25 19:37:14.772       3813 TaskMaster Agent missing and removed from global: 2056
+2017-05-25 19:37:14.772       3813 TaskMaster Agent missing and removed from global: 7180
+2017-05-25 19:37:14.772       3813 TaskMaster Agent missing and removed from global: 4472
+2017-05-25 19:37:14.772       3813 TaskMaster Agent missing and removed from global: 6504
+2017-05-25 19:37:14.772       3813 TaskMaster Agent missing and removed from global: 7584
+2017-05-25 19:37:14.772       3813 TaskMaster Agent missing and removed from global: 6904
+2017-05-25 19:37:14.772       3813 TaskMaster Agent missing and removed from global: 6592
+2017-05-25 19:37:14.772       3813 TaskMaster Agent missing and removed from global: 5608
+2017-05-25 19:37:14.772       3813 TaskMaster Agent missing and removed from global: 6848
+2017-05-25 19:37:14.772       3813 TaskMaster Agent missing and removed from global: 8088
+2017-05-25 19:37:14.772       3813 TaskMaster Agent missing and removed from global: 1604
+2017-05-25 19:37:14.772       3813 TaskMaster Agent missing and removed from global: 5100
+2017-05-25 19:37:14.772       3813 TaskMaster Agent missing and removed from global: 6924
+2017-05-25 19:37:14.772       3813 TaskMaster Agent missing and removed from global: 7848
+2017-05-25 19:37:14.772       3813 TaskMaster Agent missing and removed from global: 4600
+2017-05-25 19:37:14.772       3813 TaskMaster Agent missing and removed from global: 3252
+2017-05-25 19:37:14.772       3813 TaskMaster Agent missing and removed from global: 2688
+2017-05-25 19:37:14.772       3813 TaskMaster Agent missing and removed from global: 5876
+2017-05-25 19:37:14.772       3813 TaskMaster Agent missing and removed from global: 4128
+2017-05-25 19:37:14.772       3813 TaskMaster Agent missing and removed from global: 3312
+2017-05-25 19:37:14.772       3813 TaskMaster Agent missing and removed from global: 3200
+2017-05-25 19:37:14.772       3813 TaskMaster Agent missing and removed from global: 3280
+2017-05-25 19:37:14.772       3813 TaskMaster Agent missing and removed from global: 7000
+2017-05-25 19:37:14.772       3813 TaskMaster Agent missing and removed from global: 6240
+2017-05-25 19:37:14.772       3813 TaskMaster Agent missing and removed from global: 3512
+2017-05-25 19:37:14.772       3813 TaskMaster Agent missing and removed from global: 5280
+2017-05-25 19:37:14.772       3813 TaskMaster Agent missing and removed from global: 2264
+2017-05-25 19:37:14.772       3813 TaskMaster Agent missing and removed from global: 5584
+2017-05-25 19:37:14.773       3813 TaskMaster Agent missing and removed from global: 7176
+2017-05-25 19:37:14.773       3813 TaskMaster Agent missing and removed from global: 8004
+2017-05-25 19:37:14.773       3813 TaskMaster Agent missing and removed from global: 2232
+2017-05-25 19:37:14.773       3813 TaskMaster Agent missing and removed from global: 5372
+2017-05-25 19:37:14.773       3813 TaskMaster Agent missing and removed from global: 1920
+2017-05-25 19:37:14.773       3813 TaskMaster Agent missing and removed from global: 5156
+2017-05-25 19:37:14.773       3813 TaskMaster Agent missing and removed from global: 3624
+2017-05-25 19:37:14.773       3813 TaskMaster Agent missing and removed from global: 1708
+2017-05-25 19:37:14.773       3813 TaskMaster Agent missing and removed from global: 1768
+2017-05-25 19:37:14.773       3813 TaskMaster Agent missing and removed from global: 6900
+2017-05-25 19:37:14.773       3813 TaskMaster Agent missing and removed from global: 3932
+2017-05-25 19:37:14.773       3813 TaskMaster Agent missing and removed from global: 3044
+2017-05-25 19:37:14.773       3813 TaskMaster Agent missing and removed from global: 7936
+2017-05-25 19:37:14.773       3813 TaskMaster Agent missing and removed from global: 7248
+2017-05-25 19:37:14.773       3813 TaskMaster Agent missing and removed from global: 4144
+2017-05-25 19:37:14.773       3813 TaskMaster Agent missing and removed from global: 2912
+2017-05-25 19:37:14.773       3813 TaskMaster Create Background agents..
+2017-05-25 19:37:14.827       3813 TaskMaster Background agents created: 16
+2017-05-26 11:17:27.551      14692 TaskMaster Agent missing and removed from global: 3894
+2017-05-26 11:17:27.562      14692 TaskMaster Agent missing and removed from global: 3895
+2017-05-26 11:17:27.562      14692 TaskMaster Agent missing and removed from global: 3896
+2017-05-26 11:17:27.562      14692 TaskMaster Agent missing and removed from global: 3897
+2017-05-26 11:17:27.562      14692 TaskMaster Agent missing and removed from global: 3898
+2017-05-26 11:17:27.562      14692 TaskMaster Agent missing and removed from global: 3899
+2017-05-26 11:17:27.562      14692 TaskMaster Agent missing and removed from global: 3900
+2017-05-26 11:17:27.562      14692 TaskMaster Agent missing and removed from global: 3901
+2017-05-26 11:17:27.562      14692 TaskMaster Agent missing and removed from global: 3902
+2017-05-26 11:17:27.563      14692 TaskMaster Agent missing and removed from global: 3903
+2017-05-26 11:17:27.563      14692 TaskMaster Agent missing and removed from global: 3904
+2017-05-26 11:17:27.563      14692 TaskMaster Agent missing and removed from global: 3905
+2017-05-26 11:17:27.563      14692 TaskMaster Agent missing and removed from global: 3907
+2017-05-26 11:17:27.563      14692 TaskMaster Agent missing and removed from global: 3908
+2017-05-26 11:17:27.563      14692 TaskMaster Agent missing and removed from global: 3909
+2017-05-26 11:17:27.563      14692 TaskMaster Agent missing and removed from global: 3910
+2017-05-26 11:17:27.563      14692 TaskMaster Create Background agents..
+2017-05-26 11:17:27.601      14692 TaskMaster Background agents created: 16
+
+  </pre>
+</div><hr noshade size="4">
+<a name="cpf"></a>
+<h2>cache.cpf file</h2>
+<pre>Caché Configuration File /home/amarin/intersystems/cache20173/cache.cpf:</pre>
+<div class="scrollable" style="width:100%;height:400px;">
+  <pre>
+[ConfigFile]
+Version=2017.21
+
+[Databases]
+CACHESYS=/home/amarin/intersystems/cache20173/mgr/
+CACHELIB=/home/amarin/intersystems/cache20173/mgr/cachelib/
+CACHETEMP=/home/amarin/intersystems/cache20173/mgr/cachetemp/
+CACHE=/home/amarin/intersystems/cache20173/mgr/cache/
+CACHEAUDIT=/home/amarin/intersystems/cache20173/mgr/cacheaudit/
+APP-CACHE=/home/amarin/intersystems/cache20173/mgr/app-cache/
+APP-CODE=/home/amarin/intersystems/cache20173/mgr/app-code/
+APP-DATA=/home/amarin/intersystems/cache20173/mgr/app-data/
+APP-DEEPSEE=/home/amarin/intersystems/cache20173/mgr/app-deepsee/
+APP-DSTIME=/home/amarin/intersystems/cache20173/mgr/app-dstime/
+DOCBOOK=/home/amarin/intersystems/cache20173/mgr/docbook/
+SAMPLES=/home/amarin/intersystems/cache20173/mgr/samples/
+USER=/home/amarin/intersystems/cache20173/mgr/user/
+
+[Namespaces]
+%ALL=CACHETEMP
+%SYS=CACHESYS
+APP=APP-DATA,APP-CODE
+DOCBOOK=DOCBOOK
+SAMPLES=SAMPLES
+USER=USER
+
+[Map.%ALL]
+Global_WebTerminal=SAMPLES
+Package_WebTerminal=SAMPLES
+
+[Map.APP]
+Global_DeepSee.Cache.*=APP-CACHE
+Global_DeepSee.LastQuery=APP-CACHE
+Global_DeepSee.QueryLog=APP-CACHE
+Global_DeepSee.Update=APP-DSTIME
+Global_DeepSee.*=APP-DEEPSEE
+Global_OBJ.DSTIME=APP-DSTIME
+
+[Map.DOCBOOK]
+Global_WebTerminal=SAMPLES
+Package_WebTerminal=SAMPLES
+
+[MirrorMember]
+AgentAddress=
+AsyncMemberGUID=
+AsyncMemberType=0
+AsyncUseSystemPurgeInterval=0
+JoinMirror=0
+SystemName=
+ValidatedMember=0
+VirtualAddressInterface=
+
+[Journal]
+AlternateDirectory=/home/amarin/intersystems/cache20173/mgr/journal/
+BackupsBeforePurge=2
+CurrentDirectory=/home/amarin/intersystems/cache20173/mgr/journal/
+DaysBeforePurge=2
+FileSizeLimit=1024
+FreezeOnError=0
+JournalFilePrefix=
+JournalcspSession=0
+
+[Startup]
+CallinHalt=1
+CallinStart=1
+CliSysName=
+DBSizesAllowed=8192
+DefaultPort=1972
+DefaultPortBindAddress=
+EnsembleAutoStart=0
+ErrorPurge=30
+FIPSMode=0
+IPv6=0
+JobHalt=1
+JobServers=0
+JobStart=1
+MaxCacheTempSizeAtStart=0
+MaxConsoleLogSize=5
+ProcessHalt=1
+ProcessStart=1
+ShutdownTimeout=300
+SystemHalt=1
+SystemStart=1
+TempDirectory=Temp
+TerminalPrompt=8,2
+WebServer=1
+WebServerName=
+WebServerPort=57772
+WebServerURLPrefix=
+ZSTU=1
+
+[DeviceSubTypes]
+C-ANSI=80^#,$C(27,91,72,27,91,74)^25^$C(8)^W $C(27,91)_(DY+1)_";"_(DX+1)_"H" S $X=DX,$Y=DY^$C(27,91,74)^$C(27,91,75)^$C(27,91,72,27,91,74)^$C(8,32,8)
+C-Cache Terminal=80^#,$C(27,91,72,27,91,74)^24^$C(8)^W $C(27,91)_(DY+1)_";"_(DX+1)_"H" S $X=DX,$Y=DY^$C(27,91,74)^$C(27,91,75)^$C(27,91,72,27,91,74)^$C(8,32,8)
+C-TV925=80^#,$C(27,44)^24^$C(8)^W $C(27,61,DY+32,DX+32) S $X=DX,$Y=DY^^^$C(27,44)^$C(8,32,8)
+C-VT100=80^#,$C(27,91,72,27,91,74)^24^$C(8)^W $C(27,91)_(DY+1)_";"_(DX+1)_"H" S $X=DX,$Y=DY^$C(27,91,74)^$C(27,91,75)^^
+C-VT101W=132^#,$C(27,91,72,27,91,74)^14^$C(8)^W $C(27,91)_(DY+1)_";"_(DX+1)_"H" S $X=DX,$Y=DY^$C(27,91,74)^$C(27,91,75)^^
+C-VT132=132^#,$C(27,91,72,27,91,74)^24^$C(8)^W $C(27,91)_(DY+1)_";"_(DX+1)_"H" S $X=DX,$Y=DY^$C(27,91,74)^$C(27,91,75)^^
+C-VT220=80^#,$C(27,91,72,27,91,74)^24^$C(8)^W $C(27,91)_(DY+1)_";"_(DX+1)_"H" S $X=DX,$Y=DY^$C(27,91,74)^$C(27,91,75)^$C(27,91,72,27,91,74)^$C(8,32,8)
+C-VT240=80^#,$C(27,91,72,27,91,74)^24^$C(8)^W $C(27,91)_(DY+1)_";"_(DX+1)_"H" S $X=DX,$Y=DY^$C(27,91,74)^$C(27,91,75)^$C(27,91,72,27,91,74)^$C(8,32,8)
+C-VT52=80^#,$C(27,72)^24^$C(8)^W $C(27,89,DY+32,DX+32) S $X=DX,$Y=DY^^^^
+M/UX=255^#^66^$C(8)^^^^^
+MAIL=132^#^11^$C(8)^^^^^
+P-DEC=132^#^66^$C(8)^^^^^
+PK-DEC=150^#^66^$C(8)^^^^^
+PK-QUME=150^#^66^$C(8)^^^^^
+
+[Devices]
+0=0^TRM^C-Cache Terminal^^^^Principal device^
+2=2^SPL^PK-DEC^^^^Spool LA120^
+47=47^MT^M/UX^^("auv":0:2048)^^Magnetic tape^
+48=48^MT^M/UX^^("avl":0:2048)^^Magnetic tape^
+57=57^BT^M/UX^^("auv":0:2048)^^Magnetic tape^
+58=58^BT^M/UX^^("avl":0:2048)^^Magnetic tape^
+SPOOL=2^SPL^PK-DEC^^^^Spool LA120^
+TERM=0^TRM^C-Cache Terminal^^^^Windows Console^
+|LAT|=0^TRM^C-VT220^^^^Principal device^
+|PRN|=|PRN|^OTH^P-DEC^^"W"^^Windows Printer^
+|TNT|=0^TRM^C-VT220^^^^Principal device^
+|TRM|=0^TRM^C-Cache Terminal^^^^Windows Console^
+
+[MagTapes]
+47=/dev/st0
+48=/dev/st1
+49=/dev/st0l
+50=/dev/st1l
+51=/dev/st0a
+52=/dev/st1a
+53=/dev/st0m
+54=/dev/st1m
+55=/dev/nst0
+56=/dev/nst1
+57=/dev/st0
+58=/dev/st1
+59=/dev/st0l
+60=/dev/st1l
+61=/dev/st0a
+62=/dev/st1a
+
+[config]
+LibPath=
+MaxServerConn=1
+MaxServers=2
+Path=
+bbsiz=262144
+console=,
+errlog=500
+globals=0,0,0,0,0,0
+gmheap=37568
+history=32,1024
+ijcbuff=512
+ijcnum=16
+jrnbufs=64
+locksiz=16777216
+memlock=0
+netjob=1
+nlstab=50
+overview=Linux/x86-64~UNIX
+pijdir=
+routines=0
+targwijsz=0
+udevtabsiz=24576
+vectors=32
+wijdir=
+zfheap=0,0
+
+[Miscellaneous]
+AsyncDisconnectErr=0
+AsynchError=1
+BreakMode=1
+CollectResourceStats=0
+DisconnectErr=0
+EnableLongStrings=1
+FileMode=0
+GlobalKillEnabled=1
+IEEEError=1
+LineRecall=1
+LogRollback=0
+MVDefined=0
+NodeNameInPid=0
+NullSubscripts=0
+OldZU5=0
+OpenMode=0
+PopError=0
+RefInKind=0
+ScientificNotation=1
+SetZEOF=0
+ShutDownLogErrors=0
+StopID=0
+SwitchOSdir=0
+SynchCommit=0
+TelnetNUL=0
+TruncateOverflow=0
+Undefined=0
+UseNagleAlgorithm=0
+ViewPastData=0
+ZDateNull=0
+ZaMode=0
+
+[ECP]
+ClientReconnectDuration=1200
+ClientReconnectInterval=5
+ServerTroubleDuration=60
+
+[Cluster]
+CommIPAddress=
+JoinCluster=0
+
+[LicenseServers]
+LOCAL=127.0.0.1,4001
+
+[Monitor]
+PatrolCollectionInterval=30
+PatrolDisplayMode=0
+PatrolEnabled=0
+PatrolTopProcesses=20
+SNMPEnabled=0
+WMIEnabled=0
+
+[IO]
+File=^%X364
+MagTape=^%XMAG
+Other=^%X364
+Terminal=^%X364
+
+[SQL]
+ANSIPrecedence=0
+AllowRowIDUpdate=0
+BiasQueriesAsOutlier=0
+Comment=1
+DBMSSecurity=1
+DDLDefineBitmapExtent=1
+DDLFinal=1
+DDLNo201=0
+DDLNo30=0
+DDLNo307=0
+DDLNo311=0
+DDLNo315=0
+DDLNo324=0
+DDLNo333=0
+DDLSQLOnlyCompile=0
+DDLUseSequence=1
+DefaultSchema=SQLUser
+DelimitedIds=1
+DropDelete=1
+ECPSync=0
+ExtrinsicFunctions=0
+FastDistinct=1
+IdKey=1
+IdTrxFrom=~ `!@#$%^&*()_+-=[]\{}|;':",./<>?
+IdTrxTo=
+JDBCGatewayAddress=
+JDBCGatewayJVMArgs=
+JDBCGatewayLog=
+JDBCGatewayPort=62972
+JDBCGatewayUsePassphrase=0
+JavaClassPath=
+JavaHome=
+LockThreshold=1000
+LockTimeout=10
+ODBCVarcharMaxlen=4096
+Prefix=CacheSql
+QueryProcedures=0
+ReferentialChecks=1
+SaveMAC=0
+TCPKeepAlive=300
+TODATEDefaultFormat=DD MON YYYY
+TimePrecision=0
+
+[SqlSysDatatypes]
+BIGINT=%Library.BigInt
+BIGINT(%1)=%Library.BigInt
+BINARY=%Library.Binary(MAXLEN=1)
+BINARY VARYING=%Library.Binary(MAXLEN=1)
+BINARY VARYING(%1)=%Library.Binary(MAXLEN=%1)
+BINARY(%1)=%Library.Binary(MAXLEN=%1)
+BIT=%Library.Boolean
+BLOB=%Stream.GlobalBinary
+CHAR=%Library.String(MAXLEN=1)
+CHAR VARYING=%Library.String(MAXLEN=1)
+CHAR VARYING(%1)=%Library.String(MAXLEN=%1)
+CHAR(%1)=%Library.String(MAXLEN=%1)
+CHARACTER=%Library.String(MAXLEN=1)
+CHARACTER VARYING=%Library.String(MAXLEN=1)
+CHARACTER VARYING(%1)=%Library.String(MAXLEN=%1)
+CHARACTER(%1)=%Library.String(MAXLEN=%1)
+CLOB=%Stream.GlobalCharacter
+DATE=%Library.Date
+DATETIME=%Library.DateTime
+DATETIME2=%Library.DateTime
+DEC=%Library.Numeric(MAXVAL=999999999999999,MINVAL=-999999999999999,SCALE=0)
+DEC(%1)=%Library.Numeric(MAXVAL=<|'$$maxval^%apiSQL(%1,0)'|>,MINVAL=<|'$$minval^%apiSQL(%1,0)'|>,SCALE=0)
+DEC(%1,%2)=%Library.Numeric(MAXVAL=<|'$$maxval^%apiSQL(%1,%2)'|>,MINVAL=<|'$$minval^%apiSQL(%1,%2)'|>,SCALE=%2)
+DECIMAL=%Library.Numeric(MAXVAL=999999999999999,MINVAL=-999999999999999,SCALE=0)
+DECIMAL(%1)=%Library.Numeric(MAXVAL=<|'$$maxval^%apiSQL(%1,0)'|>,MINVAL=<|'$$minval^%apiSQL(%1,0)'|>,SCALE=0)
+DECIMAL(%1,%2)=%Library.Numeric(MAXVAL=<|'$$maxval^%apiSQL(%1,%2)'|>,MINVAL=<|'$$minval^%apiSQL(%1,%2)'|>,SCALE=%2)
+DOUBLE=%Library.Double
+DOUBLE PRECISION=%Library.Double
+FLOAT=%Library.Float
+FLOAT(%1)=%Library.Float(MAXVAL=<|'$$maxval^%apiSQL(%1)'|>,MINVAL=<|'$$minval^%apiSQL(%1)'|>)
+IMAGE=%Stream.GlobalBinary
+INT=%Library.Integer(MAXVAL=2147483647,MINVAL=-2147483648)
+INT(%1)=%Library.Integer(MAXVAL=2147483647,MINVAL=-2147483648)
+INTEGER=%Library.Integer(MAXVAL=2147483647,MINVAL=-2147483648)
+LONG=%Stream.GlobalCharacter
+LONG BINARY=%Stream.GlobalBinary
+LONG RAW=%Stream.GlobalBinary
+LONG VARCHAR=%Stream.GlobalCharacter
+LONG VARCHAR(%1)=%Stream.GlobalCharacter
+LONGTEXT=%Stream.GlobalCharacter
+LONGVARBINARY=%Stream.GlobalBinary
+LONGVARBINARY(%1)=%Stream.GlobalBinary
+LONGVARCHAR=%Stream.GlobalCharacter
+LONGVARCHAR(%1)=%Stream.GlobalCharacter
+MEDIUMINT=%Library.Integer(MAXVAL=8388607,MINVAL=-8388608)
+MEDIUMINT(%1)=%Library.Integer(MAXVAL=8388607,MINVAL=-8388608)
+MONEY=%Library.Currency
+NATIONAL CHAR=%Library.String(MAXLEN=1)
+NATIONAL CHAR VARYING=%Library.String(MAXLEN=1)
+NATIONAL CHAR VARYING(%1)=%Library.String(MAXLEN=%1)
+NATIONAL CHAR(%1)=%Library.String(MAXLEN=%1)
+NATIONAL CHARACTER=%Library.String(MAXLEN=1)
+NATIONAL CHARACTER VARYING=%Library.String(MAXLEN=1)
+NATIONAL CHARACTER VARYING(%1)=%Library.String(MAXLEN=%1)
+NATIONAL CHARACTER(%1)=%Library.String(MAXLEN=%1)
+NATIONAL VARCHAR=%Library.String(MAXLEN=1)
+NATIONAL VARCHAR(%1)=%Library.String(MAXLEN=%1)
+NCHAR=%Library.String(MAXLEN=1)
+NCHAR(%1)=%Library.String(MAXLEN=%1)
+NTEXT=%Stream.GlobalCharacter
+NUMBER=%Library.Numeric(SCALE=0)
+NUMBER(%1)=%Library.Numeric(MAXVAL=<|'$$maxval^%apiSQL(%1)'|>,MINVAL=<|'$$minval^%apiSQL(%1)'|>,SCALE=0)
+NUMBER(%1,%2)=%Library.Numeric(MAXVAL=<|'$$maxval^%apiSQL(%1,%2)'|>,MINVAL=<|'$$minval^%apiSQL(%1,%2)'|>,SCALE=%2)
+NUMERIC=%Library.Numeric(MAXVAL=999999999999999,MINVAL=-999999999999999,SCALE=0)
+NUMERIC(%1)=%Library.Numeric(MAXVAL=<|'$$maxval^%apiSQL(%1,0)'|>,MINVAL=<|'$$minval^%apiSQL(%1,0)'|>,SCALE=0)
+NUMERIC(%1,%2)=%Library.Numeric(MAXVAL=<|'$$maxval^%apiSQL(%1,%2)'|>,MINVAL=<|'$$minval^%apiSQL(%1,%2)'|>,SCALE=%2)
+NVARCHAR=%Library.String(MAXLEN=1)
+NVARCHAR(%1)=%Library.String(MAXLEN=%1)
+NVARCHAR(%1,%2)=%Library.String(MAXLEN=%1)
+NVARCHAR(MAX)=%Stream.GlobalCharacter
+POSIXTIME=%Library.PosixTime
+RAW(%1)=%Library.Binary(MAXLEN=%1)
+REAL=%Library.Float
+ROWVERSION=%Library.RowVersion
+SERIAL=%Library.Counter
+SMALLDATETIME=%Library.DateTime(MINVAL="1900-01-01 00:00:00",MAXVAL="2079-06-06-23:59:59")
+SMALLINT=%Library.SmallInt
+SMALLINT(%1)=%Library.SmallInt
+SMALLMONEY=%Library.Currency
+SYSNAME=%Library.String(MAXLEN=128)
+TEXT=%Stream.GlobalCharacter
+TIME=%Library.Time
+TIMESTAMP=%Library.PosixTime
+TINYINT=%Library.TinyInt
+TINYINT(%1)=%Library.TinyInt
+UNIQUEIDENTIFIER=%Library.UniqueIdentifier
+VARBINARY=%Library.Binary(MAXLEN=1)
+VARBINARY(%1)=%Library.Binary(MAXLEN=%1)
+VARCHAR=%Library.String(MAXLEN=1)
+VARCHAR(%1)=%Library.String(MAXLEN=%1)
+VARCHAR(%1,%2)=%Library.String(MAXLEN=%1)
+VARCHAR(MAX)=%Stream.GlobalCharacter
+VARCHAR2(%1)=%Library.String(MAXLEN=%1)
+
+[Telnet]
+DNSLookup=ON
+Port=23
+
+[Conversions]
+LastConvertTime=2017-05-08 01:37:15
+
+
+  </pre>
+</div><hr noshade size="4">
+<a name="cconsole"></a>
+<h2>cconsole.log</h2>
+
+<div class="scrollable" style="width:100%;height:400px;">
+  <pre>Caché cconsole.log on Jun 09 2017 at  2:20 PM:
+
+05/25/17-19:23:59:597 (31798) 0 Allocated 167MB shared memory: 2MB global buffers, 35MB routine buffers
+05/25/17-19:23:59:598 (31798) 0 Intel Sandy Bridge AES-NI instructions detected.
+05/25/17-19:23:59:610 (31798) 0 Creating a new WIJ file
+05/25/17-19:23:59:865 (31798) 0 New WIJ file created
+05/25/17-19:23:59:866 (31798) 0 
+CSTART of Cache for UNIX (SUSE Linux Enterprise Server for x86-64) 2017.3 (Build 587) Mon May 8 2017 01:37:27 EDT.
+	in /home/amarin/intersystems/cache20173/mgr
+	with wij: /home/amarin/intersystems/cache20173/mgr/CACHE.WIJ
+	from: /home/amarin/intersystems/cache20173/mgr/
+  OS=[Linux], version=[#74-Ubuntu SMP Fri Dec 2 15:59:10 UTC 2016], release=[4.4.0-53-generic], machine=[x86_64]
+  nodename=[amarin-Latitude-E6440].
+  numasyncwijbuf: 0, swdwrtmax: 0, wijdirectio: off, synctype: 3
+  System Initialized.
+05/25/17-19:23:59:876 (31815) 0 Write daemon started.
+05/25/17-19:24:00:388 (31832) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/ (SFN 0) read-write.
+05/25/17-19:24:00:396 (31836) 0 Starting ^INSTALL procedure
+05/25/17-19:24:00:397 (31825) 0 Starting Expansion for database /home/amarin/intersystems/cache20173/mgr/. 134 MB requested.
+05/25/17-19:24:04:474 (31825) 0 Expansion completed for database /home/amarin/intersystems/cache20173/mgr/. Expanded by 134 MB.
+05/25/17-19:24:09:689 (31836) 0 Switching to temporary %SYS Namespace
+05/25/17-19:24:09:810 (31836) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/cachelib/ (SFN 1) read-only. Database label is marked read-only. 
+05/25/17-19:24:09:811 (31836) 0 Creating missing CACHETEMP database in /home/amarin/intersystems/cache20173/mgr/cachetemp
+05/25/17-19:24:09:812 (31836) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/cachetemp/ (SFN 2) read-write.
+05/25/17-19:24:09:812 (31836) 0 Creating CACHE database in /home/amarin/intersystems/cache20173/mgr/cache/
+05/25/17-19:24:10:090 (31836) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/cache/ (SFN 3) read-write.
+05/25/17-19:24:10:095 (31836) 0 Switching to default %SYS Namespace
+05/25/17-19:24:10:095 (31836) 0 Loading DLLs
+05/25/17-19:24:10:644 (31836) 0 Loading Locale enu8 (English, United States, Latin1 (ISO 8859-1)) from objects
+05/25/17-19:24:10:919 (31798) 0 The WIJ expanded 1 time(s) and added 10MB
+05/25/17-19:24:11:651 (31850) 0 Switched database /home/amarin/intersystems/cache20173/mgr/cachelib/ (SFN 1) to read-write.
+05/25/17-19:24:11:653 (31850) 0 Switched database /home/amarin/intersystems/cache20173/mgr/cachelib/ (SFN 1) to read-only.
+05/25/17-19:24:23:643 (31836) 1 Failed to load dynamic library libkrb5.so, dlerror(): libkrb5.so: cannot open shared object file: No such file or directory
+05/25/17-19:24:23:643 (31836) 1 Failed to load dynamic library libkrb5.sl, dlerror(): libkrb5.sl: cannot open shared object file: No such file or directory
+05/25/17-19:24:23:643 (31836) 2 Kerberos authentication unavailable:  Error opening Kerberos library
+05/25/17-19:24:23:695 (31836) 0 init_gcr_seed:  gen_crypt_rand seeded from /dev/urandom:  64 bytes.
+05/25/17-19:24:23:750 (31836) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/samples/ (SFN 4) read-write.
+05/25/17-19:24:25:925 (31836) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/cacheaudit/ (SFN 5) read-write.
+05/25/17-19:24:26:473 (31836) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/user/ (SFN 6) read-write.
+05/25/17-19:24:36:565 (31836) 0 Finishing ^INSTALL procedure
+05/25/17-19:24:36:569 (2040) 0 Shutting down Cache
+05/25/17-19:24:36:581 (2040) 0 Notifying Clients
+05/25/17-19:24:36:581 (2040) 0 No user shutdown routines to execute
+05/25/17-19:24:36:581 (2040) 0 Stopping User Jobs
+05/25/17-19:24:36:582 (2040) 0 Stopping Network Servers
+05/25/17-19:24:36:582 (2040) 0 Withdrawing from License Domain
+05/25/17-19:24:36:582 (2040) 0 Waiting for users to stop
+05/25/17-19:24:36:582 (2040) 0 Stopping Client Networking
+05/25/17-19:24:36:582 (2040) 0 Removing database locks
+05/25/17-19:24:36:583 (2040) 0 Updating Journal File
+05/25/17-19:24:36:584 (2040) 0 Journal restore not required at next startup
+05/25/17-19:24:36:584 (2040) 0 Transaction rollback not required at next startup
+05/25/17-19:24:38:584 (2040) 0 Waiting for database updates to complete
+05/25/17-19:24:38:584 (2040) 0 Database updates complete
+05/25/17-19:24:38:584 (2040) 0 Stopping System Jobs
+05/25/17-19:24:38:684 (31825) 0 EXPDMN exited due to system shutdown
+05/25/17-19:24:38:684 (31817) 0 JRNDMN exited due to system shutdown
+05/25/17-19:24:38:685 (31816) 0 GARCOL exited due to system shutdown
+05/25/17-19:24:38:832 (31821) 0 SWRTDMN #1 exited due to system shutdown
+05/25/17-19:24:38:832 (31823) 0 SWRTDMN #3 exited due to system shutdown
+05/25/17-19:24:38:832 (31822) 0 SWRTDMN #2 exited due to system shutdown
+05/25/17-19:24:38:832 (31824) 0 SWRTDMN #4 exited due to system shutdown
+05/25/17-19:24:38:833 (31820) 0 SWRTDMN #6 exited due to system shutdown
+05/25/17-19:24:38:833 (31819) 0 SWRTDMN #7 exited due to system shutdown
+05/25/17-19:24:38:833 (31818) 0 SWRTDMN #5 exited due to system shutdown
+05/25/17-19:24:39:415 (31815) 0 No blocks pending in WIJ file
+05/25/17-19:24:39:416 (31815) 0 WRTDMN exited due to system shutdown
+05/25/17-19:24:39:486 (31798) 0 CONTROL exited due to system shutdown
+05/25/17-19:24:40:586 (2040) 0 Shutdown complete
+
+
+
+*** Recovery started at Thu May 25 19:24:45 2017
+     Current default directory: /home/amarin/intersystems/cache20173/mgr
+     Log file directory: /home/amarin/intersystems/cache20173/mgr/
+     WIJ file spec: ./CACHE.WIJ
+Recovering local (./CACHE.WIJ) image journal file...
+Starting WIJ recovery for &#39;./CACHE.WIJ&#39;.
+  0 blocks pending in this WIJ.
+Exiting with status 3 (Success)
+05/25/17-19:24:45:754 (2449) 0 Automatically configuring buffers
+05/25/17-19:24:45:783 (2449) 0 Allocated 1230MB shared memory: 1024MB global buffers, 35MB routine buffers
+05/25/17-19:24:45:784 (2449) 0 Intel Sandy Bridge AES-NI instructions detected.
+05/25/17-19:24:45:811 (2449) 0 No journaling info from prior system
+05/25/17-19:24:45:812 (2449) 0 Creating a new WIJ file
+05/25/17-19:24:47:635 (2449) 0 New WIJ file created
+05/25/17-19:24:47:636 (2449) 0 
+CSTART of Cache for UNIX (SUSE Linux Enterprise Server for x86-64) 2017.3 (Build 587) Mon May 8 2017 01:37:27 EDT.
+	in /home/amarin/intersystems/cache20173/mgr
+	with wij: /home/amarin/intersystems/cache20173/mgr/CACHE.WIJ
+	from: /home/amarin/intersystems/cache20173/mgr/
+  OS=[Linux], version=[#74-Ubuntu SMP Fri Dec 2 15:59:10 UTC 2016], release=[4.4.0-53-generic], machine=[x86_64]
+  nodename=[amarin-Latitude-E6440].
+  numasyncwijbuf: 0, swdwrtmax: 0, wijdirectio: off, synctype: 3
+  System Initialized.
+05/25/17-19:24:47:747 (3091) 0 Write daemon started.
+05/25/17-19:24:47:750 (3410) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/ (SFN 0) read-write.
+05/25/17-19:24:47:751 (3410) 0 Instance &#39;C173&#39; starting on node amarin-Latitude-E6440 by user cacheusr
+05/25/17-19:24:47:751 (3410) 0 Using parameters from file &#39;/home/amarin/intersystems/cache20173/cache.cpf&#39;
+05/25/17-19:24:47:751 (3410) 0 Loading DLLs
+05/25/17-19:24:47:751 (3410) 0 Switching to temporary %SYS Namespace
+05/25/17-19:24:47:751 (3410) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/cachelib/ (SFN 1) read-only. Database label is marked read-only. 
+05/25/17-19:24:47:752 (3410) 0 Loading Locale enu8 (English, United States, Latin1 (ISO 8859-1)) from objects
+05/25/17-19:24:48:015 (3410) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/cachetemp/ (SFN 2) read-write.
+05/25/17-19:24:48:016 (3410) 0 /home/amarin/intersystems/cache20173/mgr/cachetemp/ initialized as CACHETEMP
+05/25/17-19:24:48:017 (3410) 0 Switching to default %SYS Namespace
+05/25/17-19:24:48:017 (3410) 0 Added ethernet device cscotun0,eno1,vboxnet0,vboxnet1,wlp3s0 to default list
+05/25/17-19:24:48:020 (3906) 0 Cache MONITOR Started
+05/25/17-19:24:48:120 (3410) 0 Enabling long strings
+05/25/17-19:24:48:122 (4103) 0 Clean Daemon Started
+05/25/17-19:24:48:184 (3410) 0 Updating configuration information from /home/amarin/intersystems/cache20173/cache.cpf
+05/25/17-19:24:48:192 (3410) 0 Performing Journal Recovery
+05/25/17-19:24:48:192 (3410) 0 Graceful system shutdown, journal restore not required
+05/25/17-19:24:48:192 (3410) 0 Graceful system shutdown, transaction rollback not required
+05/25/17-19:24:48:193 (3410) 0 START: /home/amarin/intersystems/cache20173/mgr/journal/20170525.001
+05/25/17-19:24:48:441 (3410) 0 CACHE JOURNALING SYSTEM MESSAGE
+Journaling started to: /home/amarin/intersystems/cache20173/mgr/journal/20170525.001
+05/25/17-19:24:48:441 (3410) 0 Journaling to /home/amarin/intersystems/cache20173/mgr/journal/20170525.001 started.
+05/25/17-19:24:48:442 (3410) 0 Processing Startup section
+05/25/17-19:24:48:444 (4688) 0 Purging old application errors
+05/25/17-19:24:48:444 (3410) 0 Created temp directory /home/amarin/intersystems/cache20173/mgr/Temp
+05/25/17-19:24:48:447 (3410) 0 Initializing Security system
+05/25/17-19:24:48:467 (4688) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/cache/ (SFN 3) read-write.
+05/25/17-19:24:48:473 (3410) 0 Processing Network section
+05/25/17-19:24:48:473 (3410) 0 Activating Network
+05/25/17-19:24:48:678 (3410) 0 Processing Databases section
+05/25/17-19:24:48:679 (3410) 0 Processing Namespaces section
+05/25/17-19:24:48:679 (3410) 0 Loading all namespaces
+05/25/17-19:24:48:720 (3410) 0 Activating namespaces
+05/25/17-19:24:48:720 (3410) 0 Activating new namespace map
+05/25/17-19:24:48:730 (3410) 0 Namespace changes have been activated
+05/25/17-19:24:48:731 (3410) 0 Auditing is disabled
+05/25/17-19:24:48:732 (3410) 0 Starting Super Server on port 1972
+05/25/17-19:24:48:734 (3410) 0 Network Lock Upload Phase Starting
+05/25/17-19:24:48:734 (3410) 0 Lock Upload Phase Complete
+05/25/17-19:24:48:735 (3410) 0 Processing Miscellaneous section
+05/25/17-19:24:48:740 (5422) 0 LMF Info:  Licensed for 10000 users.
+05/25/17-19:24:48:742 (3410) 0 init_gcr_seed:  gen_crypt_rand seeded from /dev/urandom:  64 bytes.
+05/25/17-19:24:48:743 (3410) 0 Processing Devices section
+05/25/17-19:24:48:743 (3410) 0 Processing DeviceSubTypes section
+05/25/17-19:24:48:743 (3410) 0 Processing MagTape section
+05/25/17-19:24:48:743 (3410) 0 Processing IO section
+05/25/17-19:24:48:743 (3410) 0 Processing SQL section
+05/25/17-19:24:48:756 (5425) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/cacheaudit/ (SFN 4) read-write.
+05/25/17-19:24:48:862 (5423) 0 Private webserver started on 57772
+05/25/17-19:24:48:865 (5423) 0 Processing Shadows section (this system as shadow)
+05/25/17-19:24:48:865 (5423) 0 Processing Monitor section
+05/25/17-19:24:49:071 (5578) 0 [SYSTEM MONITOR] System Monitor started in %SYS
+05/25/17-19:24:49:078 (3410) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/docbook/ (SFN 5) read-write.
+05/25/17-19:24:49:100 (3410) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/samples/ (SFN 6) read-write.
+05/25/17-19:24:49:533 (3410) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/user/ (SFN 7) read-write.
+05/25/17-19:24:49:534 (3410) 0 Executing ^ZSTU routine
+05/25/17-19:24:49:534 (3410) 0 Executing ^%ZSTART routine
+05/25/17-19:24:49:534 (3410) 0 Enabling logons
+05/25/17-19:24:50:741 (5422) 0 LMF Info:  License server started on port 4001
+05/25/17-19:24:52:742 (5422) 0 LMF Info:  Connected to license server 127.0.0.1,4001
+05/25/17-19:36:55:183 (3813) 0 Switched database /home/amarin/intersystems/cache20173/mgr/cachelib/ (SFN 1) to read-write.
+05/25/17-19:36:55:649 (3106) 0 Starting Expansion for database /home/amarin/intersystems/cache20173/mgr/cachetemp/. 10 MB requested.
+05/25/17-19:36:55:929 (3106) 0 Expansion completed for database /home/amarin/intersystems/cache20173/mgr/cachetemp/. Expanded by 10 MB.
+05/25/17-19:37:07:273 (3858) 0 Activating new namespace map
+05/25/17-19:37:07:294 (3858) 0 Namespace changes have been activated
+05/25/17-19:37:07:352 (3858) 0 Activating new namespace map
+05/25/17-19:37:07:364 (3858) 0 Namespace changes have been activated
+05/25/17-19:37:07:429 (3858) 0 Activating new namespace map
+05/25/17-19:37:07:441 (3858) 0 Namespace changes have been activated
+05/25/17-19:37:07:464 (3858) 0 Activating DOCBOOK namespace map
+05/25/17-19:37:07:476 (3858) 0 Namespace DOCBOOK changes have been activated
+05/25/17-19:37:07:507 (3858) 0 Activating DOCBOOK namespace map
+05/25/17-19:37:07:509 (3858) 0 Namespace DOCBOOK changes have been activated
+05/25/17-19:37:09:345 (3106) 0 Starting Expansion for database /home/amarin/intersystems/cache20173/mgr/samples/. 12 MB requested.
+05/25/17-19:37:09:783 (3106) 0 Expansion completed for database /home/amarin/intersystems/cache20173/mgr/samples/. Expanded by 12 MB.
+05/25/17-21:37:34:221 (4103) 0 Clean daemon. exited due to SIGTERM received
+05/25/17-21:37:34:223 (4786) 0 ECP Worker daemon exited due to SIGTERM received
+05/25/17-21:37:34:224 (5420) 0 Super Server exited due to SIGTERM received
+05/25/17-21:37:34:265 (4780) 0 Receive daemon exited due to SIGTERM received
+05/25/17-21:37:34:265 (5422) 0 LMFMON exited due to SIGTERM received
+05/25/17-21:37:34:266 (5579) 0 Task Manager exited due to SIGTERM received
+05/25/17-21:37:34:266 (3906) 0 Cache MONITOR exited due to SIGTERM received
+05/25/17-21:37:34:268 (5578) 0 Application Monitor exited due to SIGTERM received
+
+
+
+*** Recovery started at Fri May 26 11:15:58 2017
+     Current default directory: /home/amarin/intersystems/cache20173/mgr
+     Log file directory: /home/amarin/intersystems/cache20173/mgr/
+     WIJ file spec: ./CACHE.WIJ
+Recovering local (./CACHE.WIJ) image journal file...
+Starting WIJ recovery for &#39;./CACHE.WIJ&#39;.
+  0 blocks pending in this WIJ.
+WIJ pass # is 0.
+Starting fast WIJ compare
+Finished comparing 6 blocks in 0 seconds
+Exiting with status 3 (Success)
+05/26/17-11:15:58:130 (14460) 0 Automatically configuring buffers
+05/26/17-11:15:58:210 (14460) 0 Allocated 1230MB shared memory: 1024MB global buffers, 35MB routine buffers
+05/26/17-11:15:58:213 (14460) 0 Intel Sandy Bridge AES-NI instructions detected.
+05/26/17-11:15:58:309 (14460) 0 Jrn info from prior WIJ (imflags: 0):
+	wdpass: 0
+	jrnwdpass: 720
+	fspec: /home/amarin/intersystems/cache20173/mgr/journal/20170525.001
+	filecnt: 1
+	fileoff: 8850688
+	prevfcnt: 1
+	prevfileoeff: 8850688
+	min trans cnt: 1
+	min trans index: 8850688
+05/26/17-11:15:58:311 (14460) 0 
+CSTART of Cache for UNIX (SUSE Linux Enterprise Server for x86-64) 2017.3 (Build 587) Mon May 8 2017 01:37:27 EDT.
+	in /home/amarin/intersystems/cache20173/mgr
+	with wij: /home/amarin/intersystems/cache20173/mgr/CACHE.WIJ
+	from: /home/amarin/intersystems/cache20173/mgr/
+  OS=[Linux], version=[#99-Ubuntu SMP Thu Apr 27 15:29:09 UTC 2017], release=[4.4.0-78-generic], machine=[x86_64]
+  nodename=[amarin-Latitude-E6440].
+  numasyncwijbuf: 0, swdwrtmax: 0, wijdirectio: off, synctype: 3
+  System Initialized.
+05/26/17-11:15:58:331 (14477) 0 Write daemon started.
+05/26/17-11:15:58:345 (14488) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/ (SFN 0) read-write.
+05/26/17-11:15:58:432 (14488) 0 Instance &#39;C173&#39; starting on node amarin-Latitude-E6440 by user cacheusr
+05/26/17-11:15:58:432 (14488) 0 Using parameters from file &#39;/home/amarin/intersystems/cache20173/cache.cpf&#39;
+05/26/17-11:15:58:454 (14488) 0 Loading DLLs
+05/26/17-11:15:58:454 (14488) 0 Switching to temporary %SYS Namespace
+05/26/17-11:15:58:488 (14488) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/cachelib/ (SFN 1) read-write.
+05/26/17-11:15:58:944 (14488) 0 Loading Locale enu8 (English, United States, Latin1 (ISO 8859-1)) from objects
+05/26/17-11:15:59:176 (14488) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/cachetemp/ (SFN 2) read-write.
+05/26/17-11:15:59:367 (14488) 0 /home/amarin/intersystems/cache20173/mgr/cachetemp/ initialized as CACHETEMP
+05/26/17-11:15:59:398 (14488) 0 Switching to default %SYS Namespace
+05/26/17-11:15:59:480 (14488) 0 Added ethernet device cscotun0,eno1,vboxnet1,wlp3s0 to default list
+05/26/17-11:15:59:548 (14489) 0 Cache MONITOR Started
+05/26/17-11:15:59:648 (14488) 2 Previous system shutdown was abnormal, system forced down or crashed
+05/26/17-11:15:59:661 (14488) 0 Enabling long strings
+05/26/17-11:15:59:673 (14490) 0 Clean Daemon Started
+05/26/17-11:15:59:709 (14488) 0 Updating configuration information from /home/amarin/intersystems/cache20173/cache.cpf
+05/26/17-11:15:59:994 (14488) 0 Performing Journal Recovery
+05/26/17-11:16:01:131 (14488) 0 Restoring from journal /home/amarin/intersystems/cache20173/mgr/journal/20170525.001
+05/26/17-11:16:01:169 (14488) 0 Performing Transaction Rollback if necessary
+05/26/17-11:16:01:201 (14488) 0   Scanning /home/amarin/intersystems/cache20173/mgr/journal/20170525.001
+05/26/17-11:16:01:202 (14488) 0 No open transactions to roll back
+05/26/17-11:16:01:209 (14488) 0 START: /home/amarin/intersystems/cache20173/mgr/journal/20170526.001
+05/26/17-11:16:01:218 (14488) 1 Warning: Alternate and primary journal directories are the same
+05/26/17-11:16:01:371 (14488) 0 CACHE JOURNALING SYSTEM MESSAGE
+Journaling started to: /home/amarin/intersystems/cache20173/mgr/journal/20170526.001
+05/26/17-11:16:01:371 (14488) 0 Journaling to /home/amarin/intersystems/cache20173/mgr/journal/20170526.001 started.
+05/26/17-11:16:01:413 (14488) 0 Processing Startup section
+05/26/17-11:16:01:417 (14496) 0 Purging old application errors
+05/26/17-11:16:01:815 (14488) 0 Initializing Security system
+05/26/17-11:16:01:830 (14496) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/cache/ (SFN 3) read-write.
+05/26/17-11:16:01:873 (14488) 0 Processing Network section
+05/26/17-11:16:01:874 (14488) 0 Activating Network
+05/26/17-11:16:02:088 (14488) 0 Processing Databases section
+05/26/17-11:16:02:136 (14488) 0 Processing Namespaces section
+05/26/17-11:16:02:136 (14488) 0 Namespaces are up to date
+05/26/17-11:16:02:136 (14488) 0 Activating namespaces
+05/26/17-11:16:02:136 (14488) 0 Activating new namespace map
+05/26/17-11:16:02:185 (14488) 0 Namespace changes have been activated
+05/26/17-11:16:02:191 (14488) 0 Auditing is disabled
+05/26/17-11:16:02:237 (14488) 0 Starting Super Server on port 1972
+05/26/17-11:16:02:239 (14488) 0 Network Lock Upload Phase Starting
+05/26/17-11:16:02:239 (14488) 0 Lock Upload Phase Complete
+05/26/17-11:16:02:239 (14488) 0 Processing Miscellaneous section
+05/26/17-11:16:02:407 (14488) 0 init_gcr_seed:  gen_crypt_rand seeded from /dev/urandom:  64 bytes.
+05/26/17-11:16:02:407 (14488) 0 Processing Devices section
+05/26/17-11:16:02:407 (14488) 0 Processing DeviceSubTypes section
+05/26/17-11:16:02:407 (14488) 0 Processing MagTape section
+05/26/17-11:16:02:475 (14501) 0 LMF Info:  Licensed for 10000 users.
+05/26/17-11:16:02:484 (14488) 0 Processing IO section
+05/26/17-11:16:02:484 (14488) 0 Processing SQL section
+05/26/17-11:16:02:684 (14488) 0 Executing ^ZSTU routine
+05/26/17-11:16:02:714 (14488) 0 Executing ^%ZSTART routine
+05/26/17-11:16:02:734 (14488) 0 Enabling logons
+05/26/17-11:16:03:028 (14502) 0 Private webserver started on 57772
+05/26/17-11:16:03:030 (14502) 0 Processing Shadows section (this system as shadow)
+05/26/17-11:16:03:038 (14502) 0 Processing Monitor section
+05/26/17-11:16:03:296 (14656) 0 [SYSTEM MONITOR] System Monitor started in %SYS
+05/26/17-11:16:04:634 (14501) 0 LMF Info:  License server started on port 4001
+05/26/17-11:16:04:759 (14658) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/samples/ (SFN 4) read-write.
+05/26/17-11:16:06:635 (14501) 0 LMF Info:  Connected to license server 127.0.0.1,4001
+05/26/17-11:17:00:304 (14759) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/docbook/ (SFN 5) read-write.
+05/26/17-11:17:00:414 (14753) 0 Purging old application errors
+05/26/17-11:17:00:681 (14754) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/user/ (SFN 6) read-write.
+05/26/17-11:46:33:925 (14656) 0 [SYSTEM MONITOR] Alert state cleared.
+05/26/17-13:30:09:265 (14666) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/app-data/ (SFN 7) read-write.
+05/26/17-13:30:24:811 (14666) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/app-code/ (SFN 8) read-write.
+05/26/17-13:30:31:088 (14666) 0 Activating APP namespace map
+05/26/17-13:30:31:091 (14666) 0 Namespace APP changes have been activated
+05/26/17-13:31:20:095 (14666) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/app-deepsee/ (SFN 9) read-write.
+05/26/17-13:31:49:992 (14666) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/app-cache/ (SFN 10) read-write.
+05/26/17-13:32:05:769 (14658) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/app-dstime/ (SFN 11) read-write.
+05/26/17-13:34:02:661 (14658) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/cacheaudit/ (SFN 12) read-write.
+05/26/17-13:34:02:661 (14658) 0 Auditing to /home/amarin/intersystems/cache20173/mgr/cacheaudit/
+05/26/17-13:37:53:645 (14658) 0 Activating APP namespace map
+05/26/17-13:37:53:691 (14658) 0 Namespace APP changes have been activated
+05/26/17-15:07:18:815 (14490) 0 Clean daemon. exited due to SIGTERM received
+05/26/17-15:07:18:817 (14489) 0 Cache MONITOR exited due to SIGTERM received
+05/26/17-15:07:18:817 (14657) 0 Task Manager exited due to SIGTERM received
+05/26/17-15:07:18:818 (14498) 0 ECP Worker daemon exited due to SIGTERM received
+05/26/17-15:07:18:818 (14499) 0 Super Server exited due to SIGTERM received
+05/26/17-15:07:18:818 (14501) 0 LMFMON exited due to SIGTERM received
+05/26/17-15:07:18:833 (14656) 0 Application Monitor exited due to SIGTERM received
+05/26/17-15:07:18:839 (14497) 0 Receive daemon exited due to SIGTERM received
+05/26/17-15:07:18:840 (14659) 0 CSP daemon exited due to SIGTERM received
+
+
+
+*** Recovery started at Wed Jun  7 22:42:26 2017
+     Current default directory: /home/amarin/intersystems/cache20173/mgr
+     Log file directory: /home/amarin/intersystems/cache20173/mgr/
+     WIJ file spec: ./CACHE.WIJ
+Recovering local (./CACHE.WIJ) image journal file...
+Starting WIJ recovery for &#39;./CACHE.WIJ&#39;.
+  0 blocks pending in this WIJ.
+WIJ pass # is 0.
+Starting fast WIJ compare
+Finished comparing 5 blocks in 0 seconds
+Exiting with status 3 (Success)
+06/07/17-22:42:26:418 (4273) 0 Automatically configuring buffers
+06/07/17-22:42:26:795 (4273) 0 Allocated 1230MB shared memory: 1024MB global buffers, 35MB routine buffers
+06/07/17-22:42:26:812 (4273) 0 Intel Sandy Bridge AES-NI instructions detected.
+06/07/17-22:42:27:265 (4273) 0 Jrn info from prior WIJ (imflags: 0):
+	wdpass: 0
+	jrnwdpass: 1200
+	fspec: /home/amarin/intersystems/cache20173/mgr/journal/20170526.001
+	filecnt: 2
+	fileoff: 11731316
+	prevfcnt: 2
+	prevfileoeff: 11731316
+	min trans cnt: 2
+	min trans index: 11731316
+06/07/17-22:42:27:266 (4273) 0 
+CSTART of Cache for UNIX (SUSE Linux Enterprise Server for x86-64) 2017.3 (Build 587) Mon May 8 2017 01:37:27 EDT.
+	in /home/amarin/intersystems/cache20173/mgr
+	with wij: /home/amarin/intersystems/cache20173/mgr/CACHE.WIJ
+	from: /home/amarin/intersystems/cache20173/mgr/
+  OS=[Linux], version=[#99-Ubuntu SMP Thu Apr 27 15:29:09 UTC 2017], release=[4.4.0-78-generic], machine=[x86_64]
+  nodename=[amarin-Latitude-E6440].
+  numasyncwijbuf: 0, swdwrtmax: 0, wijdirectio: off, synctype: 3
+  System Initialized.
+06/07/17-22:42:27:307 (4290) 0 Write daemon started.
+06/07/17-22:42:27:389 (4301) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/ (SFN 0) read-write.
+06/07/17-22:42:28:197 (4301) 0 Instance &#39;C173&#39; starting on node amarin-Latitude-E6440 by user cacheusr
+06/07/17-22:42:28:197 (4301) 0 Using parameters from file &#39;/home/amarin/intersystems/cache20173/cache.cpf&#39;
+06/07/17-22:42:28:519 (4301) 0 Loading DLLs
+06/07/17-22:42:28:519 (4301) 0 Switching to temporary %SYS Namespace
+06/07/17-22:42:28:730 (4301) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/cachelib/ (SFN 1) read-write.
+06/07/17-22:42:29:386 (4301) 0 Loading Locale enu8 (English, United States, Latin1 (ISO 8859-1)) from objects
+06/07/17-22:42:30:025 (4301) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/cachetemp/ (SFN 2) read-write.
+06/07/17-22:42:30:319 (4301) 0 /home/amarin/intersystems/cache20173/mgr/cachetemp/ initialized as CACHETEMP
+06/07/17-22:42:30:361 (4301) 0 Switching to default %SYS Namespace
+06/07/17-22:42:30:530 (4301) 0 Added ethernet device cscotun0,eno1,vboxnet1,wlp3s0 to default list
+06/07/17-22:42:30:889 (4302) 0 Cache MONITOR Started
+06/07/17-22:42:31:120 (4301) 2 Previous system shutdown was abnormal, system forced down or crashed
+06/07/17-22:42:31:168 (4301) 0 Enabling long strings
+06/07/17-22:42:31:180 (4303) 0 Clean Daemon Started
+06/07/17-22:42:31:338 (4301) 0 Updating configuration information from /home/amarin/intersystems/cache20173/cache.cpf
+06/07/17-22:42:33:676 (4301) 0 Performing Journal Recovery
+06/07/17-22:42:35:190 (4301) 0 Restoring from journal /home/amarin/intersystems/cache20173/mgr/journal/20170526.001
+06/07/17-22:42:35:231 (4301) 0 Performing Transaction Rollback if necessary
+06/07/17-22:42:35:271 (4301) 0   Scanning /home/amarin/intersystems/cache20173/mgr/journal/20170526.001
+06/07/17-22:42:35:272 (4301) 0 No open transactions to roll back
+06/07/17-22:42:35:313 (4301) 0 START: /home/amarin/intersystems/cache20173/mgr/journal/20170607.001
+06/07/17-22:42:35:321 (4301) 1 Warning: Alternate and primary journal directories are the same
+06/07/17-22:42:35:541 (4301) 0 CACHE JOURNALING SYSTEM MESSAGE
+Journaling started to: /home/amarin/intersystems/cache20173/mgr/journal/20170607.001
+06/07/17-22:42:35:541 (4301) 0 Journaling to /home/amarin/intersystems/cache20173/mgr/journal/20170607.001 started.
+06/07/17-22:42:35:634 (4301) 0 Processing Startup section
+06/07/17-22:42:35:636 (4310) 0 Purging old application errors
+06/07/17-22:42:36:140 (4301) 0 Initializing Security system
+06/07/17-22:42:36:280 (4310) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/cache/ (SFN 3) read-write.
+06/07/17-22:42:36:424 (4301) 0 Processing Network section
+06/07/17-22:42:36:424 (4301) 0 Activating Network
+06/07/17-22:42:36:706 (4301) 0 Processing Databases section
+06/07/17-22:42:37:588 (4301) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/cacheaudit/ (SFN 4) read-write.
+06/07/17-22:42:37:591 (4301) 0 Processing Namespaces section
+06/07/17-22:42:37:591 (4301) 0 Namespaces are up to date
+06/07/17-22:42:37:591 (4301) 0 Activating namespaces
+06/07/17-22:42:37:591 (4301) 0 Activating new namespace map
+06/07/17-22:42:38:210 (4301) 0 Namespace changes have been activated
+06/07/17-22:42:38:467 (4301) 0 Auditing to /home/amarin/intersystems/cache20173/mgr/cacheaudit/
+06/07/17-22:42:39:950 (4301) 0 Starting Super Server on port 1972
+06/07/17-22:42:39:952 (4301) 0 Network Lock Upload Phase Starting
+06/07/17-22:42:39:952 (4301) 0 Lock Upload Phase Complete
+06/07/17-22:42:39:952 (4301) 0 Processing Miscellaneous section
+06/07/17-22:42:40:690 (4301) 0 init_gcr_seed:  gen_crypt_rand seeded from /dev/urandom:  64 bytes.
+06/07/17-22:42:40:690 (4301) 0 Processing Devices section
+06/07/17-22:42:40:690 (4301) 0 Processing DeviceSubTypes section
+06/07/17-22:42:40:690 (4301) 0 Processing MagTape section
+06/07/17-22:42:41:048 (4301) 0 Processing IO section
+06/07/17-22:42:41:048 (4301) 0 Processing SQL section
+06/07/17-22:42:41:117 (4331) 0 LMF Info:  Licensed for 10000 users.
+06/07/17-22:42:41:665 (4301) 0 Executing ^ZSTU routine
+06/07/17-22:42:41:811 (4301) 0 Executing ^%ZSTART routine
+06/07/17-22:42:42:039 (4301) 0 Enabling logons
+06/07/17-22:42:43:422 (4332) 0 Private webserver started on 57772
+06/07/17-22:42:43:425 (4332) 0 Processing Shadows section (this system as shadow)
+06/07/17-22:42:43:492 (4332) 0 Processing Monitor section
+06/07/17-22:42:43:557 (4331) 0 LMF Info:  License server started on port 4001
+06/07/17-22:42:43:657 (4489) 0 [SYSTEM MONITOR] System Monitor started in %SYS
+06/07/17-22:42:43:669 (4332) 2 Preserving journal files /home/amarin/intersystems/cache20173/mgr/journal/20170526.001 and later for journal recovery and transaction rollback
+06/07/17-22:42:43:748 (4332) 0 DELETE: /home/amarin/intersystems/cache20173/mgr/journal/20170525.001
+06/07/17-22:42:45:558 (4331) 0 LMF Info:  Connected to license server 127.0.0.1,4001
+06/07/17-22:43:36:939 (4575) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/samples/ (SFN 5) read-write.
+06/07/17-22:56:15:464 (4303) 0 Clean daemon. exited due to SIGTERM received
+06/07/17-22:56:15:464 (4312) 0 Receive daemon exited due to SIGTERM received
+06/07/17-22:56:15:464 (4495) 0 Task Manager exited due to SIGTERM received
+06/07/17-22:56:15:465 (4302) 0 Cache MONITOR exited due to SIGTERM received
+06/07/17-22:56:15:465 (4331) 0 LMFMON exited due to SIGTERM received
+06/07/17-22:56:15:465 (4333) 0 CSP daemon exited due to SIGTERM received
+06/07/17-22:56:15:466 (4313) 0 ECP Worker daemon exited due to SIGTERM received
+06/07/17-22:56:15:472 (4326) 0 Super Server exited due to SIGTERM received
+06/07/17-22:56:15:494 (4489) 0 Application Monitor exited due to SIGTERM received
+
+
+
+*** Recovery started at Fri Jun  9 08:34:40 2017
+     Current default directory: /home/amarin/intersystems/cache20173/mgr
+     Log file directory: /home/amarin/intersystems/cache20173/mgr/
+     WIJ file spec: ./CACHE.WIJ
+Recovering local (./CACHE.WIJ) image journal file...
+Starting WIJ recovery for &#39;./CACHE.WIJ&#39;.
+  0 blocks pending in this WIJ.
+WIJ pass # is 0.
+Starting fast WIJ compare
+Finished comparing 8 blocks in 0 seconds
+Exiting with status 3 (Success)
+06/09/17-08:34:40:422 (31306) 0 Automatically configuring buffers
+06/09/17-08:34:40:474 (31306) 0 Allocated 1230MB shared memory: 1024MB global buffers, 35MB routine buffers
+06/09/17-08:34:40:489 (31306) 0 Intel Sandy Bridge AES-NI instructions detected.
+06/09/17-08:34:40:575 (31306) 0 Jrn info from prior WIJ (imflags: 0):
+	wdpass: 0
+	jrnwdpass: 66
+	fspec: /home/amarin/intersystems/cache20173/mgr/journal/20170607.001
+	filecnt: 3
+	fileoff: 169484
+	prevfcnt: 3
+	prevfileoeff: 169484
+	min trans cnt: 3
+	min trans index: 169484
+06/09/17-08:34:40:576 (31306) 0 
+CSTART of Cache for UNIX (SUSE Linux Enterprise Server for x86-64) 2017.3 (Build 587) Mon May 8 2017 01:37:27 EDT.
+	in /home/amarin/intersystems/cache20173/mgr
+	with wij: /home/amarin/intersystems/cache20173/mgr/CACHE.WIJ
+	from: /home/amarin/intersystems/cache20173/mgr/
+  OS=[Linux], version=[#99-Ubuntu SMP Thu Apr 27 15:29:09 UTC 2017], release=[4.4.0-78-generic], machine=[x86_64]
+  nodename=[amarin-Latitude-E6440].
+  numasyncwijbuf: 0, swdwrtmax: 0, wijdirectio: off, synctype: 3
+  System Initialized.
+06/09/17-08:34:40:678 (31327) 0 Write daemon started.
+06/09/17-08:34:41:675 (31338) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/ (SFN 0) read-write.
+06/09/17-08:34:41:773 (31338) 0 Instance &#39;C173&#39; starting on node amarin-Latitude-E6440 by user cacheusr
+06/09/17-08:34:41:773 (31338) 0 Using parameters from file &#39;/home/amarin/intersystems/cache20173/cache.cpf&#39;
+06/09/17-08:34:41:796 (31338) 0 Loading DLLs
+06/09/17-08:34:41:796 (31338) 0 Switching to temporary %SYS Namespace
+06/09/17-08:34:41:841 (31338) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/cachelib/ (SFN 1) read-write.
+06/09/17-08:34:42:242 (31338) 0 Loading Locale enu8 (English, United States, Latin1 (ISO 8859-1)) from objects
+06/09/17-08:34:42:463 (31338) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/cachetemp/ (SFN 2) read-write.
+06/09/17-08:34:42:631 (31338) 0 /home/amarin/intersystems/cache20173/mgr/cachetemp/ initialized as CACHETEMP
+06/09/17-08:34:42:662 (31338) 0 Switching to default %SYS Namespace
+06/09/17-08:34:42:744 (31338) 0 Added ethernet device cscotun0,eno1,wlp3s0 to default list
+06/09/17-08:34:42:801 (31413) 0 Cache MONITOR Started
+06/09/17-08:34:42:901 (31338) 2 Previous system shutdown was abnormal, system forced down or crashed
+06/09/17-08:34:42:914 (31338) 0 Enabling long strings
+06/09/17-08:34:42:926 (31416) 0 Clean Daemon Started
+06/09/17-08:34:42:962 (31338) 0 Updating configuration information from /home/amarin/intersystems/cache20173/cache.cpf
+06/09/17-08:34:43:336 (31338) 0 Performing Journal Recovery
+06/09/17-08:34:44:375 (31338) 0 Restoring from journal /home/amarin/intersystems/cache20173/mgr/journal/20170607.001
+06/09/17-08:34:44:449 (31338) 0 Performing Transaction Rollback if necessary
+06/09/17-08:34:44:499 (31338) 0   Scanning /home/amarin/intersystems/cache20173/mgr/journal/20170607.001
+06/09/17-08:34:44:499 (31338) 0 No open transactions to roll back
+06/09/17-08:34:44:507 (31338) 0 START: /home/amarin/intersystems/cache20173/mgr/journal/20170609.001
+06/09/17-08:34:44:515 (31338) 1 Warning: Alternate and primary journal directories are the same
+06/09/17-08:34:44:650 (31338) 0 CACHE JOURNALING SYSTEM MESSAGE
+Journaling started to: /home/amarin/intersystems/cache20173/mgr/journal/20170609.001
+06/09/17-08:34:44:650 (31338) 0 Journaling to /home/amarin/intersystems/cache20173/mgr/journal/20170609.001 started.
+06/09/17-08:34:44:686 (31338) 0 Processing Startup section
+06/09/17-08:34:44:688 (31493) 0 Purging old application errors
+06/09/17-08:34:45:112 (31338) 0 Initializing Security system
+06/09/17-08:34:45:126 (31493) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/cache/ (SFN 3) read-write.
+06/09/17-08:34:45:194 (31338) 0 Processing Network section
+06/09/17-08:34:45:194 (31338) 0 Activating Network
+06/09/17-08:34:45:423 (31338) 0 Processing Databases section
+06/09/17-08:34:45:492 (31338) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/cacheaudit/ (SFN 4) read-write.
+06/09/17-08:34:45:493 (31338) 0 Processing Namespaces section
+06/09/17-08:34:45:493 (31338) 0 Namespaces are up to date
+06/09/17-08:34:45:493 (31338) 0 Activating namespaces
+06/09/17-08:34:45:494 (31338) 0 Activating new namespace map
+06/09/17-08:34:45:650 (31338) 0 Namespace changes have been activated
+06/09/17-08:34:45:677 (31338) 0 Auditing to /home/amarin/intersystems/cache20173/mgr/cacheaudit/
+06/09/17-08:34:45:900 (31338) 0 Starting Super Server on port 1972
+06/09/17-08:34:45:903 (31338) 0 Network Lock Upload Phase Starting
+06/09/17-08:34:45:903 (31338) 0 Lock Upload Phase Complete
+06/09/17-08:34:45:903 (31338) 0 Processing Miscellaneous section
+06/09/17-08:34:46:087 (31338) 0 init_gcr_seed:  gen_crypt_rand seeded from /dev/urandom:  64 bytes.
+06/09/17-08:34:46:087 (31338) 0 Processing Devices section
+06/09/17-08:34:46:087 (31338) 0 Processing DeviceSubTypes section
+06/09/17-08:34:46:087 (31338) 0 Processing MagTape section
+06/09/17-08:34:46:159 (31338) 0 Processing IO section
+06/09/17-08:34:46:159 (31338) 0 Processing SQL section
+06/09/17-08:34:46:188 (31545) 0 LMF Info:  Licensed for 10000 users.
+06/09/17-08:34:46:356 (31338) 0 Executing ^ZSTU routine
+06/09/17-08:34:46:366 (31338) 0 Executing ^%ZSTART routine
+06/09/17-08:34:46:480 (31558) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/samples/ (SFN 5) read-write.
+06/09/17-08:34:46:525 (31338) 0 Enabling logons
+06/09/17-08:34:46:813 (31557) 0 Private webserver started on 57772
+06/09/17-08:34:46:816 (31557) 0 Processing Shadows section (this system as shadow)
+06/09/17-08:34:46:823 (31557) 0 Processing Monitor section
+06/09/17-08:34:46:902 (31738) 0 [SYSTEM MONITOR] System Monitor started in %SYS
+06/09/17-08:34:48:359 (31545) 0 LMF Info:  License server started on port 4001
+06/09/17-08:34:50:359 (31545) 0 LMF Info:  Connected to license server 127.0.0.1,4001
+06/09/17-09:00:00:688 (12560) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/app-data/ (SFN 6) read-write.
+06/09/17-09:00:01:240 (12560) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/app-code/ (SFN 7) read-write.
+06/09/17-09:00:01:339 (12560) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/docbook/ (SFN 8) read-write.
+06/09/17-09:00:13:079 (12560) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/user/ (SFN 9) read-write.
+06/09/17-09:05:17:390 (31738) 0 [SYSTEM MONITOR] Alert state cleared.
+
+
+
+*** Recovery started at Fri Jun  9 10:52:36 2017
+     Current default directory: /home/amarin/intersystems/cache20173/mgr
+     Log file directory: /home/amarin/intersystems/cache20173/mgr/
+     WIJ file spec: ./CACHE.WIJ
+Recovering local (./CACHE.WIJ) image journal file...
+Starting WIJ recovery for &#39;./CACHE.WIJ&#39;.
+  0 blocks pending in this WIJ.
+WIJ pass # is 0.
+Starting fast WIJ compare
+Finished comparing 4 blocks in 0 seconds
+Exiting with status 3 (Success)
+06/09/17-10:52:36:763 (5699) 0 Automatically configuring buffers
+06/09/17-10:52:36:865 (5699) 0 Allocated 1230MB shared memory: 1024MB global buffers, 35MB routine buffers
+06/09/17-10:52:36:910 (5699) 0 Intel Sandy Bridge AES-NI instructions detected.
+06/09/17-10:52:37:177 (5699) 0 Jrn info from prior WIJ (imflags: 0):
+	wdpass: 0
+	jrnwdpass: 26
+	fspec: /home/amarin/intersystems/cache20173/mgr/journal/20170609.001
+	filecnt: 4
+	fileoff: 161760
+	prevfcnt: 4
+	prevfileoeff: 161760
+	min trans cnt: 4
+	min trans index: 131088
+06/09/17-10:52:37:179 (5699) 0 
+CSTART of Cache for UNIX (SUSE Linux Enterprise Server for x86-64) 2017.3 (Build 587) Mon May 8 2017 01:37:27 EDT.
+	in /home/amarin/intersystems/cache20173/mgr
+	with wij: /home/amarin/intersystems/cache20173/mgr/CACHE.WIJ
+	from: /home/amarin/intersystems/cache20173/mgr/
+  OS=[Linux], version=[#99-Ubuntu SMP Thu Apr 27 15:29:09 UTC 2017], release=[4.4.0-78-generic], machine=[x86_64]
+  nodename=[amarin-Latitude-E6440].
+  numasyncwijbuf: 0, swdwrtmax: 0, wijdirectio: off, synctype: 3
+  System Initialized.
+06/09/17-10:52:37:242 (5716) 0 Write daemon started.
+06/09/17-10:52:37:268 (5727) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/ (SFN 0) read-write.
+06/09/17-10:52:37:732 (5727) 0 Instance &#39;C173&#39; starting on node amarin-Latitude-E6440 by user cacheusr
+06/09/17-10:52:37:732 (5727) 0 Using parameters from file &#39;/home/amarin/intersystems/cache20173/cache.cpf&#39;
+06/09/17-10:52:37:744 (5727) 0 Loading DLLs
+06/09/17-10:52:37:744 (5727) 0 Switching to temporary %SYS Namespace
+06/09/17-10:52:37:788 (5727) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/cachelib/ (SFN 1) read-write.
+06/09/17-10:52:38:522 (5727) 0 Loading Locale enu8 (English, United States, Latin1 (ISO 8859-1)) from objects
+06/09/17-10:52:39:087 (5727) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/cachetemp/ (SFN 2) read-write.
+06/09/17-10:52:39:433 (5727) 0 /home/amarin/intersystems/cache20173/mgr/cachetemp/ initialized as CACHETEMP
+06/09/17-10:52:39:464 (5727) 0 Switching to default %SYS Namespace
+06/09/17-10:52:39:571 (5727) 0 Added ethernet device cscotun0,eno1,vboxnet1,wlp3s0 to default list
+06/09/17-10:52:39:669 (5728) 0 Cache MONITOR Started
+06/09/17-10:52:39:770 (5727) 2 Previous system shutdown was abnormal, system forced down or crashed
+06/09/17-10:52:39:805 (5727) 0 Enabling long strings
+06/09/17-10:52:39:817 (5729) 0 Clean Daemon Started
+06/09/17-10:52:39:975 (5727) 0 Updating configuration information from /home/amarin/intersystems/cache20173/cache.cpf
+06/09/17-10:52:41:092 (5727) 0 Performing Journal Recovery
+06/09/17-10:52:42:185 (5727) 0 Restoring from journal /home/amarin/intersystems/cache20173/mgr/journal/20170609.001
+06/09/17-10:52:42:226 (5727) 0 Performing Transaction Rollback if necessary
+06/09/17-10:52:42:299 (5727) 0   Scanning /home/amarin/intersystems/cache20173/mgr/journal/20170609.001
+06/09/17-10:52:42:300 (5727) 0 No open transactions to roll back
+06/09/17-10:52:42:307 (5727) 0 START: /home/amarin/intersystems/cache20173/mgr/journal/20170609.002
+06/09/17-10:52:42:316 (5727) 1 Warning: Alternate and primary journal directories are the same
+06/09/17-10:52:42:583 (5727) 0 CACHE JOURNALING SYSTEM MESSAGE
+Journaling started to: /home/amarin/intersystems/cache20173/mgr/journal/20170609.002
+06/09/17-10:52:42:583 (5727) 0 Journaling to /home/amarin/intersystems/cache20173/mgr/journal/20170609.002 started.
+06/09/17-10:52:42:630 (5727) 0 Processing Startup section
+06/09/17-10:52:42:633 (5740) 0 Purging old application errors
+06/09/17-10:52:43:157 (5727) 0 Initializing Security system
+06/09/17-10:52:43:170 (5740) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/cache/ (SFN 3) read-write.
+06/09/17-10:52:43:310 (5727) 0 Processing Network section
+06/09/17-10:52:43:310 (5727) 0 Activating Network
+06/09/17-10:52:43:567 (5727) 0 Processing Databases section
+06/09/17-10:52:43:781 (5727) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/cacheaudit/ (SFN 4) read-write.
+06/09/17-10:52:43:783 (5727) 0 Processing Namespaces section
+06/09/17-10:52:43:783 (5727) 0 Namespaces are up to date
+06/09/17-10:52:43:783 (5727) 0 Activating namespaces
+06/09/17-10:52:43:783 (5727) 0 Activating new namespace map
+06/09/17-10:52:43:994 (5727) 0 Namespace changes have been activated
+06/09/17-10:52:44:043 (5727) 0 Auditing to /home/amarin/intersystems/cache20173/mgr/cacheaudit/
+06/09/17-10:52:44:445 (5727) 0 Starting Super Server on port 1972
+06/09/17-10:52:44:447 (5727) 0 Network Lock Upload Phase Starting
+06/09/17-10:52:44:447 (5727) 0 Lock Upload Phase Complete
+06/09/17-10:52:44:447 (5727) 0 Processing Miscellaneous section
+06/09/17-10:52:44:673 (5727) 0 init_gcr_seed:  gen_crypt_rand seeded from /dev/urandom:  64 bytes.
+06/09/17-10:52:44:673 (5727) 0 Processing Devices section
+06/09/17-10:52:44:674 (5727) 0 Processing DeviceSubTypes section
+06/09/17-10:52:44:674 (5727) 0 Processing MagTape section
+06/09/17-10:52:44:758 (5727) 0 Processing IO section
+06/09/17-10:52:44:758 (5727) 0 Processing SQL section
+06/09/17-10:52:44:775 (5745) 0 LMF Info:  Licensed for 10000 users.
+06/09/17-10:52:44:952 (5727) 0 Executing ^ZSTU routine
+06/09/17-10:52:44:999 (5727) 0 Executing ^%ZSTART routine
+06/09/17-10:52:45:124 (5727) 0 Enabling logons
+06/09/17-10:52:45:734 (5746) 0 Private webserver started on 57772
+06/09/17-10:52:45:737 (5746) 0 Processing Shadows section (this system as shadow)
+06/09/17-10:52:45:756 (5746) 0 Processing Monitor section
+06/09/17-10:52:45:899 (5902) 0 [SYSTEM MONITOR] System Monitor started in %SYS
+06/09/17-10:52:46:969 (5745) 0 LMF Info:  License server started on port 4001
+06/09/17-10:52:48:970 (5745) 0 LMF Info:  Connected to license server 127.0.0.1,4001
+06/09/17-11:00:00:617 (6296) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/app-data/ (SFN 5) read-write.
+06/09/17-11:00:00:995 (6296) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/app-code/ (SFN 6) read-write.
+06/09/17-11:00:01:072 (6296) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/docbook/ (SFN 7) read-write.
+06/09/17-11:00:01:538 (6296) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/samples/ (SFN 8) read-write.
+06/09/17-11:00:13:149 (6296) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/user/ (SFN 9) read-write.
+06/09/17-11:15:29:339 (5726) 0 Starting Expansion for database /home/amarin/intersystems/cache20173/mgr/cache/. 10 MB requested.
+06/09/17-11:15:29:768 (5726) 0 Expansion completed for database /home/amarin/intersystems/cache20173/mgr/cache/. Expanded by 10 MB.
+06/09/17-11:23:16:417 (5902) 0 [SYSTEM MONITOR] Alert state cleared.
+
+</pre></div><hr noshade size="4">
+<a name="LocalDB"></a>
+<h2>Local Databases</h2>
+
+
+<br>
+<table id="journalTable" width="100%" border="0" cellpadding="7" cellspacing="3" class="zebraStriped">
+  <tbody>
+    <tr align="left">
+      <th>Database</th><th>Directory</th><th>Size in MB</th><th>Status</th><th>Resource</th><th>Encrypted</th><th>Journal</th>
+    </tr>
+    <tr>
+      <td>CACHESYS</td>
+      <td>/home/amarin/intersystems/cache20173/mgr/</td>
+      <td>170</td>
+      <td>Mounted/RW</td>
+      <td>%DB_CACHESYS</td>
+      <td>No</td>
+      <td>Yes</td>
+    </tr>
+    <tr>
+      <td>CACHELIB</td>
+      <td>/home/amarin/intersystems/cache20173/mgr/cachelib/</td>
+      <td>500</td>
+      <td>Mounted/RW</td>
+      <td>%DB_CACHELIB</td>
+      <td>No</td>
+      <td>No</td>
+    </tr>
+    <tr>
+      <td>CACHETEMP</td>
+      <td>/home/amarin/intersystems/cache20173/mgr/cachetemp/</td>
+      <td>11</td>
+      <td>Mounted/RW</td>
+      <td>%DB_CACHETEMP</td>
+      <td>No</td>
+      <td>No</td>
+    </tr>
+    <tr>
+      <td>CACHE</td>
+      <td>/home/amarin/intersystems/cache20173/mgr/cache/</td>
+      <td>11</td>
+      <td>Mounted/RW</td>
+      <td>%DB_CACHE</td>
+      <td>No</td>
+      <td>No</td>
+    </tr>
+    <tr>
+      <td>CACHEAUDIT</td>
+      <td>/home/amarin/intersystems/cache20173/mgr/cacheaudit/</td>
+      <td>1</td>
+      <td>Mounted/RW</td>
+      <td>%DB_CACHEAUDIT</td>
+      <td>No</td>
+      <td>Yes</td>
+    </tr>
+    <tr>
+      <td>APP-CACHE</td>
+      <td>/home/amarin/intersystems/cache20173/mgr/app-cache/</td>
+      <td>1</td>
+      <td>Unmounted</td>
+      <td>%DB_%DEFAULT</td>
+      <td>No</td>
+      <td>No</td>
+    </tr>
+    <tr>
+      <td>APP-CODE</td>
+      <td>/home/amarin/intersystems/cache20173/mgr/app-code/</td>
+      <td>1</td>
+      <td>Mounted/RW</td>
+      <td>%DB_%DEFAULT</td>
+      <td>No</td>
+      <td>No</td>
+    </tr>
+    <tr>
+      <td>APP-DATA</td>
+      <td>/home/amarin/intersystems/cache20173/mgr/app-data/</td>
+      <td>1</td>
+      <td>Mounted/RW</td>
+      <td>%DB_%DEFAULT</td>
+      <td>No</td>
+      <td>No</td>
+    </tr>
+    <tr>
+      <td>APP-DEEPSEE</td>
+      <td>/home/amarin/intersystems/cache20173/mgr/app-deepsee/</td>
+      <td>1</td>
+      <td>Unmounted</td>
+      <td>%DB_%DEFAULT</td>
+      <td>No</td>
+      <td>Yes</td>
+    </tr>
+    <tr>
+      <td>APP-DSTIME</td>
+      <td>/home/amarin/intersystems/cache20173/mgr/app-dstime/</td>
+      <td>1</td>
+      <td>Unmounted</td>
+      <td>%DB_%DEFAULT</td>
+      <td>No</td>
+      <td>No</td>
+    </tr>
+    <tr>
+      <td>DOCBOOK</td>
+      <td>/home/amarin/intersystems/cache20173/mgr/docbook/</td>
+      <td>200</td>
+      <td>Mounted/RW</td>
+      <td>%DB_DOCBOOK</td>
+      <td>No</td>
+      <td>No</td>
+    </tr>
+    <tr>
+      <td>SAMPLES</td>
+      <td>/home/amarin/intersystems/cache20173/mgr/samples/</td>
+      <td>114</td>
+      <td>Mounted/RW</td>
+      <td>%DB_SAMPLES</td>
+      <td>No</td>
+      <td>No</td>
+    </tr>
+    <tr>
+      <td>USER</td>
+      <td>/home/amarin/intersystems/cache20173/mgr/user/</td>
+      <td>1</td>
+      <td>Mounted/RW</td>
+      <td>%DB_USER</td>
+      <td>No</td>
+      <td>Yes</td>
+    </tr>
+  </tbody>
+</table><hr noshade size="4">
+<a name="Journaling"></a>
+<h2>Journaling</h2>
+<h4>Primary Directory</h4>
+
+<p>/home/amarin/intersystems/cache20173/mgr/journal/</p><h4>Alternative Directory</h4>
+
+<p>/home/amarin/intersystems/cache20173/mgr/journal/</p><h4>Free Space</h4>
+
+<p>155,348 MB </p><h4>State</h4>
+
+<p>Normal</p><h4>Journal Files</h4>
+
+<table id="journalTable" border="0" cellpadding="7" cellspacing="3" class="zebraStriped">
+  <tbody>
+    <tr align="left">
+      <th>Name</th><th>Size in KB</th><th>Creation Time</th><th>Reason</th>
+    </tr>
+    <tr>
+      <td>/home/amarin/intersystems/cache20173/mgr/journal/20170609.002</td>
+      <td style="text-align:right">49,472</td>
+      <td>2017-06-09 10:52:42</td>
+      <td>by backup</td>
+    </tr>
+    <tr>
+      <td>/home/amarin/intersystems/cache20173/mgr/journal/20170609.001</td>
+      <td style="text-align:right">192</td>
+      <td>2017-06-09 08:34:44</td>
+      <td>by backup</td>
+    </tr>
+    <tr>
+      <td>/home/amarin/intersystems/cache20173/mgr/journal/20170607.001</td>
+      <td style="text-align:right">192</td>
+      <td>2017-06-07 22:42:35</td>
+      <td>by backup</td>
+    </tr>
+    <tr>
+      <td>/home/amarin/intersystems/cache20173/mgr/journal/20170526.001</td>
+      <td style="text-align:right">11,520</td>
+      <td>2017-05-26 11:16:01</td>
+      <td>by backup</td>
+    </tr>
+  </tbody>
+</table><hr noshade size="4">
+<a name="end"></a>
+<h2>End of Caché Diagnostic Log</h2>
+
+<p>C173 on Machine "amarin-Latitude-E6440"</p>
+</div>
+</body>
+</html>
