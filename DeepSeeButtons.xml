@@ -62,7 +62,7 @@ GetCubeInfo
 	Do ##class(%DeepSee.Utils).%GetCubeList(.plist)
 	Set type = $lg(plist(cube),4)
 	Set sourceclass = $$GetSourceClass(cube,type,isInsight)
-	Write !,?6,"<p>",sourceclass,"</p>"		//writes sourceClass
+	Write !,"<p>",sourceclass,"</p>"		//writes sourceClass
 	Write !,"<h4>SQL Table Name </h4>"
 	Set sqlclass = ##class(%DeepSee.Utils).%GetSQLTableName(sourceclass)
 	Write !,"<p>",sqlclass,"</p>"
@@ -195,7 +195,7 @@ Dimensions
 	Write !,?8,"</pre>"	
 	Write !,?6,"</td>"
 	Write !,?4,"</tr>"
-	Write !,?2,"</tbody>",!
+	Write !,?2,"</tbody>"
 	Write !,"</table>",!
 	ZN "%SYS"
 	Quit
@@ -204,7 +204,7 @@ Dimensions
 OtherElements
 	Use LogFile
 	ZN namespace
-	Write !,"<hr noshade size=""4"">"	
+	Write "<hr noshade size=""4"">"	
 	Write !,"<a name=""otherelements""></a>"
 	Write !,"<h2>Other Elements for "_cube_"</h2>"
 	If ##class(%DeepSee.Utils).%IsCubeAbstract(cube) {
@@ -244,7 +244,7 @@ OtherElements
 		//Write !,"<p>No pivot variables defined in this cube</p>"
 	}
 	/// Named sets	
-	Write !,"<h4>Named Sets</h4>"
+	Write !,"<h4>Named Sets</h4>",!
 	Merge namedsets = ^DeepSee.Cubes("cubes",cube,"namedSets")
 	If $d(namedsets){
 		Write "<table id=""NamedSetsTable"" width=""80%"" cellpadding=""5"" cellspacing=""5"" class=""tableWithBorders"">"
@@ -676,7 +676,7 @@ StartLogging(cubeList,getLogs,LogFile)
 			Set cube=$lg(cubeList,i)
 			If cube'=""{
 				//Set cube=$ZCONVERT(cube,"t")				
-				Write !,"<a href=""#cubeinfo"_cube_""">",cube_"</a>"
+				Write "<a href=""#cubeinfo"_cube_""">",cube_"</a>"
 				Write !,"<br>"
 			}
 		}
@@ -1098,6 +1098,7 @@ LogHeader(cubeList,getLogs)
 	Write !,?2,"<b>BETA</b>"
 	Write !,"</font>"
 	Write !,"<h1>DeepSeeButtons: DeepSee Diagnostic for the ",namespace," Namespace</h1>"
+	Write !
 	//Do LogServerSetup
 	
 LogServerSetup()
@@ -1295,10 +1296,10 @@ OSVer
 	If OS?1"Win".e Set Cmd="Ver"
 	If OS="UNIX" Set Cmd="uname -a"
 	If OS="VMS" Set Cmd="WRITE SYS$OUTPUT ""OpenVMS "",F$GETSYI(""VERSION"")"
-	Do WriteLog("<p>")
+	Write "<p>"
 	Do ExternalCmd(Cmd)
 	If OS="UNIX" Set uname=$$uname() If uname?1"AIX".e Do WriteLog(" -- "),ExternalCmd("lsattr -El proc0")
-	Do WriteLog("</p>")
+	Write "</p>"
 	Quit
  
 OSVerErr
@@ -1647,15 +1648,14 @@ LogDeepSeeSetupSection
  	Set count=##class(%DeepSee.Utils).%GetAgentCount()
  	If count=""{
 	 	Set tCPU=##class(%SYSTEM.CPU).%New()
-	 	Set count=tCPU.nCores*4
-	 	 Set countstring="Default agent count: 4 x number of cores = "_count_" high-priority agents"
+	 	Set count=tCPU.nCores
+ 		Set countstring="Default = 8 x "_count_" cores = "_(count*2) _" High Priority + "_(count*2)_" Low Priority = "_(count*4)_" DeepSee Agents"
  	} Else {
-	 	Set countstring="Non-default agent count: "_count_" high-priority agents"
+	 	Set countstring="Non-default = "_count_" High Priority agents + " _count_" Low Priority agents"
 	 	}
  	ZN "%SYS"
  	Do WriteHeader4("Agent Count")
- 	Write "<p>"
- 	Do WriteLog(countstring_"</p>")
+ 	Do WriteLog("<p>"_countstring_"</p>")
  	Do GetDeepSeeAuditCode
  	Do WriteHeader4("Recent Activity in Cube Manager")
  	ZN namespace
@@ -1729,7 +1729,7 @@ LogDeepSeeSetupSection
 	Close ConfigFile
 	Use LogFile
 	
-	Do WriteHeader4("Config section of cpf file")
+	Do WriteHeader4("Configuration section of cpf file")
 	Write "<p>globals=",GlobalKSize,"</p>",!
 	Write "<p>routines=",RoutineSize,"</p>",!
 	Write "<p>bbsiz=",bbsiz,"</p>",!
@@ -1898,13 +1898,13 @@ CubeData
 				Set cubenode=$order(plist(cubenode))
 			}
 		 	Write !,?2,"</tbody>"
-		 	Write !,"</table>"
+		 	Write !,"</table>",!
 			//write out list of abstract cubes, storageList, inheritList
 			Do WriteHeader4("Abstract Cube List")
 			If abstractcount {
 				Set ind = $O(abstractList(""))
 				While ind {
-						Write !,"<p>",abstractList(ind),"</p>"
+						Write "<p>",abstractList(ind),"</p>",!
 						Set ind = $O(abstractList(ind))
 					}
 			}			
@@ -1920,7 +1920,7 @@ CubeData
 			If $d(inheritList){	
 					Set ptr=0
 					While $LISTNEXT(inheritList,ptr,class){
-						Write !,"<p>",class,"</p>"
+						Write "<p>",class,"</p>",!
 					}
 			}
 	 	}
@@ -1976,9 +1976,9 @@ QueryLog
 		Use LogFile  Use PDev
 	}
 	Use LogFile
-	Write !,"</pre>"
+	Write "</pre>",!
 	Do WriteHeader4("MDX queries by user")
-	Write !,"<pre class=""wrapped"">"
+	Write "<pre class=""wrapped"">"
 	Use PDev
 	Set username=""
 	For k=1:1{
@@ -1999,7 +1999,7 @@ QueryLog
 		}
 		Use LogFile  Write !  Use PDev		
 	}
-	Use LogFile  Write !,"</pre>"  Use PDev
+	Use LogFile  Write "</pre>",!  Use PDev
 	Quit
 	
 	
@@ -2177,7 +2177,7 @@ DSLog
 	New x
 	Set DSFile=$zu(12)_"DeepSeeTasks_"_namespace_".log"
 	Do WriteParagraph("dslog","DeepSee Log")
-	Write !,"<div class=""scrollable"" style=""width:100%;height:400px;"">"
+	Write "<div class=""scrollable"" style=""width:100%;height:400px;"">"
 	Write !,?2,"<pre>"
 	Use PDev	
 	Do WriteLog("DeepSee Log File "_DSFile_":"),WriteLog("")
@@ -2185,7 +2185,7 @@ DSLog
 	Open DSFile:"R":FileOpenTimeOut
 	If '$Test Do  Quit
 	.	Do WriteLog("Error: could not open DeepSee Log File "_DSFile)
-	.	Use LogFile Write !,"</pre>" Use PDev
+	.	Use LogFile Write "</pre>",! Use PDev
 	.	Quit
 	; Read timeout added to prevent the case where neither <ENDOFFILE> error nor $ZEOF terminate the loop
 	For  Use DSFile Read x:FileReadTimeOut Set ZEOF=$ZEof Use PDev Quit:'$Test!(ZEOF)  Use LogFile Write x,CRLF Use PDev
