@@ -62,7 +62,7 @@ GetCubeInfo
 	Do ##class(%DeepSee.Utils).%GetCubeList(.plist)
 	Set type = $lg(plist(cube),4)
 	Set sourceclass = $$GetSourceClass(cube,type,isInsight)
-	Write !,?6,"<p>",sourceclass,"</p>"		//writes sourceClass
+	Write !,"<p>",sourceclass,"</p>"		//writes sourceClass
 	Write !,"<h4>SQL Table Name </h4>"
 	Set sqlclass = ##class(%DeepSee.Utils).%GetSQLTableName(sourceclass)
 	Write !,"<p>",sqlclass,"</p>"
@@ -195,7 +195,7 @@ Dimensions
 	Write !,?8,"</pre>"	
 	Write !,?6,"</td>"
 	Write !,?4,"</tr>"
-	Write !,?2,"</tbody>",!
+	Write !,?2,"</tbody>"
 	Write !,"</table>",!
 	ZN "%SYS"
 	Quit
@@ -204,7 +204,7 @@ Dimensions
 OtherElements
 	Use LogFile
 	ZN namespace
-	Write !,"<hr noshade size=""4"">"	
+	Write "<hr noshade size=""4"">"	
 	Write !,"<a name=""otherelements""></a>"
 	Write !,"<h2>Other Elements for "_cube_"</h2>"
 	If ##class(%DeepSee.Utils).%IsCubeAbstract(cube) {
@@ -244,10 +244,10 @@ OtherElements
 		//Write !,"<p>No pivot variables defined in this cube</p>"
 	}
 	/// Named sets	
-	Write !,"<h4>Named Sets</h4>"
+	Write !,"<h4>Named Sets</h4>",!
 	Merge namedsets = ^DeepSee.Cubes("cubes",cube,"namedSets")
 	If $d(namedsets){
-		Write "<table id=""NamedSetsTable"" cellpadding=""5"" cellspacing=""5"" class=""tableWithBorders"">"
+		Write "<table id=""NamedSetsTable"" width=""80%"" cellpadding=""5"" cellspacing=""5"" class=""tableWithBorders"">"
 		Write !,?2,"<tbody>"
 		Write !,?4,"<tr align=""left"">"
 		Write !,?6,"<th>Name</th><th>Set Expression</th>"
@@ -268,7 +268,7 @@ OtherElements
 	}
 	Write !,"<h4>Listing Fields</h4>"
 	If $d(listingfields){
-		W !,"<table id=""ListingFields"" cellpadding=""5"" cellspacing=""5"" class=""tableWithBorders"">"
+		W !,"<table id=""ListingFields"" width=""80%"" cellpadding=""5"" cellspacing=""5"" class=""tableWithBorders"">"
   		W !,?2,"<tbody>"
     	W !,?4,"<tr align=""left"">"
       	W !,?6,"<th>Name</th><th>Field Expression</th><th>Description</th>"
@@ -292,7 +292,7 @@ OtherElements
 	Write !,"<h4>Listings</h4>"
 	If $d(listings){
 		Set node=$O(listings(""))		//Initialize
-		Write !,"<table id=""ListingTable"" cellpadding=""5"" cellspacing=""5"" class=""tableWithBorders"">"
+		Write !,"<table id=""ListingTable"" width=""80%"" cellpadding=""5"" cellspacing=""5"" class=""tableWithBorders"">"
 		Write !,?2,"<tbody>"
 		Write !,?4,"<tr align=""left"">"
 		Write !,?6,"<th>Listing Name</th>"
@@ -333,6 +333,7 @@ OtherElements
 	Else{
 		Write "No detail listings defined in this cube"
 	}
+	Write !,"<br>"
 	Write !	
 	ZN "%SYS"
 	Quit	
@@ -454,7 +455,7 @@ DeepSeeButtons(namespace="",cubeString="", LogFile="") ;;;Collect Evidence and L
 	;	1) DeepSee Setup
 	;		-Agent Count and cores
 	;		-DeepSee.AuditCode, DeepSee.AuditQueryCode
-	;		-Most recent activity in  Cube manager
+	;		-Recent activity in  Cube manager
 	;		-Important mappings
 	;		-ECP Servers
 	;		-Server Initialization Code
@@ -675,7 +676,7 @@ StartLogging(cubeList,getLogs,LogFile)
 			Set cube=$lg(cubeList,i)
 			If cube'=""{
 				//Set cube=$ZCONVERT(cube,"t")				
-				Write !,"<a href=""#cubeinfo"_cube_""">",cube_"</a>"
+				Write "<a href=""#cubeinfo"_cube_""">",cube_"</a>"
 				Write !,"<br>"
 			}
 		}
@@ -1097,6 +1098,7 @@ LogHeader(cubeList,getLogs)
 	Write !,?2,"<b>BETA</b>"
 	Write !,"</font>"
 	Write !,"<h1>DeepSeeButtons: DeepSee Diagnostic for the ",namespace," Namespace</h1>"
+	Write !
 	//Do LogServerSetup
 	
 LogServerSetup()
@@ -1104,22 +1106,21 @@ LogServerSetup()
 	Do WriteParagraph("serverdetails","Server Details",1)
 	///The old "Configuration" section
 	Do WriteHeader4("Configuration")
-	Write !,"<p>",ConfigName," on Machine """,HostName,"""","</p>"
+	Write "<p>",ConfigName," on Machine """,HostName,"""","</p>",!
 	If CustomerName'?1a.e Set CustomerName="Unknown"
 	Do WriteHeader4("Customer Name")
-	Write !,"<p>",CustomerName,"</p>"
+	Write "<p>",CustomerName,"</p>",!
 	Do WriteHeader4("License Order Number")
-	Write !,"<p>",OrderNumber,"</p>"
+	Write "<p>",OrderNumber,"</p>",!
 	Do WriteHeader4("Fully Qualified Host Name")
-	Write !,"<p>"_FullHostName_" with IP Address: "_IPAddr,"</p>"
+	Write "<p>"_FullHostName_" with IP Address: "_IPAddr,"</p>",!
 	Do INT^%D,INT^%T
 	//Do WriteLog(""),WriteLog("Log created by User """_CurUser_""" on "_%DAT_" at "_%TIM)
 	Do WriteHeader4("Log created by User")
-	Write !,"<p>"_CurUser_" on "_%DAT_" at "_%TIM,"</p>"
+	Write "<p>"_CurUser_" on "_%DAT_" at "_%TIM,"</p>",!
 	Use LogFile Do Timeup
-	//Write !,"<p>Caché Version String: ",CacheVerStr,"</p>",!
 	Do WriteHeader4("Caché Version String")
-	Write !,"<p>",CacheVerStr,"</p>",!
+	Write "<p>",CacheVerStr,"</p>"
 	
 	Set isInsight=$$HealthInsightTest(namespace)		//Determine if this is a Health Insight namespace (1 if yes)
 	If isInsight{
@@ -1196,7 +1197,7 @@ Timeup
 	//Do WriteLog("Started on "_$ZDATETIME(oh))
 	//W !,"<p>Caché Started on "_$ZDATETIME(oh)_". As of this report Caché has been up for "_days_" days "_hours_" hours "_minutes_" minutes "_seconds_" seconds"_"</p>"
 	Do WriteHeader4("Last Caché Startup")
-	W !,"<p>"_$ZDATETIME(oh)_". As of this report Caché has been up for "_days_" days "_hours_" hours "_minutes_" minutes "_seconds_" seconds"_"</p>"
+	W "<p>"_$ZDATETIME(oh)_". As of this report Caché has been up for "_days_" days "_hours_" hours "_minutes_" minutes "_seconds_" seconds"_"</p>",!
 	Quit
 	
 TimeupErr
@@ -1260,11 +1261,9 @@ NLS
 	Set oLoc=##class(Config.NLS.Locales).OpenCurrent()
 	If oLoc="" Set LocCur="Unknown",LocDesc="Unknown"
 	Else  Set LocCur=oLoc.Name,LocDesc=oLoc.Description
-	//Do WriteLog("Current Locale: "_LocCur_" ("_LocDesc_")")
-	//W "<p>Current Locale: "_LocCur_" ("_LocDesc_")<p>"
 	Do WriteHeader4("Current Locale")
 	Set LocSrc=$$$LOCALEPATH
-	Write !,"<p>"_LocCur_" ("_LocDesc_")<p>"
+	Write "<p>"_LocCur_" ("_LocDesc_")</p>"
 	Quit
  
 NLSErr
@@ -1294,14 +1293,13 @@ OSVer
 	New Cmd,uname
 	Do WriteLog("")
 	Do WriteHeader4("Operating System Version")
-	//Do WriteLog("<p>Operating System Version:</p>")
 	If OS?1"Win".e Set Cmd="Ver"
 	If OS="UNIX" Set Cmd="uname -a"
 	If OS="VMS" Set Cmd="WRITE SYS$OUTPUT ""OpenVMS "",F$GETSYI(""VERSION"")"
-	Do WriteLog("<p>")
+	Write "<p>"
 	Do ExternalCmd(Cmd)
 	If OS="UNIX" Set uname=$$uname() If uname?1"AIX".e Do WriteLog(" -- "),ExternalCmd("lsattr -El proc0")
-	Do WriteLog("</p>")
+	Write "</p>"
 	Quit
  
 OSVerErr
@@ -1428,13 +1426,14 @@ WriteLog(Record)
 WriteParagraph(name,title,flag)
 	Use LogFile	
 	If '$D(flag) Set flag = 1
-	If flag Write !,"<hr noshade size=""4"">"
-	Write !,"<a name="""_name_"""></a>"
-	Write !,"<h2>"_title_"</h2>"
+	If flag Write "<hr noshade size=""4"">",!
+	Write "<a name="""_name_"""></a>",!
+	Write "<h2>"_title_"</h2>",!
 	
 WriteHeader4(header)
 	Use LogFile
-	Write !,"<h4>"_header_"</h4>"
+	Write "<h4>"_header_"</h4>"
+	Write !
 ExternalCmd(Command)
 	; Executes an external program and adds its output to LogFile
 	; Requires the full specification of the Exe file
@@ -1538,9 +1537,8 @@ CPF
 	Do WriteParagraph("cpf","cache.cpf file")
 	//Write !,?2,"<pre>"
 	Use PDev
-	Do WriteLog("")
 	Do WriteLog("<pre>Caché Configuration File "_ConfigFile_":"_"</pre>")
-	Do WriteLog("<div class=""scrollable"" style=""width:1200px;height:400px;"">")
+	Do WriteLog("<div class=""scrollable"" style=""width:100%;height:400px;"">")
 	Do WriteLog("  <pre>")
 	Set $ZTrap="CPFErr"
 	Open ConfigFile:"R":FileOpenTimeOut
@@ -1602,7 +1600,7 @@ cconsole
 	; Processes cconsole.log
 	New cconsoleFile,cconsoleSize,x
 	Do WriteParagraph("cconsole","cconsole.log")
-	Write !,"<div class=""scrollable"" style=""width:1200px;height:400px;"">"
+	Write !,"<div class=""scrollable"" style=""width:100%;height:400px;"">"
 	Write !,?2,"<pre>"
 	Use PDev
 	If $Data(NoRun("cconsole")) Do  Quit
@@ -1650,23 +1648,21 @@ LogDeepSeeSetupSection
  	Set count=##class(%DeepSee.Utils).%GetAgentCount()
  	If count=""{
 	 	Set tCPU=##class(%SYSTEM.CPU).%New()
-	 	Set count=tCPU.nCores*4
-	 	 Set countstring="Default agent count: 4 x number of cores = "_count_" high-priority agents"
+	 	Set count=tCPU.nCores
+ 		Set countstring="Default = 8 x "_count_" cores = "_(count*2) _" High Priority + "_(count*2)_" Low Priority = "_(count*4)_" DeepSee Agents"
  	} Else {
-	 	Set countstring="Non-default agent count: "_count_" high-priority agents"
+	 	Set countstring="Non-default = "_count_" High Priority agents + " _count_" Low Priority agents"
 	 	}
  	ZN "%SYS"
  	Do WriteHeader4("Agent Count")
- 	Write !,"<p>"
- 	Do WriteLog(countstring_"</p>")
- 	//Write ,!
+ 	Do WriteLog("<p>"_countstring_"</p>")
  	Do GetDeepSeeAuditCode
- 	Do WriteHeader4("Most Recent Activity in Cube Manager")
+ 	Do WriteHeader4("Recent Activity in Cube Manager")
  	ZN namespace
  	s msgbuild=$$GetLastBuild("Build")						//Get last build, synch, and update info
  	s msgsynch=$$GetLastBuild("Synch")
  	s msgupdate=$$GetLastBuild("Update") 
- 	ZN "%SYS"	
+ 	ZN "%SYS"
  	Write "<p>",msgbuild,"</p>",!
  	Write "<p>",msgsynch,"</p>",!
  	Write "<p>",msgupdate,"</p>",!
@@ -1733,15 +1729,15 @@ LogDeepSeeSetupSection
 	Close ConfigFile
 	Use LogFile
 	
-	Do WriteHeader4("Config section of cpf file")
-	Write "<p>globals=",GlobalKSize,"</p>"
-	Write "<p>routines=",RoutineSize,"</p>"
-	Write "<p>bbsiz=",bbsiz,"</p>"
+	Do WriteHeader4("Configuration section of cpf file")
+	Write "<p>globals=",GlobalKSize,"</p>",!
+	Write "<p>routines=",RoutineSize,"</p>",!
+	Write "<p>bbsiz=",bbsiz,"</p>",!
 	
 	Do WriteHeader4("Important Mappings")
  	Write "<p>"
 	If $D(DSMapFrom){
-		Write "^OBJ.DSTIME is mapped from ",DSMapFrom," namespace to the ",DSMapTo," database."
+		Write "^OBJ.DSTIME is mapped from ",DSMapFrom," namespace to the ",DSMapTo," database"
 	}
 	Else{
 		Write "There are no mappings defined for ^OBJ.DSTIME"
@@ -1778,29 +1774,20 @@ LogDeepSeeSetupSection
 	
 	//Initialization code
 	Do WriteHeader4("Server Initialization Code")
-	Write !,"<p>"
 	Try {
 		If $d(^[namespace]DeepSee.InitCode){
 			Set initcode=$g(^[namespace]DeepSee.InitCode)
 			Write "^DeepSee.InitCode: "
-			Do WriteLog(initcode)
+			Do WriteLog("<p>"_initcode_"</p>")
 		} Else{
 			Set initcode="^DeepSee.InitCode is undefined"
-			Do WriteLog(initcode)
+			Do WriteLog("<p>"_initcode_"</p>")
 		}
 		
 	} Catch {
-		W "Not Available"
+		W "<p>Not Available</p>"
 	}
-	Write "</p>"
-	Quit 
-	
-	
-	Do FindOrphanedCubes()
-	Use LogFile Write !,"</pre>" Use PDev
- 	Quit
- 	
-
+	Quit
 
 CubeData
 	try {
@@ -1811,24 +1798,25 @@ CubeData
 		Set cubenode=$order(plist(""))
 		If cubenode=""{
 			Use LogFile 
-			Write !,"<p>"
+			Write "<p>"
 		 	Do WriteLog("There are no cubes in this namespace")
-		 	Write "</p>"  Use PDev
+		 	Write "</p>",!
+		 	Use PDev
 		 	Quit
 	 	}
 	 	Else{
 		 	Use LogFile
 		 	If ##class(%DeepSee.CubeManager.Utils).GetActiveRegistry()=""{
-			 	Write !,"<p>"
+			 	Write "<p>"
 			 	Write "No active registry so BuildTime and BuildRate will not be populated.",!
 			 	Write "</p>",!
 		 	}
 		 	Else{
-			 	Write !,"<p>"
+			 	Write "<p>"
 			 	Write "A value of 'N/A' for BuildTime and BuildRate means the cube has not been built from Cube Manager."
-			 	Write "</p>"	
+			 	Write "</p>",!
 		 	} 	
-		 	Write !,"<table id=""CubeTable"" border=""0"" cellpadding=""7"" cellspacing=""3"" class=""zebraStriped"">"
+		 	Write "<table id=""CubeTable"" border=""0"" cellpadding=""7"" cellspacing=""3"" class=""zebraStriped"">"
 		 	Write !,?2,"<tbody>"
 		 	Write !,?4,"<tr align=""left"">"
 		 	Write !,?6,"<th>Cube Name</th><th>Display Name</th><th>Build Time [s]</th><th>Fact Count</th><th>Build Rate [Facts/s]</th><th>Last Compile</th>"_
@@ -1910,13 +1898,13 @@ CubeData
 				Set cubenode=$order(plist(cubenode))
 			}
 		 	Write !,?2,"</tbody>"
-		 	Write !,"</table>"
+		 	Write !,"</table>",!
 			//write out list of abstract cubes, storageList, inheritList
 			Do WriteHeader4("Abstract Cube List")
 			If abstractcount {
 				Set ind = $O(abstractList(""))
 				While ind {
-						Write !,"<p>",abstractList(ind),"</p>"
+						Write "<p>",abstractList(ind),"</p>",!
 						Set ind = $O(abstractList(ind))
 					}
 			}			
@@ -1932,7 +1920,7 @@ CubeData
 			If $d(inheritList){	
 					Set ptr=0
 					While $LISTNEXT(inheritList,ptr,class){
-						Write !,"<p>",class,"</p>"
+						Write "<p>",class,"</p>",!
 					}
 			}
 	 	}
@@ -1955,10 +1943,10 @@ GetLastBuild(CubeEvent) [CubeEvent,cubekey,cubeevent,totaltime,cubesize,finishti
 	ORDER BY FinishTime DESC)
 	IF SQLCODE=0 {
 		If CubeEvent="Synch"{
-    		Set string="Synch events:  "_$fnumber(factsupdated,",")_" facts synched on "_finishtime_" in "_totaltime_" seconds for the "_cubekey_" cube."
+    		Set string="Synch events: "_$fnumber(factsupdated,",")_" facts synched on "_finishtime_" in "_totaltime_" seconds for the "_cubekey_" cube."
 		}
 		If CubeEvent="Build"{
-			Set string="Build events:  "_$fnumber(cubesize,",")_" facts built on "_finishtime_" in "_totaltime_" seconds for the "_cubekey_" cube."
+			Set string="Build events: "_$fnumber(cubesize,",")_" facts built on "_finishtime_" in "_totaltime_" seconds for the "_cubekey_" cube."
 		}
 		If CubeEvent="Update"{
 			Set string="Update events: "_cubekey_" on "_finishtime
@@ -1988,9 +1976,9 @@ QueryLog
 		Use LogFile  Use PDev
 	}
 	Use LogFile
-	Write !,"</pre>"
+	Write "</pre>",!
 	Do WriteHeader4("MDX queries by user")
-	Write !,"<pre class=""wrapped"">"
+	Write "<pre class=""wrapped"">"
 	Use PDev
 	Set username=""
 	For k=1:1{
@@ -2011,7 +1999,7 @@ QueryLog
 		}
 		Use LogFile  Write !  Use PDev		
 	}
-	Use LogFile  Write !,"</pre>"  Use PDev
+	Use LogFile  Write "</pre>",!  Use PDev
 	Quit
 	
 	
@@ -2189,7 +2177,7 @@ DSLog
 	New x
 	Set DSFile=$zu(12)_"DeepSeeTasks_"_namespace_".log"
 	Do WriteParagraph("dslog","DeepSee Log")
-	Write !,"<div class=""scrollable"" style=""width:1200px;height:400px;"">"
+	Write "<div class=""scrollable"" style=""width:100%;height:400px;"">"
 	Write !,?2,"<pre>"
 	Use PDev	
 	Do WriteLog("DeepSee Log File "_DSFile_":"),WriteLog("")
@@ -2197,14 +2185,15 @@ DSLog
 	Open DSFile:"R":FileOpenTimeOut
 	If '$Test Do  Quit
 	.	Do WriteLog("Error: could not open DeepSee Log File "_DSFile)
-	.	Use LogFile Write !,"</pre>" Use PDev
+	.	Use LogFile Write "</pre>",! Use PDev
 	.	Quit
 	; Read timeout added to prevent the case where neither <ENDOFFILE> error nor $ZEOF terminate the loop
 	For  Use DSFile Read x:FileReadTimeOut Set ZEOF=$ZEof Use PDev Quit:'$Test!(ZEOF)  Use LogFile Write x,CRLF Use PDev
 	Close DSFile
 	Use LogFile
-	Write !,?2,"</pre>"
-	Write !,"</div>"
+	Write ?2,"</pre>",!
+	Write "</div>",!
+	Write !
 	Use PDev
 	Quit
  
@@ -2268,7 +2257,7 @@ Journal
 	//Write !,"<pre>"
 	do WriteLog^Buttons("")
 	Write !,"<br>"
-	Write !,"<table id=""journalTable"" border=""0"" cellpadding=""7"" cellspacing=""3"" class=""zebraStriped"">"
+	Write !,"<table id=""journalTable"" width=""100%"" border=""0"" cellpadding=""7"" cellspacing=""3"" class=""zebraStriped"">"
 	Write !,?2,"<tbody>"
 	Write !,?4,"<tr align=""left"">"
 	Write !,?6,"<th>Database</th><th>Directory</th><th>Size in MB</th><th>Status</th><th>Resource</th><th>Encrypted</th><th>Journal</th>"
