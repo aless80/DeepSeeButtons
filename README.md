@@ -7,4 +7,4 @@ Import DeepSeeButtons.xml in the %SYS directory and launch it from terminal as:
 
 Then follow the prompts. The script outputs an html file similar to test.html included in this repo. 
 
-Open test.html in a browser: [https://rawgit.com/aless80/DeepSeeButtons/master/test.html](https://rawgit.com/aless80/DeepSeeButtons/master/test.html)
+Open DSbuttons.html in a browser: [https://rawgit.com/aless80/DeepSeeButtons/master/DSbuttons.html](https://rawgit.com/aless80/DeepSeeButtons/master/DSbuttons.html)
