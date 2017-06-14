@@ -31,7 +31,6 @@
       padding-top: 60px;
     }
     .sidenav a {
-      //border: 1px solid;
       font-family: Arial, Helvetica, sans-serif;
       font-weight: bold;
       padding: 8px 8px 8px 8px;
@@ -74,7 +73,7 @@
       height: 25px; 
       position:fixed;
       border-top: 20px solid transparent;
-      border-left: 25px solid rgb(185,207,227); // #2963BD;
+      border-left: 25px solid rgb(185,207,227);
       border-bottom: 20px solid transparent;
       box-sizing: content-box;
     }
@@ -137,11 +136,39 @@
       overflow: hidden;
       background: white;
     }
+    .tableWithBorders {
+      position: relative;
+      visibility: visible;
+      table-layout: fixed;
+      padding: 0px;
+      height: auto;
+      font-family: Arial;
+      border-collapse: collapse;
+      border-right: 2px solid #D0D0D0;
+      border-left: 2px solid #D0D0D0;
+      border-bottom: 2px solid #D0D0D0;
+      border-top: 2px solid #D0D0D0;
+    }
+    .tableWithBorders th {
+      height: 22px;
+      overflow: hidden;
+      vertical-align: middle;
+      border-bottom: 2px solid #D0D0D0;
+    }
+    .tableWithBorders td {
+      border-right: 1px solid #E8E8E8;
+      border-bottom: 1px solid #E8E8E8;
+      overflow: hidden;
+      background: white;
+    }
+    .tableTabbed p {
+      padding-left: 4ch;
+    }
   </style>
 </head>
 <body bgcolor="#FFFFFF" text="#000000">
 <div class="trapezoid">
-  <span class="closebtn" onclick="openNav()"> &#9776; </span>
+  <span onclick="openNav()"> &#9776; </span>
 </div>
 <div id="mySidenav" class="sidenav">
   <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
@@ -166,55 +193,122 @@
 <h1>DeepSeeButtons: DeepSee Diagnostic for the SAMPLES Namespace</h1>
 <a name="deepseesetup"></a>
 <h2>DeepSee Setup in SAMPLES</h2>
-<h4>Agent Count</h4>
-<p>
-Default agent count: 4 x number of cores = 8 high-priority agents</p>
-<h4>Audit</h4>
-<p>^DeepSee.AuditCode is undefined</p>
-<p>^DeepSee.AuditQueryCode is undefined</p>
-<h4>Most Recent Activity in Cube Manager</h4>
-<p>Build events: 12,744 facts built on 2017-06-08 09:08:03 in 3 seconds for the CITYRAINFALL cube.</p>
-<p>Synch events: 0 facts synched on 2017-06-07 08:56:00 in 0 seconds for the CITYRAINFALL cube.</p>
-<p>Update events: CITYRAINFALL on 2017-05-23 14:54:37</p>
-<h4>Config section of cpf file</h4>
-<p>globals=0,0,0,0,0,0</p>
-<p>routines=0</p>
-<p>bbsiz=262144</p>
-<h4>Important Mappings</h4>
-<p>There are no mappings defined for ^OBJ.DSTIME</p>
-<p>Global_DeepSee.Cache.*=APP-CACHE</p>
-<h4>Server Initialization Code</h4>
-<p>Not Available
-<hr noshade size="4">
+<table id="DSSetupTable" cellpadding="7" cellspacing="3" class="tableWithBorders tableTabbed">
+  <tbody>
+    <tr>
+      <td>
+        <h4>Agent Count</h4>
+        <p>Default agent count: 4 x number of cores = 8 high-priority agents</p>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <h4>Audit</h4>
+        <p>^DeepSee.AuditCode is undefined</p>
+        <p>^DeepSee.AuditQueryCode is undefined</p>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <h4>Most Recent Activity in Cube Manager</h4>
+        <p>Build events: 12,744 facts built on 2017-06-08 09:08:03 in 3 seconds for the CITYRAINFALL cube</p>
+        <p>Synch events: 0 facts synched on 2017-06-14 09:09:11 in 0 seconds for the CITYRAINFALL cube</p>
+        <p>Update events: CITYRAINFALL on 2017-05-23 14:54:37</p>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <h4>Config section of cpf file</h4>
+        <p>globals=0,0,0,0,0,0</p>
+        <p>routines=0</p>
+        <p>bbsiz=262144</p>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <h4>Important Mappings</h4>
+        <p>There are no mappings defined for ^OBJ.DSTIME</p>
+        <p>Global_DeepSee.Cache.*=APP-CACHE</p>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <h4>Server Initialization Code</h4>
+        <p>Not Available
+      </td>
+    </tr>
+  </tbody>
+</table>
+<hr noshade size="4" width="auto">
 <a name="serverdetails"></a>
 <h2>Server Details</h2>
-<h4>Configuration</h4>
-<p>C173 on Machine "amarin-Latitude-E7470"</p>
-<h4>Customer Name</h4>
-<p>ISC Development</p>
-<h4>License Order Number</h4>
-<p>54321</p>
-<h4>Fully Qualified Host Name</h4>
-<p>amarin-Latitude-E7470 with IP Address: 127.0.1.1</p>
-<h4>Log created by User</h4>
-<p>amarin on Jun 12 2017 at  4:56 PM</p>
-<h4>Last Caché Startup</h4>
-<p>06/12/2017 10:33:47. As of this report Caché has been up for 0 days 6 hours 23 minutes 1 seconds</p>
-<h4>Caché Version String</h4>
-<p>Cache for UNIX (SUSE Linux Enterprise Server for x86-64) 2017.3 (Build 587) Mon May 8 2017 01:37:27 EDT</p>
-<h4>Current Locale</h4>
-<p>enu8 (English, United States, Latin1 (ISO 8859-1))<p>
-<h4>Operating System Version</h4>
-<p>
+<table id="ServerDetailsTable" cellpadding="7" cellspacing="3" class="tableWithBorders tableTabbed">
+  <tbody>
+    <tr>
+      <td>
+        <h4>Configuration</h4>
+        <p>C173 on Machine "amarin-Latitude-E7470"</p>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <h4>Customer Name</h4>
+        <p>ISC Development</p>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <h4>License Order Number</h4>
+        <p>54321</p>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <h4>Fully Qualified Host Name</h4>
+        <p>amarin-Latitude-E7470 with IP Address: 127.0.1.1</p>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <h4>Log created by User</h4>
+        <p>amarin on Jun 14 2017 at  4:13 PM</p>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <h4>Last Caché Startup</h4>
+        <p>06/13/2017 14:16:44. As of this report Caché has been up for 1 days 1 hours 56 minutes 22 seconds</p>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <h4>Caché Version String</h4>
+        <p>Cache for UNIX (SUSE Linux Enterprise Server for x86-64) 2017.3 (Build 587) Mon May 8 2017 01:37:27 EDT</p>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <h4>Current Locale</h4>
+        <p>enu8 (English, United States, Latin1 (ISO 8859-1))<p>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <h4>Operating System Version</h4>
+        <p>
 Linux amarin-Latitude-E7470 4.4.0-79-generic #100-Ubuntu SMP Wed May 17 19:58:14 UTC 2017 x86_64 x86_64 x86_64 GNU/Linux
-</p>
-<hr noshade size="4">
+        </p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<hr noshade size="4" width="auto">
 <a name="cubelist"></a>
 <h2>Cubes in SAMPLES</h2>
 <p>A value of 'N/A' for BuildTime and BuildRate means the cube has not been built from Cube Manager.</p>
 <table id="CubeTable" border="0" cellpadding="7" cellspacing="3" class="zebraStriped">
   <tbody>
-    <tr align="left">
+    <tr>
       <th>Cube Name</th><th>Display Name</th><th>Build Time [s]</th><th>Fact Count</th><th>Build Rate [Facts/s]</th><th>Last Compile</th><th>Source Class</th><th>Cube Class</th><th>Last Build/Synch</th><th>Related Cubes</th>
     </tr>
     <tr>
@@ -239,18 +333,6 @@ Linux amarin-Latitude-E7470 4.4.0-79-generic #100-Ubuntu SMP Wed May 17 19:58:14
       <td>Not available</td>
       <td>Ale.AbstractChild</td>
       <td>06/02/2017 20:24:30</td>
-      <td>-</td>
-    </tr>
-    <tr>
-      <td>alessandromarin80alessandromarin80alessandromarin80alessandromarin80alessandromarin80alessandromarin80alessandromarin80alessandromarin80</td>
-      <td>alessandromarin80alessandromarin80alessandromarin80alessandromarin80alessandromarin80alessandromarin80alessandromarin80alessandromarin80</td>
-      <td>N/A</td>
-      <td>0</td>
-      <td>N/A</td>
-      <td>06/08/2017 19:51:08</td>
-      <td>%DeepSee.UserLibrary.NamedFilter</td>
-      <td>User.alessandromarin80alessandromarin80alessandromarin80alessandromarin80alessandromarin80alessandromarin80alessandromarin80alessandromarin80</td>
-      <td>06/08/2017 19:51:17</td>
       <td>-</td>
     </tr>
     <tr>
@@ -322,7 +404,7 @@ Linux amarin-Latitude-E7470 4.4.0-79-generic #100-Ubuntu SMP Wed May 17 19:58:14
       <td>05/08/2017 05:42:23</td>
       <td>DeepSee.Study.CityRainfall</td>
       <td>DeepSee.Model.RainfallCube</td>
-      <td>06/08/2017 13:08:03</td>
+      <td>06/14/2017 13:09:11</td>
       <td>-</td>
     </tr>
     <tr>
@@ -468,6 +550,30 @@ Linux amarin-Latitude-E7470 4.4.0-79-generic #100-Ubuntu SMP Wed May 17 19:58:14
       <td>HoleFoods.CombinedCube</td>
       <td>N/A</td>
       <td></td>
+    </tr>
+    <tr>
+      <td>ILPD</td>
+      <td>ILPD- Generated by Utility</td>
+      <td>N/A</td>
+      <td>583</td>
+      <td>N/A</td>
+      <td>06/13/2017 15:03:41</td>
+      <td>User.ILPD</td>
+      <td>User.ILPDCube</td>
+      <td>06/13/2017 15:03:42</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td>Inpatients</td>
+      <td>Inpatients- Generated by Utility</td>
+      <td>N/A</td>
+      <td>10000</td>
+      <td>N/A</td>
+      <td>06/13/2017 15:05:08</td>
+      <td>User.Inpatients</td>
+      <td>User.InpatientsCube</td>
+      <td>06/13/2017 15:05:10</td>
+      <td>-</td>
     </tr>
     <tr>
       <td>IrisCube</td>
@@ -669,12 +775,12 @@ Linux amarin-Latitude-E7470 4.4.0-79-generic #100-Ubuntu SMP Wed May 17 19:58:14
 <h4>Cubes Based on Data Connectors</h4>
 <p>CONNECTORCUBE</p>
 <p>PATIENTSQUERYCUBE</p>
-<hr noshade size="4">
+<hr noshade size="4" width="auto">
 <a name="cuberegistry"></a>
 <h2>Cube Registry</h2>
 <table id="RegistryMap" cellpadding="7" cellspacing="3" class="tableWithBorders">
   <tbody>
-    <tr align="left">
+    <tr>
       <th>Group Name</th><th>Cube</th>
       <th>Disabled</th>
       <th>UpdatePlan</th>
@@ -705,7 +811,7 @@ Linux amarin-Latitude-E7470 4.4.0-79-generic #100-Ubuntu SMP Wed May 17 19:58:14
   </tbody>
 </table>
 <br>
-<hr noshade size="4">
+<hr noshade size="4" width="auto">
 <a name="cubeinfo"></a>
 <h2>Cube Info</h2>
 <a href="#cubeinfoPATIENTS">PATIENTS</a>
@@ -713,38 +819,82 @@ Linux amarin-Latitude-E7470 4.4.0-79-generic #100-Ubuntu SMP Wed May 17 19:58:14
 <hr size="4" noshade>
 <a name="cubeinfoPATIENTS"></a>
 <h2>Cube Info for PATIENTS</h2>
-<h4>Cube Display Name</h4>
-<p>Patients</p>
-<h4>Cube Type</h4>
-<p>Not a subject area, abstract, or a compound cube</p>
-<h4>Cube Class</h4>
-<p>DeepSee.Model.PatientsCube</p>
-<h4>Inherits from</h4>
-<p></p>
-<h4>Source Class</h4>
-      <p>DeepSee.Study.Patient</p>
-<h4>SQL Table Name </h4>
-<p>DeepSee_Study.Patient</p>
-<h4>Fact Class</h4>
-<p>DeepSee.Model.PatientsCube.Fact</p>
-<h4>Fact Count</h4>
-<p>1000</p>
-<h4>Last Modified</h4>
-<p>06/05/2017 17:50:33</p>
-<h4>Build Errors</h4>
-<pre>0 build error(s) for 'PATIENTS'
-</pre>
+<table id="CubeInfoTable" cellpadding="7" cellspacing="3" class="tableWithBorders tableTabbed">
+  <tbody>
+    <tr>
+      <td>
+        <h4>Cube Display Name</h4>
+        <p>Patients</p>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <h4>Cube Type</h4>
+        <p>Not a subject area, abstract, or a compound cube</p>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <h4>Cube Class</h4>
+        <p>DeepSee.Model.PatientsCube</p>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <h4>Inherits from</h4>
+        <p></p>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <h4>Source Class</h4>
+        <p>DeepSee.Study.Patient</p>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <h4>SQL Table Name </h4>
+        <p>DeepSee_Study.Patient</p>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <h4>Fact Class</h4>
+        <p>DeepSee.Model.PatientsCube.Fact</p>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <h4>Fact Count</h4>
+        <p>1000</p>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <h4>Last Modified</h4>
+        <p>06/05/2017 17:50:33</p>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <h4>Build Errors</h4>
+        <p>0 build error(s) for 'PATIENTS'
+        </p>
+      </td>
+    </tr>
+  </tbody>
+</table>
 <hr size="4" noshade>
 <a name="dimensionsPATIENTS"></a>
 <h2>Dimensions for PATIENTS</h2>
 <h4>Dimension List</h4>
 <table id="DimensionTable" border="0" class="tableWithBorders" cellpadding="3" cellspacing="3">
   <tbody>
-    <tr align="left">
+    <tr>
       <th>Dimension</th>
       <th>Hierarchy </th>
       <th>Level</th>
-      <th></th>
+      <th>Type</th>
     </tr>
     <tr>
       <td>Measures</td>
@@ -987,7 +1137,7 @@ Linux amarin-Latitude-E7470 4.4.0-79-generic #100-Ubuntu SMP Wed May 17 19:58:14
 <h4>Analyze</h4>
 <table border="0" cellpadding="5" cellspacing="5">
   <tbody>
-    <tr align="left">
+    <tr>
       <td>
         <pre>Do ##class(%DeepSee.Utils).%Analyze("PATIENTS","fic",0)
 
@@ -1133,10 +1283,10 @@ Lvl [ProfD].[H1].[Profession]                                    550   55.00%
 <h4>Pivot Variables</h4>
 <table id="PivotVarTable" cellpadding="5" cellspacing="5" class="tableWithBorders">
   <tbody>
-    <tr align="left">
+    <tr>
       <th>Name</th><th>Description</th><th>Default Value</th><th>Type</th>
     </tr>
-    <tr align="left">
+    <tr>
       <td>Year</td>
       <td>Year</td>
       <td>2012</td>
@@ -1144,16 +1294,17 @@ Lvl [ProfD].[H1].[Profession]                                    550   55.00%
     </tr>
   </tbody>
 </table>
-<h4>Named Sets</h4><table id="NamedSetsTable" cellpadding="5" cellspacing="5" class="tableWithBorders">
+<h4>Named Sets</h4>
+<table id="NamedSetsTable" cellpadding="5" cellspacing="5" class="tableWithBorders">
   <tbody>
-    <tr align="left">
+    <tr>
       <th>Name</th><th>Set Expression</th>
     </tr>
-    <tr align="left">
+    <tr>
       <td>Sample Set</td>
       <td>homed.h1.city.MEMBERS</td>
     </tr>
-    <tr align="left">
+    <tr>
       <td>Sample Set 2</td>
       <td>{colord.h1.[favorite color].red,allerd.h1.allergies.wheat,aged.h1.age.75}</td>
     </tr>
@@ -1163,7 +1314,7 @@ Lvl [ProfD].[H1].[Profession]                                    550   55.00%
 <h4>Listings</h4>
 <table id="ListingTable" cellpadding="5" cellspacing="5" class="tableWithBorders">
   <tbody>
-    <tr align="left">
+    <tr>
       <th>Listing Name</th>
       <th>Fields</th>
       </tr>
@@ -1258,24 +1409,24 @@ Lvl [ProfD].[H1].[Profession]                                    550   55.00%
   </tbody>
 </table>
 
-<hr noshade size="4">
+<hr noshade size="4" width="auto">
 <a name="querylog"></a>
 <h2>Query Log</h2>
 <h4>Last query</h4>
 <pre>
-SELECT  FROM [ALESSANDROMARIN80ALESSANDROMARIN80ALESSANDROMARIN80ALESSANDROMARIN80ALESSANDROMARIN80ALESSANDROMARIN80ALESSANDROMARIN80ALESSANDROMARIN80]
+SELECT NON EMPTY {[Measures].[AverageTotalPayments].AVG,[Measures].[AverageCoveredCharges].AVG} ON 0,NON EMPTY [ProviderName].[H1].[ProviderName].Members ON 1 FROM [INPATIENTS]
 </pre>
 <h4>MDX queries by user</h4>
 <pre class="wrapped">
-Last 5 of 182 MDX queries by User: UnknownUser
-1) SELECT  FROM [ALESSANDROMARIN80ALESSANDROMARIN80ALESSANDROMARIN80ALESSANDROMARIN80ALESSANDROMARIN80ALESSANDROMARIN80ALESSANDROMARIN80ALESSANDROMARIN80]
-2)  WITH  MEMBER [AgeD].[testTermList] AS '%OR(%TERMLIST("test"))' SELECT  FROM [PATIENTS] %FILTER [AgeD].[H1].[Age Group].&[0 to 29]
-3)  WITH  MEMBER [AgeD].[testTermList] AS '%OR(%TERMLIST("test"))' SELECT  FROM [PATIENTS] %FILTER [AgeD].[H1].[Age Group].&[0 to 29]
-4)  WITH  MEMBER [AgeD].[testTermList] AS '%OR(%TERMLIST("test"))' SELECT  FROM [PATIENTS] %FILTER [AgeD].[H1].[Age Group].&[0 to 29]
-5)  WITH  MEMBER [AgeD].[testTermList] AS '%OR(%TERMLIST("test"))' SELECT  FROM [PATIENTS] %FILTER [AgeD].[H1].[Age Group].&[0 to 29]
+Last 5 of 195 MDX queries by User: UnknownUser
+1) SELECT NON EMPTY {[Measures].[AverageTotalPayments].AVG,[Measures].[AverageCoveredCharges].AVG} ON 0,NON EMPTY [ProviderName].[H1].[ProviderName].Members ON 1 FROM [INPATIENTS]
+2) SELECT NON EMPTY {[Measures].[AverageTotalPayments].AVG,[Measures].[AverageCoveredCharges].AVG} ON 0,NON EMPTY [ProviderName].[H1].[ProviderName].Members ON 1 FROM [INPATIENTS]
+3) SELECT NON EMPTY {[Measures].[AverageTotalPayments].AVG,[Measures].[AverageCoveredCharges].AVG} ON 0,NON EMPTY [ProviderName].[H1].[ProviderName].Members ON 1 FROM [INPATIENTS]
+4) SELECT NON EMPTY {[Measures].[AverageTotalPayments].AVG,[Measures].[AverageCoveredCharges].AVG} ON 0,NON EMPTY [ProviderName].[H1].[ProviderName].Members ON 1 FROM [INPATIENTS]
+5) SELECT NON EMPTY [DRGDefinition].[H1].[DRGDefinition].Members ON 1 FROM [INPATIENTS]
 
 </pre>
-<hr noshade size="4">
+<hr noshade size="4" width="auto">
 <a name="dslog"></a>
 <h2>DeepSee Log</h2>
 <div class="scrollable" style="width:100%;height:400px;">
@@ -1341,7 +1492,7 @@ DeepSee Log File /home/amarin/intersystems/cache20173/mgr/DeepSeeTasks_SAMPLES.l
 
   </pre>
 </div>
-<hr noshade size="4">
+<hr noshade size="4" width="auto">
 <a name="cpf"></a>
 <h2>cache.cpf file</h2>
 
@@ -1716,12 +1867,12 @@ LastConvertTime=2017-05-08 01:37:15
 
   </pre>
 </div>
-<hr noshade size="4">
+<hr noshade size="4" width="auto">
 <a name="cconsole"></a>
 <h2>cconsole.log</h2>
 <div class="scrollable" style="width:100%;height:400px;">
   <pre>
-Caché cconsole.log on Jun 12 2017 at  4:56 PM:
+Caché cconsole.log on Jun 14 2017 at  4:13 PM:
 05/19/17-21:07:53:412 (1252) 2 Cache license file (cache.key) missing or unreadable.
 05/19/17-21:07:53:437 (1252) 0 Allocated 165MB shared memory: 2MB global buffers, 35MB routine buffers
 05/19/17-21:07:53:438 (1252) 0 Intel Sandy Bridge AES-NI instructions detected.
@@ -4067,16 +4218,126 @@ Journaling started to: /home/amarin/intersystems/cache20173/mgr/journal/20170612
 06/12/17-11:00:00:385 (8368) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/samples/ (SFN 8) read-write.
 06/12/17-11:00:00:509 (8368) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/user/ (SFN 9) read-write.
 06/12/17-11:04:21:618 (3280) 0 [SYSTEM MONITOR] Alert state cleared.
+06/13/17-09:18:07:229 (2723) 1 Warning: Alternate and primary journal directories are the same
+06/13/17-09:18:07:259 (11337) 0 CACHE JOURNALING SYSTEM MESSAGE
+Journaling switched to: /home/amarin/intersystems/cache20173/mgr/journal/20170613.001
+06/13/17-09:18:07:321 (11343) 0 Purging old application errors
+
+
+
+*** Recovery started at Tue Jun 13 14:16:43 2017
+     Current default directory: /home/amarin/intersystems/cache20173/mgr
+     Log file directory: /home/amarin/intersystems/cache20173/mgr/
+     WIJ file spec: ./CACHE.WIJ
+Recovering local (./CACHE.WIJ) image journal file...
+Starting WIJ recovery for &#39;./CACHE.WIJ&#39;.
+  0 blocks pending in this WIJ.
+WIJ pass # is 0.
+Starting fast WIJ compare
+Finished comparing 4 blocks in 0 seconds
+Exiting with status 3 (Success)
+06/13/17-14:16:43:918 (2747) 0 Automatically configuring buffers
+06/13/17-14:16:44:120 (2747) 0 Allocated 1236MB shared memory: 1024MB global buffers, 35MB routine buffers
+06/13/17-14:16:44:127 (2747) 0 Intel Sandy Bridge AES-NI instructions detected.
+06/13/17-14:16:44:264 (2747) 0 Jrn info from prior WIJ (imflags: 0):
+	wdpass: 0
+	jrnwdpass: 1308
+	fspec: /home/amarin/intersystems/cache20173/mgr/journal/20170613.001
+	filecnt: 26
+	fileoff: 8256424
+	prevfcnt: 26
+	prevfileoeff: 8256424
+	min trans cnt: 26
+	min trans index: 8256424
+06/13/17-14:16:44:265 (2747) 0 
+CSTART of Cache for UNIX (SUSE Linux Enterprise Server for x86-64) 2017.3 (Build 587) Mon May 8 2017 01:37:27 EDT.
+	in /home/amarin/intersystems/cache20173/mgr
+	with wij: /home/amarin/intersystems/cache20173/mgr/CACHE.WIJ
+	from: /home/amarin/intersystems/cache20173/mgr/
+  OS=[Linux], version=[#100-Ubuntu SMP Wed May 17 19:58:14 UTC 2017], release=[4.4.0-79-generic], machine=[x86_64]
+  nodename=[amarin-Latitude-E7470].
+  numasyncwijbuf: 0, swdwrtmax: 0, wijdirectio: off, synctype: 3
+  System Initialized.
+06/13/17-14:16:44:286 (2786) 0 Write daemon started.
+06/13/17-14:16:44:318 (2797) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/ (SFN 0) read-write.
+06/13/17-14:16:44:322 (2797) 0 Instance &#39;C173&#39; starting on node amarin-Latitude-E7470 by user cacheusr
+06/13/17-14:16:44:322 (2797) 0 Using parameters from file &#39;/home/amarin/intersystems/cache20173/cache.cpf&#39;
+06/13/17-14:16:44:323 (2797) 0 Loading DLLs
+06/13/17-14:16:44:323 (2797) 0 Switching to temporary %SYS Namespace
+06/13/17-14:16:44:323 (2797) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/cachelib/ (SFN 1) read-write.
+06/13/17-14:16:44:333 (2797) 0 Loading Locale enu8 (English, United States, Latin1 (ISO 8859-1)) from objects
+06/13/17-14:16:44:356 (2797) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/cachetemp/ (SFN 2) read-write.
+06/13/17-14:16:44:357 (2797) 0 /home/amarin/intersystems/cache20173/mgr/cachetemp/ initialized as CACHETEMP
+06/13/17-14:16:44:360 (2797) 0 Switching to default %SYS Namespace
+06/13/17-14:16:44:362 (2797) 0 Added ethernet device enp0s31f6,wlp1s0 to default list
+06/13/17-14:16:44:374 (2798) 0 Cache MONITOR Started
+06/13/17-14:16:44:474 (2797) 2 Previous system shutdown was abnormal, system forced down or crashed
+06/13/17-14:16:44:475 (2797) 0 Enabling long strings
+06/13/17-14:16:44:502 (2797) 0 Updating configuration information from /home/amarin/intersystems/cache20173/cache.cpf
+06/13/17-14:16:44:503 (2840) 0 Clean Daemon Started
+06/13/17-14:16:44:340 (2797) 0 Performing Journal Recovery
+06/13/17-14:16:46:549 (2797) 0 Restoring from journal /home/amarin/intersystems/cache20173/mgr/journal/20170613.001
+06/13/17-14:16:46:551 (2797) 0 Performing Transaction Rollback if necessary
+06/13/17-14:16:46:551 (2797) 0   Scanning /home/amarin/intersystems/cache20173/mgr/journal/20170613.001
+06/13/17-14:16:46:552 (2797) 0 No open transactions to roll back
+06/13/17-14:16:46:553 (2797) 0 START: /home/amarin/intersystems/cache20173/mgr/journal/20170613.002
+06/13/17-14:16:46:553 (2797) 1 Warning: Alternate and primary journal directories are the same
+06/13/17-14:16:46:569 (2797) 0 CACHE JOURNALING SYSTEM MESSAGE
+Journaling started to: /home/amarin/intersystems/cache20173/mgr/journal/20170613.002
+06/13/17-14:16:46:569 (2797) 0 Journaling to /home/amarin/intersystems/cache20173/mgr/journal/20170613.002 started.
+06/13/17-14:16:46:572 (2797) 0 Processing Startup section
+06/13/17-14:16:46:599 (3158) 0 Purging old application errors
+06/13/17-14:16:46:608 (2797) 0 Initializing Security system
+06/13/17-14:16:46:624 (2797) 0 Processing Network section
+06/13/17-14:16:46:626 (2797) 0 Activating Network
+06/13/17-14:16:46:627 (3158) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/cache/ (SFN 3) read-write.
+06/13/17-14:16:46:878 (2797) 0 Processing Databases section
+06/13/17-14:16:46:892 (2797) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/cacheaudit/ (SFN 4) read-write.
+06/13/17-14:16:46:893 (2797) 0 Processing Namespaces section
+06/13/17-14:16:46:893 (2797) 0 Namespaces are up to date
+06/13/17-14:16:46:893 (2797) 0 Activating namespaces
+06/13/17-14:16:46:893 (2797) 0 Activating new namespace map
+06/13/17-14:16:47:234 (2797) 0 Namespace changes have been activated
+06/13/17-14:16:47:259 (2797) 0 Auditing to /home/amarin/intersystems/cache20173/mgr/cacheaudit/
+06/13/17-14:16:47:277 (2797) 0 Starting Super Server on port 1972
+06/13/17-14:16:47:280 (2797) 0 Network Lock Upload Phase Starting
+06/13/17-14:16:47:280 (2797) 0 Lock Upload Phase Complete
+06/13/17-14:16:47:280 (2797) 0 Processing Miscellaneous section
+06/13/17-14:16:47:362 (3179) 0 LMF Info:  Licensed for 50000 users.
+06/13/17-14:16:47:385 (2797) 0 init_gcr_seed:  gen_crypt_rand seeded from /dev/urandom:  64 bytes.
+06/13/17-14:16:47:385 (2797) 0 Processing Devices section
+06/13/17-14:16:47:386 (2797) 0 Processing DeviceSubTypes section
+06/13/17-14:16:47:386 (2797) 0 Processing MagTape section
+06/13/17-14:16:47:386 (2797) 0 Processing IO section
+06/13/17-14:16:47:386 (2797) 0 Processing SQL section
+06/13/17-14:16:47:387 (2797) 0 Executing ^ZSTU routine
+06/13/17-14:16:47:387 (2797) 0 Executing ^%ZSTART routine
+06/13/17-14:16:47:392 (2797) 0 Enabling logons
+06/13/17-14:16:47:421 (3182) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/samples/ (SFN 5) read-write.
+06/13/17-14:16:47:786 (3185) 0 Private webserver started on 57772
+06/13/17-14:16:47:791 (3185) 0 Processing Shadows section (this system as shadow)
+06/13/17-14:16:47:791 (3185) 0 Processing Monitor section
+06/13/17-14:16:47:809 (3496) 0 [SYSTEM MONITOR] System Monitor started in %SYS
+06/13/17-14:16:49:371 (3179) 0 LMF Info:  License server started on port 4001
+06/13/17-14:16:51:374 (3179) 0 LMF Info:  Connected to license server 127.0.0.1,4001
+06/13/17-14:47:18:111 (3496) 0 [SYSTEM MONITOR] Alert state cleared.
+06/13/17-15:00:00:872 (9186) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/app-data/ (SFN 6) read-write.
+06/13/17-15:00:00:899 (9186) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/app/ (SFN 7) read-write.
+06/13/17-15:00:00:903 (9186) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/docbook/ (SFN 8) read-write.
+06/13/17-15:00:01:090 (9186) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/user/ (SFN 9) read-write.
+06/14/17-09:09:11:688 (2788) 1 Warning: Alternate and primary journal directories are the same
+06/14/17-09:09:11:726 (15208) 0 CACHE JOURNALING SYSTEM MESSAGE
+Journaling switched to: /home/amarin/intersystems/cache20173/mgr/journal/20170614.001
+06/14/17-09:09:11:773 (15216) 0 Purging old application errors
 
 </pre></div>
-<hr noshade size="4">
+<hr noshade size="4" width="auto">
 <a name="LocalDB"></a>
 <h2>Local Databases</h2>
-
 <br>
-<table id="journalTable" border="0" cellpadding="7" cellspacing="3" class="zebraStriped" width="100%"> 
+<table id="journalTable" border="0" cellpadding="7" cellspacing="3" class="zebraStriped">
   <tbody>
-    <tr align="left">
+    <tr>
       <th>Database</th><th>Directory</th><th>Size in MB</th><th>Status</th><th>Resource</th><th>Encrypted</th><th>Journal</th>
     </tr>
     <tr>
@@ -4189,22 +4450,60 @@ Journaling started to: /home/amarin/intersystems/cache20173/mgr/journal/20170612
     </tr>
   </tbody>
 </table>
-<hr noshade size="4">
+<hr noshade size="4" width="auto">
 <a name="Journaling"></a>
 <h2>Journaling</h2>
-<h4>Primary Directory</h4>
-<p>/home/amarin/intersystems/cache20173/mgr/journal/</p>
-<h4>Alternative Directory</h4>
-<p>/home/amarin/intersystems/cache20173/mgr/journal/</p>
-<h4>Free Space</h4>
-<p>162,048 MB </p>
-<h4>State</h4>
-<p>Normal</p>
+<table id="JournalingTable" cellpadding="7" cellspacing="3" class="tableWithBorders tableTabbed">
+  <tbody>
+    <tr>
+      <td>
+        <h4>Primary Directory</h4>
+        <p>/home/amarin/intersystems/cache20173/mgr/journal/</p>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <h4>Alternative Directory</h4>
+        <p>/home/amarin/intersystems/cache20173/mgr/journal/</p>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <h4>Free Space</h4>
+        <p>160,691 MB </p>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <h4>State</h4>
+        <p>Normal</p>
+      </td>
+    </tr>
+      </tbody>
+    </table>
 <h4>Journal Files</h4>
 <table id="journalTable" border="0" cellpadding="7" cellspacing="3" class="zebraStriped">
   <tbody>
-    <tr align="left">
+    <tr>
       <th>Name</th><th>Size in KB</th><th>Creation Time</th><th>Reason</th>
+    </tr>
+    <tr>
+      <td>/home/amarin/intersystems/cache20173/mgr/journal/20170614.001</td>
+      <td style="text-align:right">91,712</td>
+      <td>2017-06-14 09:09:11</td>
+      <td>by backup</td>
+    </tr>
+    <tr>
+      <td>/home/amarin/intersystems/cache20173/mgr/journal/20170613.002</td>
+      <td style="text-align:right">57,344</td>
+      <td>2017-06-13 14:16:46</td>
+      <td>by backup</td>
+    </tr>
+    <tr>
+      <td>/home/amarin/intersystems/cache20173/mgr/journal/20170613.001</td>
+      <td style="text-align:right">8,064</td>
+      <td>2017-06-13 09:18:07</td>
+      <td>by backup</td>
     </tr>
     <tr>
       <td>/home/amarin/intersystems/cache20173/mgr/journal/20170612.002</td>
@@ -4226,7 +4525,7 @@ Journaling started to: /home/amarin/intersystems/cache20173/mgr/journal/20170612
     </tr>
   </tbody>
 </table>
-<hr noshade size="4">
+<hr noshade size="4" width="auto">
 <a name="end"></a>
 <h2>End of Caché Diagnostic Log</h2>
 <p>C173 on Machine "amarin-Latitude-E7470"</p>
