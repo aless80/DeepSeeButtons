@@ -1913,11 +1913,11 @@ Journal
 	Do WriteParagraph("LocalDB","Local Databases")
 	//Write !,"<pre>"
 	//Do WriteLog^Buttons("")
-	Write !,"<br>"
-	Write !,"<table id=""journalTable"" border=""0"" cellpadding=""7"" cellspacing=""3"" class=""zebraStriped"">"
-	Write !,?2,"<tbody>"
-	Write !,?4,"<tr>"
-	Do WriteLog("<th>Database</th><th>Directory</th><th>Size in MB</th><th>Status</th><th>Resource</th><th>Encrypted</th><th>Journal</th>"
+	Do WriteLog("<br>")
+	Do WriteLog("<table id=""journalTable"" border=""0"" cellpadding=""7"" cellspacing=""3"" class=""zebraStriped"">")
+	Do WriteLog("<tbody>",2)
+	Do WriteLog("<tr>",4)
+	Do WriteLog("<th>Database</th><th>Directory</th><th>Size in MB</th><th>Status</th><th>Resource</th><th>Encrypted</th><th>Journal</th>",6)
 	Write !,?4,"</tr>"
 	Set Maj=##class(%SYSTEM.Version).GetMajor()
 	If Maj<2009 {
@@ -1928,15 +1928,15 @@ Journal
 	Set sc=result.Execute() If ('sc) Do DisplayError^%apiOBJ(sc) Quit
 	While result.Next(.sc) {
 		If ('sc) Quit
-		Write !,?4,"<tr>"
-		Do WriteLog("<td>",result.Data("Name"),"</td>"
-		Do WriteLog("<td>",result.Data("Directory"),"</td>"
-		Do WriteLog("<td>",result.Data("Size in MB"),"</td>"
-		Do WriteLog("<td>",result.Data("Status"),"</td>"
-		Do WriteLog("<td>",result.Data("Resource"),"</td>"
-		Do WriteLog("<td>",result.Data("Encrypted"),"</td>"
-		Do WriteLog("<td>",result.Data("Journal"),"</td>"
-		Write !,?4,"</tr>"
+		Do WriteLog("<tr>",6)
+		Do WriteLog("<td>"_result.Data("Name")_"</td>",8)
+		Do WriteLog("<td>"_result.Data("Directory")_"</td>",8)
+		Do WriteLog("<td>"_result.Data("Size in MB")_"</td>",8)
+		Do WriteLog("<td>"_result.Data("Status")_"</td>",8)
+		Do WriteLog("<td>"_result.Data("Resource")_"</td>",8)
+		Do WriteLog("<td>"_result.Data("Encrypted")_"</td>",8)
+		Do WriteLog("<td>"_result.Data("Journal")_"</td>",8)
+		Do WriteLog("</tr>",6)
 	}
 	If ('sc) Do DisplayError^%apiOBJ(sc)
 	Write !,?2,"</tbody>"
@@ -1973,25 +1973,25 @@ Journal
 		Write !,"<p>",stateString,"</p>"	
 		If $D(Row(1)) {
 			Do WriteHeader4("Journal Files")
-			Write !,"<table id=""journalTable"" border=""0"" cellpadding=""7"" cellspacing=""3"" class=""zebraStriped"">"
-			Write !,?2,"<tbody>"
-			Write !,?4,"<tr>"
-			Do WriteLog("<th>Name</th><th>Size in KB</th><th>Creation Time</th><th>Reason</th>"
-			Write !,?4,"</tr>"
+			Do WriteLog("<table id=""journalTable"" border=""0"" cellpadding=""7"" cellspacing=""3"" class=""zebraStriped"">")
+			Do WriteLog("<tbody>",2)
+			Do WriteLog("<tr>",4)
+			Do WriteLog("<th>Name</th><th>Size in KB</th><th>Creation Time</th><th>Reason</th>",6)
+			Do WriteLog("</tr>",4)
 			Set filen=1
 			While $D(Row(filen)) {			
-				Write !,?4,"<tr>"
-				Do WriteLog("<td>",$LG(Row(filen),1),"</td>"
-				Do WriteLog("<td style=""text-align:right"">",$FN($LG(Row(filen),2)/1024,",",0),"</td>"
-				Do WriteLog("<td>",$LG(Row(filen),3),"</td>"
+				Do WriteLog("<tr>",4)
+				Do WriteLog("<td>"_$LG(Row(filen),1)_"</td>",6)
+				Do WriteLog("<td style=""text-align:right"">"_$FN($LG(Row(filen),2)/1024,",",0)_"</td>",6)
+				Do WriteLog("<td>"_$LG(Row(filen),3)_"</td>",6)
 				Set a=$LG(Row(filen),4)
 				Set reas=$S(a=-1:"<STARTUP>",a=0:"unspecified",a=1:"by user",a=2:"file size limit reached",a=3:"to retry failed I/O",a=4:"by backup",a=5:"by restore",a=6:"by task manager",a=7:"to activate journal changes",a=8:"to reenable journaling",a=9:"by mirror startup",a=10:"by mirror shutdown",a=11:"mirror database removed",1:"Unknown")
-				Do WriteLog("<td>",reas,"</td>"
-				Write !,?4,"</tr>"
+				Do WriteLog("<td>"_reas_"</td>",6)
+				Do WriteLog("</tr>",4)
 				Set filen=filen+1
 			}
-			Write !,?2,"</tbody>"
-			Write !,"</table>"
+			Do WriteLog("</tbody>",2)
+			Do WriteLog("</table>")
 		}
 	} Catch {
 		Write !,"<p>An error occurred</p>"
