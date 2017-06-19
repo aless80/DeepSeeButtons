@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
 <Routine name="DeepSeeButtons" type="MAC" languagemode="0"><![CDATA[
-DeepSeeButtons(namespace="",cubeString="", LogFile="") ;;;Collect Evidence and Log;
+DeepSeeButtons(namespace="",cubeString="", getLogs="", LogFile="") ;;;Collect Evidence and Log;
 #include COPYRIGH
 #include %occConstant
 #include %occStatus
@@ -48,7 +48,7 @@ DeepSeeButtons(namespace="",cubeString="", LogFile="") ;;;Collect Evidence and L
 
 
 Start
-	New (namespace,cubeString,LogFile)	
+	New (namespace,cubeString,getLogs,LogFile)	
 	Set PDev=$Principal
 	Use PDev
  
@@ -160,23 +160,25 @@ VerifyInputCubes(cubeList,namespace){
 
 GetLogsConfirm
 	ZN "%SYS"
-	Write !, "Include cconsole.log, Query Log, and DeepSee log? [Y] "  Read getLogs
-	If getLogs=""{
-		Set getLogs=1		//If they don't make a selection, add console and query logs
-	}
-	Else{
+	Set getLogs=$ZCONVERT(getLogs,"U")
+	If (getLogs="") {
+		Write !, "Include cconsole.log, Query Log, and DeepSee log? [Y/n] "  Read getLogs
 		Set getLogs=$ZCONVERT(getLogs,"U")
-		If (getLogs'="Y")&(getLogs'="YES")&(getLogs'="N")&(getLogs'="NO") Write !,"Please enter Y or N"	Goto GetLogsConfirm
-		If (getLogs="N")||(getLogs="NO"){
+		If (getLogs="") {
+			Set getLogs=1		//If the user did not make a selection, add console and query logs
+		} ElseIf (getLogs="N")||(getLogs="NO") {
 			Set getLogs=0
-		}
-		If (getLogs="Y")||(getLogs="YES"){
+		} ElseIf (getLogs="Y")||(getLogs="YES") {
 			Set getLogs=1
+		} Else {
+			Write !,"Please enter Y or N"	
+			Set getLogs=""
+			Goto GetLogsConfirm
 		}
 	}
 	
 ReadLogTypeConfirm	
-	Write !,"Continue? [Y]" Read LogType
+	Write !,"Continue? [Y/n]" Read LogType
 	Set LogType=$ZCONVERT(LogType,"U")
 	If LogType="NO"!(LogType="N")!(LogType="Q")!(LogType="QUIT")    Quit
 	If LogType'=""&(LogType'="Y")&(LogType'="YES") Write !,"Please enter Y or N" Goto ReadLogTypeConfirm	
@@ -275,7 +277,7 @@ ListCubes(){
 		Quit:cubetmp=""
 		Write i_") "_cubetmp,!	
 	}
-	Write !, "Select a cube name: "
+	Write !, "Select a cube name or press enter to continue: "
 	Read cube
 	If cube'=""{
 		Write !,"Gathering detailed information on "_cube
@@ -487,7 +489,7 @@ LogHeader(cubeList,getLogs)
 	Do WriteLog("left: 0;",6)
 	Do WriteLog("background-color: rgb(220,231,241);",6)
 	Do WriteLog("overflow-x: hidden;",6)
-	Do WriteLog("transition: 0.5s;",6)
+	Do WriteLog("transition: 0.75s;",6)
 	Do WriteLog("padding-top: 60px;",6)
 	Do WriteLog("}",4)
 	Do WriteLog(".sidenav a {",4)
@@ -502,7 +504,7 @@ LogHeader(cubeList,getLogs)
 	Do WriteLog("}",4)
 	Do WriteLog(".sidenav a:hover, .offcanvas a:focus{",4)
 	Do WriteLog("font-family: Arial, Helvetica, sans-serif;",6)
-	Do WriteLog("color: rgb(104,30,30);",6)
+	Do WriteLog("color: white;",6)
 	Do WriteLog("}",4)
 	Do WriteLog(".sidenav .closebtn {",4)
 	Do WriteLog("position: absolute;",6)
@@ -636,6 +638,9 @@ LogHeader(cubeList,getLogs)
 	Do WriteLog(".tableTabbed p {",4)
     Do WriteLog("padding-left: 4ch;",6)
     Do WriteLog("}",4)
+    Do WriteLog("div a:hover {",4)
+    Do WriteLog("background: rgb(40,94,124);",6)
+	Do WriteLog("}",4)
 	Do WriteLog("</style>",2)
 	Do WriteLog("</head>")
 	
@@ -647,10 +652,18 @@ LogHeader(cubeList,getLogs)
 	Do WriteLog("</div>")
 	Do WriteLog("<div id=""mySidenav"" class=""sidenav"">")
 	Do WriteLog("<a href=""javascript:void(0)"" class=""closebtn"" onclick=""closeNav()"">&times;</a>",2)
-	Do WriteLog("<font face=""Arial, Helvetica, sans-serif"" size=""9"" color=""#ff3300"">")
-	Do WriteLog("<b>BETA!</b>",2)
-	Do WriteLog("</font>")	
+	Do WriteLog("<font face=""Arial, Helvetica, sans-serif"" size=""9"" color=""#ff3300"">",2)
+	Do WriteLog("<b>Beta!</b>",4)
+	Do WriteLog("</font>",2)	
 	Do WriteLog("<a href=""#deepseesetup"">DeepSee Setup</a>",2)
+	Set isInsight=$$isHealthInsight(namespace) 	//Determine if this is a Health Insight namespace (1 if yes)
+	Set isTrak=$$isTrak(namespace) 	//Determine if this is a Health Insight namespace (1 if yes)
+	If (isInsight || isTrak) {
+		Set nOverrides=$$CountNodes(namespace,"^DeepSee.Overrides")
+		If (nOverrides>=10) {
+			Do WriteLog("<a href=""#overrides"">DeepSee Overrides</a>",2)
+		}
+	}	
 	Do WriteLog("<a href=""#serverdetails"">Server Details</a>",2)
 	Do WriteLog("<a href=""#cubelist"">Cubes</a>",2)
 	Do WriteLog("<a href=""#cuberegistry"">Cube Registry</a>",2)
@@ -666,10 +679,12 @@ LogHeader(cubeList,getLogs)
 	}
 	If getLogs{
 		Do WriteLog("<a href=""#querylog"">Query Log</a>",2)
-		Do WriteLog("<a href=""#dslog"">DeepSee Log</a>",2)
-		Do WriteLog("<a href=""#cconsole"">cconsole.log</a>",2)
+		Do WriteLog("<a href=""#dslog"">DeepSee Log</a>",2)	
 	}
 	Do WriteLog("<a href=""#cpf"">cache.cpf</a>",2)
+	If getLogs{
+		Do WriteLog("<a href=""#cconsole"">cconsole.log</a>",2)
+	}
   	Do WriteLog("<a href=""#LocalDB"">Local Databases</a>",2)
   	Do WriteLog("<a href=""#Journaling"">Journaling</a>",2)
   	Do WriteLog("</div>")
@@ -755,13 +770,13 @@ LogServerSetup()
 	Quit
  
 isHealthInsight(namespace){
-	try{
+	Try{
 		ZN namespace
 		//Set x=##class(HSAA.Utils).GetLogDirectory()				//Just testing to see if this method works
 		Set HealthShare=##class(%SYSTEM.License).GetFeature(12) 	//Look in license for HealthShare Foundation
 		ZN "%SYS"
 		return HealthShare
-	} catch {
+	} Catch {
 		ZN "%SYS"
 		return 0						//Method did not work so return 0
 	}
@@ -1407,39 +1422,60 @@ LogDeepSeeSetupSection
 	Do WriteLog("</td>",6)
 	Do WriteLog("</tr>",4)
 	
-	
 	//DeepSee overrides
 	Do WriteLog("<tr>",4)
 	Do WriteLog("<td>",6)
-	Set isInsight=$$isHealthInsight(namespace) 	//Determine if this is a Health Insight namespace (1 if yes)
-	Set isTrak=$$isTrak(namespace) 	//Determine if this is a Health Insight namespace (1 if yes)
-	If (isInsight || isTrak) {
+	//Set isInsight=$$isHealthInsight(namespace) 	//Determine if this is a Health Insight namespace (1 if yes)
+	//Set isTrak=$$isTrak(namespace) 	//Determine if this is a Health Insight namespace (1 if yes)
+	If '(isInsight || isTrak) {
 		Do WriteHeader4("DeepSee Overrides",8)
-		Do PrintGlobal(namespace,"^DeepSee.Overrides")
+		Do WriteLog("<p>Not applicable</p>",8)
+		
+	} Else {
+		If (nOverrides<10) {
+			Do WriteHeader4("DeepSee Overrides",8)
+			Do PrintGlobal(namespace,"^DeepSee.Overrides",8)
+		}
 	}
 	Do WriteLog("</td>",6)
 	Do WriteLog("</tr>",4)	
 	Do WriteLog("</tbody>",2)
  	Do WriteLog("</table>",0)
-	Quit 
+	//If there are many overrides place them in a scrollable div
+ 	If ((isInsight || isTrak) && (nOverrides>=10)) {
+	 	Do WriteLog("<hr noshade size=""4"" width=""auto"">"	)
+		Do WriteLog("<a name=""overrides""</a>")
+		Do WriteLog("<h2>DeepSee Overrides</h2>")
+		Do WriteLog("<div class=""scrollable"" style=""width:100%;height:400px;"">")
+		Do PrintGlobal(namespace,"^DeepSee.Overrides",2)
+		Do WriteLog("</div>")
+ 	}	
+	Quit
 	
-
-PrintGlobal(namespace,glob){
+CountNodes(namespace,g){
+	ZN namespace
+	Quit:'$D(@g)
+	For count=$D(@g)#10:1 Set g=$Query(@g) Quit:g=""
+	Return count
+}
+	
+PrintGlobal(namespace,glob,spaces){
 	ZN namespace
 	Quit:'$D(@glob)
 	Quit:glob=""
+	Set:$D(spaces) spaces = 0
 	Set queryary=$QUERY(@glob@(""))
 	Set res=@queryary
 	Set quote=""
 	Set:'(res=+res) quote=""""
-	Do WriteLog("<p>"_queryary_" = "_quote_res_quote_"</p>",8)
+	Do WriteLog("<p>"_queryary_" = "_quote_res_quote_"</p>",spaces)
 	For   {
     Set queryary=$QUERY(@queryary) 
         Quit:queryary=""
         Set res=@queryary
 		Set quote=""
 		Set:'(res=+res) quote=""""
-        Do WriteLog("<p>"_queryary_" = "_quote_res_quote_"</p>",8)
+        Do WriteLog("<p>"_queryary_" = "_quote_res_quote_"</p>",spaces)
 	}
 }
 
@@ -1616,8 +1652,7 @@ GetLastBuild(CubeEvent) [CubeEvent,cubekey,cubeevent,totaltime,cubesize,finishti
 
  //Get last 5 queries run by each user
 QueryLog
-	Do WriteParagraph("querylog","Query Log")	
-	//Write "<br>"
+	Do WriteParagraph("querylog","Query Log")
 	Do WriteHeader4("Last query")
 	Do WriteLog("<pre>")
 	Use PDev
@@ -1629,6 +1664,19 @@ QueryLog
 	Use LogFile
 	Do WriteLog("</pre>")
 	Do WriteHeader4("MDX queries by user")
+	
+	//Count users in ^DeepSee.QueryLog
+ 	ZN namespace
+ 	Set i=$O(^DeepSee.QueryLog(""))
+ 	Set users=0
+ 	While (i'="") {
+		Set i=$O(^DeepSee.QueryLog(i))
+		Set users=$I(users)
+ 	}
+ 	Do WriteHeader4("count querylog users="_users)
+ 	ZN "%SYS"
+ 	If (users > 5) Do WriteLog("<div class=""scrollable"" style=""width:100%;height:400px;"">")
+ 	
 	Do WriteLog("<pre class=""wrapped"">")
 	Use PDev
 	Set username=""
@@ -1650,7 +1698,10 @@ QueryLog
 		}
 		Use LogFile  Write !  Use PDev		
 	}
-	Use LogFile  Do WriteLog("</pre>")  Use PDev
+	Use LogFile
+	Do WriteLog("</pre>")
+ 	If (users > 5) Do WriteLog("</div>")
+	Use PDev
 	Quit
 	
 	
@@ -1947,14 +1998,34 @@ Journal
 		}
 		ZN namespace
 		Use LogFile
-		Do WriteHeader4("Primary Directory")
-		Do WriteLog("<p>"_pdir_"</p>")
-		Do WriteHeader4("Alternative Directory")
-		Do WriteLog("<p>"_altdir_"</p>")
-		Do WriteHeader4("Free Space")
-		Do WriteLog("<p>"_$FN(freesp/1024/1024,",",0)_" MB </p>")
-		Do WriteHeader4("State")
-		Do WriteLog("<p>"_stateString_"</p>")
+		Do WriteLog("<table id=""journalinfoTable"" cellpadding=""7"" cellspacing=""3"" class=""tableWithBorders tableTabbed"">")
+  		Do WriteLog("<tbody>",2)
+    	Do WriteLog("<tr>",4)
+    	Do WriteLog("<td>",6)	
+		Do WriteHeader4("Primary Directory",8)
+		Do WriteLog("<p>"_pdir_"</p>",8)
+		Do WriteLog("</td>",6)
+ 		Do WriteLog("</tr>",4)
+ 		Do WriteLog("<tr>",4)
+    	Do WriteLog("<td>",6)
+		Do WriteHeader4("Alternative Directory",8)
+		Do WriteLog("<p>"_altdir_"</p>",8)
+		Do WriteLog("</td>",6)
+ 		Do WriteLog("</tr>",4)
+ 		Do WriteLog("<tr>",4)
+    	Do WriteLog("<td>",6)
+		Do WriteHeader4("Free Space",8)
+		Do WriteLog("<p>"_$FN(freesp/1024/1024,",",0)_" MB </p>",8)
+		Do WriteLog("</td>",6)
+ 		Do WriteLog("</tr>",4)
+ 		Do WriteLog("<tr>",4)
+    	Do WriteLog("<td>",6)
+		Do WriteHeader4("State",8)
+		Do WriteLog("<p>"_stateString_"</p>",8)
+		Do WriteLog("</td>",6)
+ 		Do WriteLog("</tr>",4)
+ 		Do WriteLog("</tbody>",2)
+    	Do WriteLog("</table>")
 		If $D(Row(1)) {
 			Do WriteHeader4("Journal Files")
 			Do WriteLog("<table id=""journalTable"" border=""0"" cellpadding=""7"" cellspacing=""3"" class=""zebraStriped"">")
@@ -2252,7 +2323,7 @@ Dimensions
 OtherElements
 	Use LogFile
 	ZN namespace
-	Do WriteLog("<hr noshade size=""4"">"	)
+	Do WriteLog("<hr noshade size=""4"" width=""auto"">"	)
 	Do WriteLog("<a name=""otherelements""></a>")
 	Do WriteLog("<h2>Other Elements for "_cube_"</h2>")
 	If ##class(%DeepSee.Utils).%IsCubeAbstract(cube) {
@@ -2401,39 +2472,28 @@ FieldNameToSpec(pCubeName) {
 		 		While (indL '= "") {
 		 			Set list = ^DeepSee.Cubes("cubes",tCube,"mbr#",indD,indH,indL)
 		 			Set type = $LG(list,1)
-		 			Set tIndex = $LG(list,5)	 			
-		 			
-		 
-		 	//OK s fieldname2spec=tIndex
-		 	
+		 			Set tIndex = $LG(list,5)
 		 			If ((tIndex'="") && ((type="l") || (type="m") || (type="r"))) { 
 		 				Set tIndexName = $S($E(tIndex)="M":$G(^DeepSee.Cubes("cubes",tCube,"msr#",tIndex),tIndex),
 							1:$G(^DeepSee.Cubes("cubes",tCube,"fact#",tIndex),tIndex))
-							
-			//OK w !,$G(^DeepSee.Cubes("cubes",tCube,"fact#",tIndex),tIndex)
 						If ($D(^DeepSee.Cubes("cubes",tCube,"fact","prop",tIndexName,"alias"))) {
 							Set tIndexName = ^DeepSee.Cubes("cubes",tCube,"fact","prop",tIndexName,"alias")
 						}
-						
-			
 						If ((type="l") && (tIndexName'="") && (tIndex>1)) { //Also skipping %Search with tIndex=1
 			 				Set dimname = $LG(list,2)
 			 				Set hiername = $LG(list,3)
 			 				Set levelname = $LG(list,4)
 			 				Set fieldname2spec(tIndexName) = "["_dimname_"].["_hiername_"].["_levelname_"]"
-			 //Write it from here because I am not able to return an array..
-		 	W !,?4,tIndexName,?41," ",fieldname2spec(tIndexName)
+		 					W !,?4,tIndexName,?41," ",fieldname2spec(tIndexName)
 		 				} ElseIf ((type="m") && (tIndex'="")) { //e.g. COUNT has no tIndex 
 		 					Set dimname = $LG(list,2) 	//this is always "Measures"
 		 					Set measname = $LG(list,3)
 		 					Set fieldname2spec(tIndexName) = "["_dimname_"].["_measname_"]"
-		 	//Write it from here because I am not able to return an array..
-		 	W !,?4,tIndexName,?41," ",fieldname2spec(tIndexName)
+		 					W !,?4,tIndexName,?41," ",fieldname2spec(tIndexName)
 		 				} ElseIf (type="r") {
 		 					Set dimname = $LG(list,2)
 		 					Set fieldname2spec(tIndexName) = "["_dimname_"]"
-		 	//Write it from here because I am not able to return an array..
-		 	W !,?4,tIndexName,?41," ",fieldname2spec(tIndexName)
+		 					W !,?4,tIndexName,?41," ",fieldname2spec(tIndexName)
 		 				}
 		 			}
 		 			Set indL = $O(^DeepSee.Cubes("cubes",tCube,"mbr#",indD,indH,indL))
