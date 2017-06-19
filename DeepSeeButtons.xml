@@ -1,17 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
 <Routine name="DeepSeeButtons" type="MAC" languagemode="0"><![CDATA[
-DeepSeeButtons(namespace="",cubeString="", getLogs="", LogFile="") ;;;Collect Evidence and Log;
+DeepSeeButtons(namespace="",cubeString="", getLogs="", LogFile="", proceed="") ;;;Collect Evidence and Log;
 #include COPYRIGH
 #include %occConstant
 #include %occStatus
 #include %syDatabase
 #include %syNLS
 #include COPYRIGH
-
-	///Last edited 7/29/16
-	//This routine calls out to CubeSpec.mac
-
+	
+	;DeepSeeButtons: routine to log system and DeepSee information
+	;Install it in the %SYS namespace and launch it as: 
+	;%SYS> Do ^DeepSeeButtons
+	;
+	;You can use the following optional arguments:
+	;namespace:		namespace where this routine will run, e.g. "SAMPLES"
+	;cubeString: 	comma separated list of cubes, e.g. "patients,holefoods"
+	;getLogs:		""/0/1 to ask to/do not/do  include cconsole.log, Query Log, and DeepSee log, respectively
+	;LogFile:		output file. By default the output file will be stored in the /mgr directory
+	;proceed:		1 to skip the last prompt before launching DeepSeeButtons
+	;
+	;Example using arguments:
+	;Do ^DeepSeeButtons("SAMPLES","PATIENTS",1,"/home/amarin/Desktop/DSbuttons.html",0)
+	;
+	;
 	;DeepSee Buttons includes the following general information 
 	;	1) DeepSee Setup
 	;		-Agent Count and cores
@@ -48,7 +60,7 @@ DeepSeeButtons(namespace="",cubeString="", getLogs="", LogFile="") ;;;Collect Ev
 
 
 Start
-	New (namespace,cubeString,getLogs,LogFile)	
+	New (namespace,cubeString,getLogs,LogFile,proceed)
 	Set PDev=$Principal
 	Use PDev
  
@@ -177,11 +189,13 @@ GetLogsConfirm
 		}
 	}
 	
-ReadLogTypeConfirm	
-	Write !,"Continue? [Y/n]" Read LogType
-	Set LogType=$ZCONVERT(LogType,"U")
-	If LogType="NO"!(LogType="N")!(LogType="Q")!(LogType="QUIT")    Quit
-	If LogType'=""&(LogType'="Y")&(LogType'="YES") Write !,"Please enter Y or N" Goto ReadLogTypeConfirm	
+ReadLogTypeConfirm
+	If (proceed'=1) {
+		Write !,"Continue? [Y/n]" Read LogType
+		Set LogType=$ZCONVERT(LogType,"U")
+		If (LogType="NO")!(LogType="N")!(LogType="Q")!(LogType="QUIT") Quit
+		If (LogType'="")&(LogType'="Y")&(LogType'="YES") Write !,"Please enter Y or N" Goto ReadLogTypeConfirm	
+	}
  	Set Dir="", CacheDir="",Body=0,Big=0
 	Do LaunchLogs(Dir,0,,Big,CacheDir,Body,namespace,cubeList,getLogs)
 	Quit
