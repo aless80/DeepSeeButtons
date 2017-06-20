@@ -193,7 +193,7 @@
         <h4>Most Recent Activity in Cube Manager</h4>
         <p>Build events: 1,000 facts built on 2017-06-20 08:37:50 in 3 seconds for the ACCESSION cube</p>
         <p>Synch events: 0 facts synched on 2017-06-20 08:37:47 in 0 seconds for the CITYRAINFALL cube</p>
-        <p>Update events: ACCESSION on 2017-06-19 17:04:27</p>
+        <p>Update events: RELATEDCUBES/CITYRAINFALL on 2017-06-20 11:20:09</p>
       </td>
     </tr>
     <tr>
@@ -257,13 +257,13 @@
     <tr>
       <td>
         <h4>Log created by User</h4>
-        <p>amarin on Jun 20 2017 at 11:12 AM</p>
+        <p>amarin on Jun 20 2017 at 11:20 AM</p>
       </td>
     </tr>
     <tr>
       <td>
         <h4>Last Caché Startup</h4>
-        <p>06/19/2017 09:35:24. As of this report Caché has been up for 1 days 1 hours 36 minutes 54 seconds</p>
+        <p>06/19/2017 09:35:24. As of this report Caché has been up for 1 days 1 hours 44 minutes 48 seconds</p>
       </td>
     </tr>
     <tr>
@@ -826,6 +826,61 @@ Linux amarin-Latitude-E7470 4.4.0-79-generic #100-Ubuntu SMP Wed May 17 19:58:14
       <td>1 Day</td>
       <td></td><td></td>
     </tr>
+    <tr>
+      <td>Group 23</td>
+      <td style="text-align: center;">-</td>
+      <td>Enabled</td>
+      <td>BuildSynch</td>
+      <td>1 Week</td>
+      <td>1 Day</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>RELATEDCUBES/CITIES</td>
+      <td>Disabled</td>
+      <td>Build</td>
+      <td>1 Week</td>
+      <td>1 Day</td>
+      <td>RELATEDCUBES/ALLERGIES,RELATEDCUBES/CITYRAINFALL,RELATEDCUBES/DOCTORS,RELATEDCUBES/PATIENTS</td><td></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>RELATEDCUBES/CITYRAINFALL</td>
+      <td>Enabled</td>
+      <td>BuildSynch</td>
+      <td>1 Week</td>
+      <td>1 Day</td>
+      <td></td><td></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>RELATEDCUBES/DOCTORS</td>
+      <td>Disabled</td>
+      <td>Build</td>
+      <td>1 Week</td>
+      <td>1 Day</td>
+      <td>RELATEDCUBES/ALLERGIES,RELATEDCUBES/PATIENTS</td><td></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>RELATEDCUBES/PATIENTS</td>
+      <td>Enabled</td>
+      <td>Manual</td>
+      <td>1 Week</td>
+      <td>1 Day</td>
+      <td>RELATEDCUBES/ALLERGIES</td><td></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>RELATEDCUBES/ALLERGIES</td>
+      <td>Disabled</td>
+      <td>Build</td>
+      <td>1 Week</td>
+      <td>1 Day</td>
+      <td></td><td></td>
+    </tr>
   </tbody>
 </table>
 <br>
@@ -862,6 +917,61 @@ Linux amarin-Latitude-E7470 4.4.0-79-generic #100-Ubuntu SMP Wed May 17 19:58:14
       <td>1</td>
       <td>Build Only</td>
       <td>Yes</td>
+      <td>1 Week</td>
+      <td></td>
+    </tr>
+    <tr class="">
+        <td>RELATEDCUBES/CITIES</td>
+      <td>Group 23</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>1</td>
+      <td>Build Only</td>
+      <td>No</td>
+      <td>1 Week</td>
+      <td></td>
+    </tr>
+    <tr class="">
+        <td>RELATEDCUBES/CITYRAINFALL</td>
+      <td>Group 23</td>
+      <td>Yes</td>
+      <td>No</td>
+      <td>2</td>
+      <td>Build and Synch</td>
+      <td>Yes</td>
+      <td>1 Week</td>
+      <td>1 Day</td>
+    </tr>
+    <tr class="">
+        <td>RELATEDCUBES/DOCTORS</td>
+      <td>Group 23</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>3</td>
+      <td>Build Only</td>
+      <td>No</td>
+      <td>1 Week</td>
+      <td></td>
+    </tr>
+    <tr class="">
+        <td>RELATEDCUBES/PATIENTS</td>
+      <td>Group 23</td>
+      <td>Yes</td>
+      <td>No</td>
+      <td>4</td>
+      <td>Manual</td>
+      <td>Yes</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr class="">
+        <td>RELATEDCUBES/ALLERGIES</td>
+      <td>Group 23</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>5</td>
+      <td>Build Only</td>
+      <td>No</td>
       <td>1 Week</td>
       <td></td>
     </tr>
@@ -1099,61 +1209,6 @@ Linux amarin-Latitude-E7470 4.4.0-79-generic #100-Ubuntu SMP Wed May 17 19:58:14
     <tr class="grey">
         <td>PATIENTSQUERYCUBE</td>
       <td>Group 22</td>
-      <td>No</td>
-      <td>Yes</td>
-      <td></td>
-      <td></td>
-      <td>No</td>
-      <td></td>
-      <td></td>
-    </tr>
-    <tr class="grey">
-        <td>RELATEDCUBES/CITIES</td>
-      <td>Group 23</td>
-      <td>No</td>
-      <td>Yes</td>
-      <td></td>
-      <td></td>
-      <td>No</td>
-      <td></td>
-      <td></td>
-    </tr>
-    <tr class="grey">
-        <td>RELATEDCUBES/CITYRAINFALL</td>
-      <td>Group 23</td>
-      <td>No</td>
-      <td>Yes</td>
-      <td></td>
-      <td></td>
-      <td>Yes</td>
-      <td></td>
-      <td></td>
-    </tr>
-    <tr class="grey">
-        <td>RELATEDCUBES/DOCTORS</td>
-      <td>Group 23</td>
-      <td>No</td>
-      <td>Yes</td>
-      <td></td>
-      <td></td>
-      <td>No</td>
-      <td></td>
-      <td></td>
-    </tr>
-    <tr class="grey">
-        <td>RELATEDCUBES/PATIENTS</td>
-      <td>Group 23</td>
-      <td>No</td>
-      <td>Yes</td>
-      <td></td>
-      <td></td>
-      <td>Yes</td>
-      <td></td>
-      <td></td>
-    </tr>
-    <tr class="grey">
-        <td>RELATEDCUBES/ALLERGIES</td>
-      <td>Group 23</td>
       <td>No</td>
       <td>Yes</td>
       <td></td>
@@ -2324,7 +2379,7 @@ LastConvertTime=2017-05-08 01:37:15
 <h2>cconsole.log</h2>
 <div class="scrollable" style="width:100%;height:400px;">
   <pre>
-Caché cconsole.log on Jun 20 2017 at 11:12 AM:
+Caché cconsole.log on Jun 20 2017 at 11:20 AM:
 05/19/17-21:07:53:412 (1252) 2 Cache license file (cache.key) missing or unreadable.
 05/19/17-21:07:53:437 (1252) 0 Allocated 165MB shared memory: 2MB global buffers, 35MB routine buffers
 05/19/17-21:07:53:438 (1252) 0 Intel Sandy Bridge AES-NI instructions detected.
@@ -5578,7 +5633,7 @@ Journaling switched to: /home/amarin/intersystems/cache20173/mgr/journal/2017062
     <tr>
       <td>
         <h4>Free Space</h4>
-        <p>158,390 MB </p>
+        <p>158,401 MB </p>
       </td>
     </tr>
     <tr>
@@ -5597,7 +5652,7 @@ Journaling switched to: /home/amarin/intersystems/cache20173/mgr/journal/2017062
     </tr>
     <tr>
       <td>/home/amarin/intersystems/cache20173/mgr/journal/20170620.001</td>
-      <td style="text-align:right">28,736</td>
+      <td style="text-align:right">33,024</td>
       <td>2017-06-20 08:37:47</td>
       <td>by backup</td>
     </tr>
