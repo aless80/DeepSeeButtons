@@ -70,8 +70,7 @@ ReadLogType
 	Write !,"This reporting tool provides the information required for"
 	Write !,"InterSystems Technical Support to analyze DeepSee issues. "
  	
-GetNamespaceAndCubes
-	//Write #
+promptUser
 	Set namespace=$$ValidateNamespace(namespace)	//Make sure namespace exists
 	While namespace=""{		//User didn't enter a namespace when calling routine
 		Write !!,"Enter namespace to run DeepSeeButtons for or enter to quit: "
@@ -109,14 +108,6 @@ GetCubesToLog(namespace) {
 		If cube="?" {
 			Set cube=$$ListCubes()
 		} ElseIf cube="ALL" { //Secreat ALL keyword
-			/*Set cubetmp=""
-			Set cubeString=""			
-			For i=1:1 {
-				Set cubetmp=$order(cubeList(cubetmp))
-				Quit:cubetmp=""
-				Set cubeString=cubeString_","_cubetmp
-			}
-			Set cubeString=$P(cubeString,",",2,*)		*/
 			Set cubeString=$$GetAllCubes(namespace)
 			Set cube="QUIT"
 		}
@@ -174,7 +165,8 @@ GetLogsConfirm
 	ZN "%SYS"
 	Set getLogs=$ZCONVERT(getLogs,"U")
 	If (getLogs="") {
-		Write !, "Include cconsole.log, Query Log, and DeepSee log? [Y/n] "  Read getLogs
+		Write !, "Include cconsole.log, Query Log, and DeepSee log? [Y/n] "
+		Read getLogs
 		Set getLogs=$ZCONVERT(getLogs,"U")
 		If (getLogs="") {
 			Set getLogs=1		//If the user did not make a selection, add console and query logs
@@ -252,7 +244,6 @@ StartLogging(cubeList,getLogs,LogFile)
  		For i=1:1:cubeListLength{
 			Set cube=$lg(cubeList,i)
 			If cube'=""{
-				//Set cube=$ZCONVERT(cube,"t")				
 				Do WriteLog("<a href=""#cubeinfo"_cube_""">"_cube_"</a>")
 				Do WriteLog("<br>")
 			}
@@ -578,20 +569,18 @@ LogHeader(cubeList,getLogs)
 	Do WriteLog("}",4)
 	
     Do WriteLog(".wrapped {",4)
-    Do WriteLog("white-space: -moz-pre-wrap; /* Mozilla, supported since 1999 */",4)
+    Do WriteLog("white-space: -moz-pre-wrap; /* Mozilla, supported since 1999 */",6)
     Do WriteLog("white-space: -pre-wrap; /* Opera */",6)
     Do WriteLog("white-space: -o-pre-wrap; /* Opera */",6)
     Do WriteLog("white-space: pre-wrap; /* CSS3 - Text module (Candidate Recommendation) http://www.w3.org/TR/css3-text/#white-space */",6)
     Do WriteLog("word-wrap: break-word; /* IE 5.5+ */",6)
-	Do WriteLog("}",4)
-	
+	Do WriteLog("}",4)	
     Do WriteLog(".zebraStriped td {",4)
     Do WriteLog("border-right: 2px solid #D0D0D0;",6)
     Do WriteLog("border-left: 2px solid #D0D0D0;",6)
     Do WriteLog("border-bottom: 2px solid #D0D0D0;",6)
     Do WriteLog("border-top: 2px solid #D0D0D0;",6)
 	Do WriteLog("}",4)
-        
     Do WriteLog(".tableWithBorders {",4)
     Do WriteLog("position: relative;",6)
     Do WriteLog("visibility: visible;",6)
@@ -600,55 +589,29 @@ LogHeader(cubeList,getLogs)
     Do WriteLog("height: auto;",6)
     Do WriteLog("font-family: Arial;",6)
     Do WriteLog("border-collapse: collapse;",6)
-    //Do WriteLog("box-shadow: 2px 2px 25px rgba(0,0,0,0.25);"
     Do WriteLog("border-right: 2px solid #D0D0D0;",6)
     Do WriteLog("border-left: 2px solid #D0D0D0;",6)
     Do WriteLog("border-bottom: 2px solid #D0D0D0;",6)
     Do WriteLog("border-top: 2px solid #D0D0D0;",6)
-	Do WriteLog("}",4)
-    
+	Do WriteLog("}",4)    
     Do WriteLog(".tableWithBorders th {",4)
     Do WriteLog("height: 22px;",6)
     Do WriteLog("overflow: hidden;",6)
     Do WriteLog("vertical-align: middle;",6)
     Do WriteLog("border-bottom: 2px solid #D0D0D0;",6)
 	Do WriteLog("}",4)
-
-    Do WriteLog(".tableWithBorders td {",4)
-    Do WriteLog("border-right: 1px solid #E8E8E8;",6)
-    Do WriteLog("border-bottom: 1px solid #E8E8E8;",6)
-    //Do WriteLog("width: 100px;"
-    //Do WriteLog("height: 22px;"
-    Do WriteLog("overflow: hidden;",6)
-    //Do WriteLog("vertical-align: middle;"
-    Do WriteLog("background: white;",6)
-    //Do WriteLog("font-size: 10pt;"
-	Do WriteLog("}",4)
-	Do WriteLog(".tableWithBorders {",4)
-    Do WriteLog("position: relative;",6)
-    Do WriteLog("visibility: visible;",6)
-    Do WriteLog("table-layout: fixed;",6)
-    Do WriteLog("padding: 0px;",6)
-    Do WriteLog("height: auto;",6)
-    Do WriteLog("font-family: Arial;",6)
-    Do WriteLog("border-collapse: collapse;",6)
-    Do WriteLog("border-right: 2px solid #D0D0D0;",6)
-    Do WriteLog("border-left: 2px solid #D0D0D0;",6)
-    Do WriteLog("border-bottom: 2px solid #D0D0D0;",6)
-    Do WriteLog("border-top: 2px solid #D0D0D0;",6)
-    Do WriteLog("}",4)
-    Do WriteLog(".tableWithBorders th {",4)
-    Do WriteLog("height: 22px;",6)
-    Do WriteLog("overflow: hidden;",6)
-    Do WriteLog("vertical-align: middle;",6)
-    Do WriteLog("border-bottom: 2px solid #D0D0D0;",6)
-    Do WriteLog("}",4)
     Do WriteLog(".tableWithBorders td {",4)
     Do WriteLog("border-right: 1px solid #E8E8E8;",6)
     Do WriteLog("border-bottom: 1px solid #E8E8E8;",6)
     Do WriteLog("overflow: hidden;",6)
-    Do WriteLog("background: white;",6)
+    //Do WriteLog("word-wrap:break-word;",6)
+    //Do WriteLog("background: white;",6)
+	Do WriteLog("}",4)	
+	Do WriteLog(".grey {",4)
+    Do WriteLog("background: #ccc;",6)
     Do WriteLog("}",4)
+	
+	
 	Do WriteLog(".tableTabbed p {",4)
     Do WriteLog("padding-left: 4ch;",6)
     Do WriteLog("}",4)
@@ -656,8 +619,7 @@ LogHeader(cubeList,getLogs)
     Do WriteLog("background: rgb(40,94,124);",6)
 	Do WriteLog("}",4)
 	Do WriteLog("</style>",2)
-	Do WriteLog("</head>")
-	
+	Do WriteLog("</head>")	
 	//Begin body tag
 	Do WriteLog("<body bgcolor=""#FFFFFF"" text=""#000000"">")
 	Do WriteLog("<div class=""trapezoid"">")
@@ -1234,8 +1196,11 @@ cconsole
 	.	Do WriteLog("</div>")
 	.	Use PDev
 	.	Quit
-	If OS?1"Win".e!(OS="UNIX") Set cconsoleFile=MgrDir_DirDelim_"cconsole.log"
-	Else  If OS="VMS" Set cconsoleFile=MgrDir_"CCONSOLE.LOG"
+	If OS?1"Win".e!(OS="UNIX"){
+		Set cconsoleFile=MgrDir_DirDelim_"cconsole.log"
+	} Else {
+		If OS="VMS" Set cconsoleFile=MgrDir_"CCONSOLE.LOG"
+	}
 	Set cconsoleSize=$ZUtil(140,1,cconsoleFile)
 	If 'cconsoleSize Do  Quit
 	.	Do WriteLog("File "_cconsoleFile_" is zero bytes long.")
@@ -1818,63 +1783,47 @@ GetDeepSeeAuditCode
  
 GetCubeRegistry
 	Do WriteParagraph("cuberegistry","Cube Registry")
-	ZN namespace
+	ZN namespace	
 	Set registry=##class(%DeepSee.CubeManager.Utils).GetActiveRegistry()
 	If registry=""{
-		Write "No cube registry defined in this namespace"
+		Do WriteLog("<p>No cube registry defined in this namespace</p>")
 		ZN "%SYS"
 		Quit
 	}
 	Else{
-		Set map=##class(%DeepSee.CubeManager.RegistryMap).LoadFromClass(registry,.status)
-		If status {
-			//Do map.Print() //This is ugly
-			Do WriteLog("<table id=""RegistryMap"" cellpadding=""7"" cellspacing=""3"" class=""tableWithBorders"">")
-		 	Do WriteLog("<tbody>",2)
-		 	Do WriteLog("<tr>",4)
-		 	Do WriteLog("<th>Group Name</th><th>Cube</th>",6)
-		 	Do WriteLog("<th>Disabled</th>",6)
-		 	Do WriteLog("<th>UpdatePlan</th>",6)
-		 	Do WriteLog("<th>Build every</th>",6)
-		 	Do WriteLog("<th>Synch every</th>",6)
-		 	Do WriteLog("<th>Dependent Cubes</th>",6)
-		 	Do WriteLog("<th>Pre/Post Synch/Build Code</th>",6)
-		 	Do WriteLog("</tr>",4)
-		 	Set tGroupIndex=""
-		 	For ii=1:1:map.Groups.Count() {
-				Set tGroup = map.Groups.GetNext(.tGroupIndex)
-				Do WriteLog("<tr>",4)
-		 		Do WriteLog("<td>"_tGroup.GroupName_"</td>",6)
-		 		Do WriteLog("<td style=""text-align: center;"">-</td>",6)
-		 		Do WriteLog("<td>"_$S(tGroup.Disabled=1:"Disabled",1:"Enabled")_"</td>",6)
-		 		Do WriteLog("<td>"_tGroup.UpdatePlan_"</td>",6)
-		 		Do WriteLog("<td>"_tGroup.BuildFrequency_" "_tGroup.BuildTimeUnit_"</td>",6)
-		 		Do WriteLog("<td>"_tGroup.SynchFrequency_" "_tGroup.SynchTimeUnit_"</td>",6)
-		 		Do WriteLog("<td></td>",6)
-		 		Do WriteLog("<td></td>",6)
-		 		Do WriteLog("</tr>",4)
-		 		Set tCurrentCubeKey = ""
-				For j = 1:1:tGroup.Cubes.Count() {
-					Set tCube = tGroup.Cubes.GetNext(.tCurrentCubeKey)
-					Do WriteLog("<tr>",4)
-		 			Do WriteLog("<td></td>",6)
-		 			Do WriteLog("<td>"_tCube.CubeKey_"</td>",6)
-		 			Do WriteLog("<td>"_$S(tCube.Disabled=1:"Disabled",1:"Enabled")_"</td>",6)
-		 			Do WriteLog("<td>"_tCube.UpdatePlan_"</td>",6)
-		 			Do WriteLog("<td>"_tCube.BuildFrequency_" "_tCube.BuildTimeUnit_"</td>",6)
-		 			Do WriteLog("<td>"_tCube.SynchFrequency_" "_tCube.SynchTimeUnit_"</td>",6)
-		 			Do WriteLog("<td>"_tCube.DependentCubes_"</td>",6)
-		 			Set prepost=tCube.PreSynchCode_","_tCube.PostSynchCode_","_tCube.PostBuildCode
-		 			If prepost=",," Set prepost=""
-		 			Write "<td>",prepost,"</td>"
-					//ADD? map.SerialUpdates is parallel/serially. tCube.BuildAsynch =??
-		 			Do WriteLog("</tr>",4)
-				}
-		 	}		 	
-		 	Do WriteLog("</tbody>",2)
-		 	Do WriteLog("</table>")
+		Set rs=##class(%ResultSet).%New("%DeepSee.CubeManager.RegistryMap:RegistryMapTableView")
+		Do rs.Execute()
+		Do WriteLog("<table id=""RegistryMap"" cellpadding=""7"" cellspacing=""3"" class=""tableWithBorders"">")
+		Do WriteLog("<tbody>",2)
+		Do WriteLog("<tr>",4)
+		Do WriteLog("<th>Cube Name</th>",6)
+		Do WriteLog("<th>Group Name</th>",6)
+		Do WriteLog("<th>Registered</th>",6)
+		Do WriteLog("<th>Exclude</th>",6)
+		Do WriteLog("<th>Group Build Order</th>",6)
+		Do WriteLog("<th>Update Plan</th>",6)
+		Do WriteLog("<th>Supports Synchronize</th>",6)
+		Do WriteLog("<th>Build Every</th>",6)
+		Do WriteLog("<th>Synch Every</th>",6)
+		Do WriteLog("</tr>",4)	
+		For {
+			Quit:'rs.Next()		
+			Do WriteLog("<tr class="""_$S(rs.Get("IsRegistered")="No":"grey",1:"")_""">",4)
+			Do WriteLog("<td>"_rs.Get("CubeKey")_"</td>",8)
+			Do WriteLog("<td>"_rs.Get("MgmtGroup")_"</td>",6)
+			Do WriteLog("<td>"_rs.Get("IsRegistered")_"</td>",6)
+			Do WriteLog("<td>"_rs.Get("Disabled")_"</td>",6)
+			Do WriteLog("<td>"_rs.Get("CustomBuildOrder")_"</td>",6)
+			Do WriteLog("<td>"_rs.Get("UpdatePlan")_"</td>",6)
+			Do WriteLog("<td>"_rs.Get("DSTimeEnabled")_"</td>",6)
+			Do WriteLog("<td>"_rs.Get("BuildEvery")_"</td>",6)
+			Do WriteLog("<td>"_rs.Get("SynchEvery")_"</td>",6)
+			Do WriteLog("</tr>",4)
 		}
-		Do WriteLog("<br>")
+	
+		Do WriteLog("</tbody>",2)
+		Do WriteLog("</table>",0)
+		Do WriteLog("<br>")	
 	}
 	ZN "%SYS"
 	Quit
