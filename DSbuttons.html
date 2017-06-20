@@ -134,32 +134,9 @@
       border-right: 1px solid #E8E8E8;
       border-bottom: 1px solid #E8E8E8;
       overflow: hidden;
-      background: white;
     }
-    .tableWithBorders {
-      position: relative;
-      visibility: visible;
-      table-layout: fixed;
-      padding: 0px;
-      height: auto;
-      font-family: Arial;
-      border-collapse: collapse;
-      border-right: 2px solid #D0D0D0;
-      border-left: 2px solid #D0D0D0;
-      border-bottom: 2px solid #D0D0D0;
-      border-top: 2px solid #D0D0D0;
-    }
-    .tableWithBorders th {
-      height: 22px;
-      overflow: hidden;
-      vertical-align: middle;
-      border-bottom: 2px solid #D0D0D0;
-    }
-    .tableWithBorders td {
-      border-right: 1px solid #E8E8E8;
-      border-bottom: 1px solid #E8E8E8;
-      overflow: hidden;
-      background: white;
+    .grey {
+      background: #ccc;
     }
     .tableTabbed p {
       padding-left: 4ch;
@@ -214,9 +191,9 @@
     <tr>
       <td>
         <h4>Most Recent Activity in Cube Manager</h4>
-        <p>Build events: 12,744 facts built on 2017-06-15 10:32:02 in 2 seconds for the CITYRAINFALL cube</p>
-        <p>Synch events: 0 facts synched on 2017-06-16 09:09:00 in 0 seconds for the CITYRAINFALL cube</p>
-        <p>Update events: CITYRAINFALL on 2017-05-23 14:54:37</p>
+        <p>Build events: 1,000 facts built on 2017-06-20 08:37:50 in 3 seconds for the ACCESSION cube</p>
+        <p>Synch events: 0 facts synched on 2017-06-20 08:37:47 in 0 seconds for the CITYRAINFALL cube</p>
+        <p>Update events: ACCESSION on 2017-06-19 17:04:27</p>
       </td>
     </tr>
     <tr>
@@ -280,13 +257,13 @@
     <tr>
       <td>
         <h4>Log created by User</h4>
-        <p>amarin on Jun 19 2017 at  2:09 PM</p>
+        <p>amarin on Jun 20 2017 at 11:12 AM</p>
       </td>
     </tr>
     <tr>
       <td>
         <h4>Last Caché Startup</h4>
-        <p>06/19/2017 09:35:24. As of this report Caché has been up for 0 days 4 hours 33 minutes 45 seconds</p>
+        <p>06/19/2017 09:35:24. As of this report Caché has been up for 1 days 1 hours 36 minutes 54 seconds</p>
       </td>
     </tr>
     <tr>
@@ -323,13 +300,13 @@ Linux amarin-Latitude-E7470 4.4.0-79-generic #100-Ubuntu SMP Wed May 17 19:58:14
     <tr>
       <td>Accession</td>
       <td>Accession</td>
-      <td>N/A</td>
-      <td>0</td>
-      <td>N/A</td>
+      <td>3</td>
+      <td>1000</td>
+      <td>333.33</td>
       <td>05/23/2017 14:19:21</td>
       <td>db.dsAccessionOrderResult</td>
       <td>User.Accession</td>
-      <td>-</td>
+      <td>06/20/2017 12:37:50</td>
       <td>-</td>
     </tr>
     <tr>
@@ -413,7 +390,7 @@ Linux amarin-Latitude-E7470 4.4.0-79-generic #100-Ubuntu SMP Wed May 17 19:58:14
       <td>05/08/2017 05:42:23</td>
       <td>DeepSee.Study.CityRainfall</td>
       <td>DeepSee.Model.RainfallCube</td>
-      <td>06/16/2017 13:09:00</td>
+      <td>06/20/2017 12:37:47</td>
       <td>-</td>
     </tr>
     <tr>
@@ -802,7 +779,8 @@ Linux amarin-Latitude-E7470 4.4.0-79-generic #100-Ubuntu SMP Wed May 17 19:58:14
 <table id="RegistryMap" cellpadding="7" cellspacing="3" class="tableWithBorders">
   <tbody>
     <tr>
-      <th>Group Name</th><th>Cube</th>
+      <th>Group Name</th>
+      <th>Cube</th>
       <th>Disabled</th>
       <th>UpdatePlan</th>
       <th>Build every</th>
@@ -829,9 +807,407 @@ Linux amarin-Latitude-E7470 4.4.0-79-generic #100-Ubuntu SMP Wed May 17 19:58:14
       <td>1 Day</td>
       <td></td><td></td>
     </tr>
+    <tr>
+      <td>Group 1</td>
+      <td style="text-align: center;">-</td>
+      <td>Disabled</td>
+      <td>BuildSynch</td>
+      <td>1 Week</td>
+      <td>1 Day</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>ACCESSION</td>
+      <td>Enabled</td>
+      <td>Build</td>
+      <td>1 Week</td>
+      <td>1 Day</td>
+      <td></td><td></td>
+    </tr>
   </tbody>
 </table>
 <br>
+<br>
+<table id="RegistryMap0" cellpadding="7" cellspacing="3" class="tableWithBorders">
+  <tbody>
+    <tr>
+      <th>Cube Name</th>
+      <th>Group Name</th>
+      <th>Registered</th>
+      <th>Exclude</th>
+      <th>Group Build Order</th>
+      <th>Update Plan</th>
+      <th>Supports Synchronize</th>
+      <th>Build Every</th>
+      <th>Synch Every</th>
+    </tr>
+    <tr class="">
+        <td>CITYRAINFALL</td>
+      <td>Group 3</td>
+      <td>Yes</td>
+      <td>No</td>
+      <td>1</td>
+      <td>Build and Synch</td>
+      <td>Yes</td>
+      <td>1 Week</td>
+      <td>1 Day</td>
+    </tr>
+    <tr class="">
+        <td>ACCESSION</td>
+      <td>Group 1</td>
+      <td>Yes</td>
+      <td>No</td>
+      <td>1</td>
+      <td>Build Only</td>
+      <td>Yes</td>
+      <td>1 Week</td>
+      <td></td>
+    </tr>
+    <tr class="grey">
+        <td>ALEABSTRACTCHILD</td>
+      <td>Group 2</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td></td>
+      <td></td>
+      <td>Yes</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr class="grey">
+        <td>AVIATIONEVENTS</td>
+      <td>Group 3</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td></td>
+      <td></td>
+      <td>No</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr class="grey">
+        <td>AVIATIONAIRCRAFT</td>
+      <td>Group 3</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td></td>
+      <td></td>
+      <td>No</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr class="grey">
+        <td>AVIATIONCREW</td>
+      <td>Group 3</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td></td>
+      <td></td>
+      <td>No</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr class="grey">
+        <td>CITIES</td>
+      <td>Group 4</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td></td>
+      <td></td>
+      <td>No</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr class="grey">
+        <td>COMPOUNDCUBE/CITYRAINFALL</td>
+      <td>Group 6</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td></td>
+      <td></td>
+      <td>Yes</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr class="grey">
+        <td>COMPOUNDCUBE/DOCTORS</td>
+      <td>Group 7</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td></td>
+      <td></td>
+      <td>No</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr class="grey">
+        <td>COMPOUNDCUBE/PATIENTS</td>
+      <td>Group 8</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td></td>
+      <td></td>
+      <td>Yes</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr class="grey">
+        <td>CONNECTORCUBE</td>
+      <td>Group 9</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td></td>
+      <td></td>
+      <td>No</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr class="grey">
+        <td>DSTIMECUBE</td>
+      <td>Group 10</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td></td>
+      <td></td>
+      <td>Yes</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr class="grey">
+        <td>ERDBEBEN</td>
+      <td>Group 11</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td></td>
+      <td></td>
+      <td>No</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr class="grey">
+        <td>HOLEFOODS</td>
+      <td>Group 12</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td></td>
+      <td></td>
+      <td>Yes</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr class="grey">
+        <td>HOLEFOODSBUDGET</td>
+      <td>Group 13</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td></td>
+      <td></td>
+      <td>Yes</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr class="grey">
+        <td>ILPD</td>
+      <td>Group 14</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td></td>
+      <td></td>
+      <td>No</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr class="grey">
+        <td>ILPD2</td>
+      <td>Group 15</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td></td>
+      <td></td>
+      <td>No</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr class="grey">
+        <td>INDIANLIVERPATIENTDATASETILPD</td>
+      <td>Group 16</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td></td>
+      <td></td>
+      <td>No</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr class="grey">
+        <td>IRISCUBE</td>
+      <td>Group 17</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td></td>
+      <td></td>
+      <td>No</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr class="grey">
+        <td>MERGE</td>
+      <td>Group 18</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td></td>
+      <td></td>
+      <td>Yes</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr class="grey">
+        <td>NAMESUS</td>
+      <td>Group 19</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td></td>
+      <td></td>
+      <td>No</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr class="grey">
+        <td>NEWSARCHIVE</td>
+      <td>Group 20</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td></td>
+      <td></td>
+      <td>Yes</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr class="grey">
+        <td>PATIENTS</td>
+      <td>Group 21</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td></td>
+      <td></td>
+      <td>Yes</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr class="grey">
+        <td>PATIENTSQUERYCUBE</td>
+      <td>Group 22</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td></td>
+      <td></td>
+      <td>No</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr class="grey">
+        <td>RELATEDCUBES/CITIES</td>
+      <td>Group 23</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td></td>
+      <td></td>
+      <td>No</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr class="grey">
+        <td>RELATEDCUBES/CITYRAINFALL</td>
+      <td>Group 23</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td></td>
+      <td></td>
+      <td>Yes</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr class="grey">
+        <td>RELATEDCUBES/DOCTORS</td>
+      <td>Group 23</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td></td>
+      <td></td>
+      <td>No</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr class="grey">
+        <td>RELATEDCUBES/PATIENTS</td>
+      <td>Group 23</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td></td>
+      <td></td>
+      <td>Yes</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr class="grey">
+        <td>RELATEDCUBES/ALLERGIES</td>
+      <td>Group 23</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td></td>
+      <td></td>
+      <td>No</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr class="grey">
+        <td>SIMPLESOURCECUBE</td>
+      <td>Group 24</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td></td>
+      <td></td>
+      <td>Yes</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr class="grey">
+        <td>VERSIONED/CITIES</td>
+      <td>Group 25</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td></td>
+      <td></td>
+      <td>No</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr class="grey">
+        <td>VERSIONED/DOCTORS</td>
+      <td>Group 25</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td></td>
+      <td></td>
+      <td>No</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr class="grey">
+        <td>VERSIONED/PATIENTS</td>
+      <td>Group 25</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td></td>
+      <td></td>
+      <td>Yes</td>
+      <td></td>
+      <td></td>
+    </tr>
+  </tbody>
+</table>
 <hr noshade size="4" width="auto">
 <a name="cubeinfo"></a>
 <h2>Cube Info</h2>
@@ -1948,7 +2324,7 @@ LastConvertTime=2017-05-08 01:37:15
 <h2>cconsole.log</h2>
 <div class="scrollable" style="width:100%;height:400px;">
   <pre>
-Caché cconsole.log on Jun 19 2017 at  2:09 PM:
+Caché cconsole.log on Jun 20 2017 at 11:12 AM:
 05/19/17-21:07:53:412 (1252) 2 Cache license file (cache.key) missing or unreadable.
 05/19/17-21:07:53:437 (1252) 0 Allocated 165MB shared memory: 2MB global buffers, 35MB routine buffers
 05/19/17-21:07:53:438 (1252) 0 Intel Sandy Bridge AES-NI instructions detected.
@@ -5056,6 +5432,10 @@ Journaling started to: /home/amarin/intersystems/cache20173/mgr/journal/20170619
 06/19/17-10:00:00:907 (7327) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/docbook/ (SFN 8) read-write.
 06/19/17-10:00:01:134 (7327) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/user/ (SFN 9) read-write.
 06/19/17-10:05:58:207 (3390) 0 [SYSTEM MONITOR] Alert state cleared.
+06/20/17-08:37:47:714 (2767) 1 Warning: Alternate and primary journal directories are the same
+06/20/17-08:37:47:754 (29786) 0 CACHE JOURNALING SYSTEM MESSAGE
+Journaling switched to: /home/amarin/intersystems/cache20173/mgr/journal/20170620.001
+06/20/17-08:37:47:793 (29796) 0 Purging old application errors
 
 </pre>
 </div>
@@ -5198,7 +5578,7 @@ Journaling started to: /home/amarin/intersystems/cache20173/mgr/journal/20170619
     <tr>
       <td>
         <h4>Free Space</h4>
-        <p>159,046 MB </p>
+        <p>158,390 MB </p>
       </td>
     </tr>
     <tr>
@@ -5216,8 +5596,14 @@ Journaling started to: /home/amarin/intersystems/cache20173/mgr/journal/20170619
       <th>Name</th><th>Size in KB</th><th>Creation Time</th><th>Reason</th>
     </tr>
     <tr>
+      <td>/home/amarin/intersystems/cache20173/mgr/journal/20170620.001</td>
+      <td style="text-align:right">28,736</td>
+      <td>2017-06-20 08:37:47</td>
+      <td>by backup</td>
+    </tr>
+    <tr>
       <td>/home/amarin/intersystems/cache20173/mgr/journal/20170619.002</td>
-      <td style="text-align:right">62,528</td>
+      <td style="text-align:right">102,784</td>
       <td>2017-06-19 09:35:26</td>
       <td>by backup</td>
     </tr>
