@@ -178,7 +178,8 @@
     <tr>
       <td>
         <h4>Agent Count</h4>
-        <p>Default agent count: 4 x number of cores = 8 high-priority agents</p>
+        <p>Default agent count</p>
+        <p>2 cores x 8 = 16 agents  (8 high- and 8 low-priority agents)</p>
       </td>
     </tr>
     <tr>
@@ -217,12 +218,6 @@
         <p>Not Available
       </td>
     </tr>
-    <tr>
-      <td>
-        <h4>DeepSee Overrides</h4>
-        <p>Not applicable</p>
-      </td>
-    </tr>
   </tbody>
 </table>
 <hr noshade size="4" width="auto">
@@ -257,13 +252,13 @@
     <tr>
       <td>
         <h4>Log created by User</h4>
-        <p>amarin on Jun 20 2017 at 12:04 PM</p>
+        <p>amarin on Jun 20 2017 at  4:52 PM</p>
       </td>
     </tr>
     <tr>
       <td>
         <h4>Last Caché Startup</h4>
-        <p>06/19/2017 09:35:23. As of this report Caché has been up for 1 days 2 hours 29 minutes 18 seconds</p>
+        <p>06/20/2017 12:49:49. As of this report Caché has been up for 0 days 4 hours 3 minutes 3 seconds</p>
       </td>
     </tr>
     <tr>
@@ -2271,7 +2266,7 @@ LastConvertTime=2017-05-08 01:37:15
 <h2>cconsole.log</h2>
 <div class="scrollable" style="width:100%;height:400px;">
   <pre>
-Caché cconsole.log on Jun 20 2017 at 12:04 PM:
+Caché cconsole.log on Jun 20 2017 at  4:52 PM:
 05/19/17-21:07:53:412 (1252) 2 Cache license file (cache.key) missing or unreadable.
 05/19/17-21:07:53:437 (1252) 0 Allocated 165MB shared memory: 2MB global buffers, 35MB routine buffers
 05/19/17-21:07:53:438 (1252) 0 Intel Sandy Bridge AES-NI instructions detected.
@@ -5383,6 +5378,241 @@ Journaling started to: /home/amarin/intersystems/cache20173/mgr/journal/20170619
 06/20/17-08:37:47:754 (29786) 0 CACHE JOURNALING SYSTEM MESSAGE
 Journaling switched to: /home/amarin/intersystems/cache20173/mgr/journal/20170620.001
 06/20/17-08:37:47:793 (29796) 0 Purging old application errors
+06/20/17-12:43:09:152 (3390) 0 Application Monitor exited due to SIGTERM received
+06/20/17-12:43:09:202 (2792) 0 Cache MONITOR exited due to SIGTERM received
+06/20/17-12:43:09:203 (2816) 0 Clean daemon. exited due to SIGTERM received
+06/20/17-12:43:09:220 (3136) 0 Receive daemon exited due to SIGTERM received
+06/20/17-12:43:09:220 (3138) 0 ECP Worker daemon exited due to SIGTERM received
+06/20/17-12:43:09:221 (3151) 0 Super Server exited due to SIGTERM received
+06/20/17-12:43:09:221 (3165) 0 LMFMON exited due to SIGTERM received
+06/20/17-12:43:09:222 (3174) 0 CSP daemon exited due to SIGTERM received
+06/20/17-12:43:09:248 (3391) 0 Task Manager exited due to SIGTERM received
+
+
+
+*** Recovery started at Tue Jun 20 12:45:24 2017
+     Current default directory: /home/amarin/intersystems/cache20173/mgr
+     Log file directory: /home/amarin/intersystems/cache20173/mgr/
+     WIJ file spec: ./CACHE.WIJ
+Recovering local (./CACHE.WIJ) image journal file...
+Starting WIJ recovery for &#39;./CACHE.WIJ&#39;.
+  0 blocks pending in this WIJ.
+WIJ pass # is 0.
+Starting fast WIJ compare
+Finished comparing 6 blocks in 0 seconds
+Exiting with status 3 (Success)
+06/20/17-12:45:24:126 (2756) 0 Automatically configuring buffers
+06/20/17-12:45:24:195 (2756) 0 Allocated 1236MB shared memory: 1024MB global buffers, 35MB routine buffers
+06/20/17-12:45:24:197 (2756) 0 Intel Sandy Bridge AES-NI instructions detected.
+06/20/17-12:45:24:317 (2756) 0 Jrn info from prior WIJ (imflags: 0):
+	wdpass: 0
+	jrnwdpass: 2017
+	fspec: /home/amarin/intersystems/cache20173/mgr/journal/20170620.001
+	filecnt: 35
+	fileoff: 45344416
+	prevfcnt: 35
+	prevfileoeff: 45344416
+	min trans cnt: 35
+	min trans index: 45344416
+06/20/17-12:45:24:318 (2756) 0 
+CSTART of Cache for UNIX (SUSE Linux Enterprise Server for x86-64) 2017.3 (Build 587) Mon May 8 2017 01:37:27 EDT.
+	in /home/amarin/intersystems/cache20173/mgr
+	with wij: /home/amarin/intersystems/cache20173/mgr/CACHE.WIJ
+	from: /home/amarin/intersystems/cache20173/mgr/
+  OS=[Linux], version=[#100-Ubuntu SMP Wed May 17 19:58:14 UTC 2017], release=[4.4.0-79-generic], machine=[x86_64]
+  nodename=[amarin-Latitude-E7470].
+  numasyncwijbuf: 0, swdwrtmax: 0, wijdirectio: off, synctype: 3
+  System Initialized.
+06/20/17-12:45:24:338 (2784) 0 Write daemon started.
+06/20/17-12:45:24:391 (2796) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/ (SFN 0) read-write.
+06/20/17-12:45:24:406 (2796) 0 Instance &#39;C173&#39; starting on node amarin-Latitude-E7470 by user cacheusr
+06/20/17-12:45:24:406 (2796) 0 Using parameters from file &#39;/home/amarin/intersystems/cache20173/cache.cpf&#39;
+06/20/17-12:45:24:407 (2796) 0 Loading DLLs
+06/20/17-12:45:24:407 (2796) 0 Switching to temporary %SYS Namespace
+06/20/17-12:45:24:408 (2796) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/cachelib/ (SFN 1) read-write.
+06/20/17-12:45:24:434 (2796) 0 Loading Locale enu8 (English, United States, Latin1 (ISO 8859-1)) from objects
+06/20/17-12:45:24:453 (2796) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/cachetemp/ (SFN 2) read-write.
+06/20/17-12:45:24:472 (2796) 0 /home/amarin/intersystems/cache20173/mgr/cachetemp/ initialized as CACHETEMP
+06/20/17-12:45:24:474 (2796) 0 Switching to default %SYS Namespace
+06/20/17-12:45:24:479 (2796) 0 Added ethernet device enp0s31f6,wlp1s0 to default list
+06/20/17-12:45:24:510 (2823) 0 Cache MONITOR Started
+06/20/17-12:45:24:610 (2796) 2 Previous system shutdown was abnormal, system forced down or crashed
+06/20/17-12:45:24:611 (2796) 0 Enabling long strings
+06/20/17-12:45:24:637 (2860) 0 Clean Daemon Started
+06/20/17-12:45:24:640 (2796) 1 Configuration file /home/amarin/intersystems/cache20173/cache.cpf is not the same as when last shut down
+06/20/17-12:45:25:234 (2796) 0 Updating configuration information from /home/amarin/intersystems/cache20173/cache.cpf
+06/20/17-12:45:25:389 (2796) 0 Performing Journal Recovery
+06/20/17-12:45:27:606 (2796) 0 Restoring from journal /home/amarin/intersystems/cache20173/mgr/journal/20170620.001
+06/20/17-12:45:27:608 (2796) 0 Performing Transaction Rollback if necessary
+06/20/17-12:45:27:609 (2796) 0   Scanning /home/amarin/intersystems/cache20173/mgr/journal/20170620.001
+06/20/17-12:45:27:610 (2796) 0 No open transactions to roll back
+06/20/17-12:45:27:611 (2796) 0 START: /home/amarin/intersystems/cache20173/mgr/journal/20170620.002
+06/20/17-12:45:27:611 (2796) 1 Warning: Alternate and primary journal directories are the same
+06/20/17-12:45:27:625 (2796) 0 CACHE JOURNALING SYSTEM MESSAGE
+Journaling started to: /home/amarin/intersystems/cache20173/mgr/journal/20170620.002
+06/20/17-12:45:27:625 (2796) 0 Journaling to /home/amarin/intersystems/cache20173/mgr/journal/20170620.002 started.
+06/20/17-12:45:27:631 (2796) 0 Processing Startup section
+06/20/17-12:45:27:714 (2796) 0 Initializing Security system
+06/20/17-12:45:27:707 (3149) 0 Purging old application errors
+06/20/17-12:45:27:785 (3149) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/cache/ (SFN 3) read-write.
+06/20/17-12:45:27:802 (2796) 0 Processing Network section
+06/20/17-12:45:27:802 (2796) 0 Activating Network
+06/20/17-12:45:28:116 (2796) 0 Processing Databases section
+06/20/17-12:45:28:132 (2796) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/cacheaudit/ (SFN 4) read-write.
+06/20/17-12:45:28:141 (2796) 0 Processing Namespaces section
+06/20/17-12:45:28:141 (2796) 0 Namespaces are up to date
+06/20/17-12:45:28:141 (2796) 0 Activating namespaces
+06/20/17-12:45:28:142 (2796) 0 Activating new namespace map
+06/20/17-12:45:28:380 (2796) 0 Namespace changes have been activated
+06/20/17-12:45:28:411 (2796) 0 Auditing to /home/amarin/intersystems/cache20173/mgr/cacheaudit/
+06/20/17-12:45:28:430 (2796) 0 Starting Super Server on port 56772
+06/20/17-12:45:28:486 (2796) 0 Network Lock Upload Phase Starting
+06/20/17-12:45:28:486 (2796) 0 Lock Upload Phase Complete
+06/20/17-12:45:28:486 (2796) 0 Processing Miscellaneous section
+06/20/17-12:45:28:655 (3202) 0 LMF Info:  Licensed for 50000 users.
+06/20/17-12:45:28:666 (3203) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/samples/ (SFN 5) read-write.
+06/20/17-12:45:28:743 (2796) 0 init_gcr_seed:  gen_crypt_rand seeded from /dev/urandom:  64 bytes.
+06/20/17-12:45:28:743 (2796) 0 Processing Devices section
+06/20/17-12:45:28:743 (2796) 0 Processing DeviceSubTypes section
+06/20/17-12:45:28:743 (2796) 0 Processing MagTape section
+06/20/17-12:45:28:748 (2796) 0 Processing IO section
+06/20/17-12:45:28:748 (2796) 0 Processing SQL section
+06/20/17-12:45:28:760 (2796) 0 Executing ^ZSTU routine
+06/20/17-12:45:28:761 (2796) 0 Executing ^%ZSTART routine
+06/20/17-12:45:28:767 (2796) 0 Enabling logons
+06/20/17-12:45:28:969 (3211) 0 Private webserver started on 57773
+06/20/17-12:45:28:979 (3211) 0 Processing Shadows section (this system as shadow)
+06/20/17-12:45:28:980 (3211) 0 Processing Monitor section
+06/20/17-12:45:29:038 (3384) 0 [SYSTEM MONITOR] System Monitor started in %SYS
+06/20/17-12:45:30:659 (3202) 0 LMF Info:  License server started on port 4001
+06/20/17-12:45:32:662 (3202) 0 LMF Info:  Connected to license server 127.0.0.1,4001
+06/20/17-12:49:15:667 (6385) 0 Shutting down Cache
+06/20/17-12:49:15:703 (3384) 0 [SYSTEM MONITOR] System Monitor stopped in %SYS
+06/20/17-12:49:16:703 (6385) 0 Notifying Clients
+06/20/17-12:49:16:703 (6385) 0 No user shutdown routines to execute
+06/20/17-12:49:16:705 (6385) 0 Stopping User Jobs
+06/20/17-12:49:16:710 (6385) 0 Stopping Network Servers
+06/20/17-12:49:16:710 (6385) 0 Withdrawing from License Domain
+06/20/17-12:49:16:710 (6385) 0 Waiting for users to stop
+06/20/17-12:49:16:713 (6385) 0 Auditing stopped
+06/20/17-12:49:16:713 (6385) 0 Stopping Client Networking
+06/20/17-12:49:16:713 (6385) 0 Removing database locks
+06/20/17-12:49:16:715 (6385) 0 Updating Journal File
+06/20/17-12:49:16:918 (6385) 0 Journal restore not required at next startup
+06/20/17-12:49:16:918 (6385) 0 Transaction rollback not required at next startup
+06/20/17-12:49:18:122 (6385) 0 Waiting for database updates to complete
+06/20/17-12:49:18:122 (6385) 0 Database updates complete
+06/20/17-12:49:18:122 (6385) 0 Stopping System Jobs
+06/20/17-12:49:18:226 (2794) 0 EXPDMN exited due to system shutdown
+06/20/17-12:49:18:227 (2786) 0 JRNDMN exited due to system shutdown
+06/20/17-12:49:18:227 (2785) 0 GARCOL exited due to system shutdown
+06/20/17-12:49:18:328 (2793) 0 SWRTDMN #1 exited due to system shutdown
+06/20/17-12:49:18:328 (2792) 0 SWRTDMN #2 exited due to system shutdown
+06/20/17-12:49:18:329 (2790) 0 SWRTDMN #4 exited due to system shutdown
+06/20/17-12:49:18:329 (2789) 0 SWRTDMN #5 exited due to system shutdown
+06/20/17-12:49:18:329 (2791) 0 SWRTDMN #3 exited due to system shutdown
+06/20/17-12:49:18:329 (2788) 0 SWRTDMN #6 exited due to system shutdown
+06/20/17-12:49:18:331 (2787) 0 SWRTDMN #7 exited due to system shutdown
+06/20/17-12:49:18:838 (2784) 0 No blocks pending in WIJ file
+06/20/17-12:49:18:840 (2784) 0 WRTDMN exited due to system shutdown
+06/20/17-12:49:18:930 (2756) 0 CONTROL exited due to system shutdown
+06/20/17-12:49:20:030 (6385) 0 Shutdown complete
+
+
+
+*** Recovery started at Tue Jun 20 12:49:48 2017
+     Current default directory: /home/amarin/intersystems/cache20173/mgr
+     Log file directory: /home/amarin/intersystems/cache20173/mgr/
+     WIJ file spec: ./CACHE.WIJ
+Recovering local (./CACHE.WIJ) image journal file...
+Starting WIJ recovery for &#39;./CACHE.WIJ&#39;.
+  0 blocks pending in this WIJ.
+Exiting with status 3 (Success)
+06/20/17-12:49:48:901 (7422) 0 Automatically configuring buffers
+06/20/17-12:49:48:932 (7422) 0 Allocated 1236MB shared memory: 1024MB global buffers, 35MB routine buffers
+06/20/17-12:49:48:933 (7422) 0 Intel Sandy Bridge AES-NI instructions detected.
+06/20/17-12:49:48:960 (7422) 0 Jrn info from prior WIJ (imflags: 0):
+	wdpass: 0
+	jrnwdpass: 12
+	fspec: /home/amarin/intersystems/cache20173/mgr/journal/20170620.002
+	filecnt: 36
+	fileoff: 0
+	prevfcnt: 36
+	prevfileoeff: 0
+	min trans cnt: 36
+	min trans index: 161540
+06/20/17-12:49:48:961 (7422) 0 
+CSTART of Cache for UNIX (SUSE Linux Enterprise Server for x86-64) 2017.3 (Build 587) Mon May 8 2017 01:37:27 EDT.
+	in /home/amarin/intersystems/cache20173/mgr
+	with wij: /home/amarin/intersystems/cache20173/mgr/CACHE.WIJ
+	from: /home/amarin/intersystems/cache20173/mgr/
+  OS=[Linux], version=[#100-Ubuntu SMP Wed May 17 19:58:14 UTC 2017], release=[4.4.0-79-generic], machine=[x86_64]
+  nodename=[amarin-Latitude-E7470].
+  numasyncwijbuf: 0, swdwrtmax: 0, wijdirectio: off, synctype: 3
+  System Initialized.
+06/20/17-12:49:48:972 (7441) 0 Write daemon started.
+06/20/17-12:49:48:974 (7452) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/ (SFN 0) read-write.
+06/20/17-12:49:48:975 (7452) 0 Instance &#39;C173&#39; starting on node amarin-Latitude-E7470 by user cacheusr
+06/20/17-12:49:48:975 (7452) 0 Using parameters from file &#39;/home/amarin/intersystems/cache20173/cache.cpf&#39;
+06/20/17-12:49:48:975 (7452) 0 Loading DLLs
+06/20/17-12:49:48:975 (7452) 0 Switching to temporary %SYS Namespace
+06/20/17-12:49:48:975 (7452) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/cachelib/ (SFN 1) read-write.
+06/20/17-12:49:48:976 (7452) 0 Loading Locale enu8 (English, United States, Latin1 (ISO 8859-1)) from objects
+06/20/17-12:49:49:003 (7452) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/cachetemp/ (SFN 2) read-write.
+06/20/17-12:49:49:005 (7452) 0 /home/amarin/intersystems/cache20173/mgr/cachetemp/ initialized as CACHETEMP
+06/20/17-12:49:49:006 (7452) 0 Switching to default %SYS Namespace
+06/20/17-12:49:49:007 (7452) 0 Added ethernet device enp0s31f6,wlp1s0 to default list
+06/20/17-12:49:49:014 (7453) 0 Cache MONITOR Started
+06/20/17-12:49:49:114 (7452) 0 Enabling long strings
+06/20/17-12:49:49:123 (7454) 0 Clean Daemon Started
+06/20/17-12:49:49:125 (7452) 1 Configuration file /home/amarin/intersystems/cache20173/cache.cpf is not the same as when last shut down
+06/20/17-12:49:49:218 (7452) 0 Updating configuration information from /home/amarin/intersystems/cache20173/cache.cpf
+06/20/17-12:49:49:225 (7452) 0 Performing Journal Recovery
+06/20/17-12:49:49:226 (7452) 0 WIJ indicates no open transactions
+06/20/17-12:49:49:226 (7452) 0 START: /home/amarin/intersystems/cache20173/mgr/journal/20170620.003
+06/20/17-12:49:49:226 (7452) 1 Warning: Alternate and primary journal directories are the same
+06/20/17-12:49:49:264 (7452) 0 CACHE JOURNALING SYSTEM MESSAGE
+Journaling started to: /home/amarin/intersystems/cache20173/mgr/journal/20170620.003
+06/20/17-12:49:49:264 (7452) 0 Journaling to /home/amarin/intersystems/cache20173/mgr/journal/20170620.003 started.
+06/20/17-12:49:49:264 (7452) 0 Processing Startup section
+06/20/17-12:49:49:267 (7455) 0 Purging old application errors
+06/20/17-12:49:49:271 (7452) 0 Initializing Security system
+06/20/17-12:49:49:294 (7455) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/cache/ (SFN 3) read-write.
+06/20/17-12:49:49:313 (7452) 0 Processing Network section
+06/20/17-12:49:49:313 (7452) 0 Activating Network
+06/20/17-12:49:49:526 (7452) 0 Processing Databases section
+06/20/17-12:49:49:533 (7452) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/cacheaudit/ (SFN 4) read-write.
+06/20/17-12:49:49:536 (7452) 0 Processing Namespaces section
+06/20/17-12:49:49:536 (7452) 0 Namespaces are up to date
+06/20/17-12:49:49:536 (7452) 0 Activating namespaces
+06/20/17-12:49:49:536 (7452) 0 Activating new namespace map
+06/20/17-12:49:49:579 (7452) 0 Namespace changes have been activated
+06/20/17-12:49:49:579 (7452) 0 Auditing to /home/amarin/intersystems/cache20173/mgr/cacheaudit/
+06/20/17-12:49:49:582 (7452) 0 Starting Super Server on port 1972
+06/20/17-12:49:49:584 (7452) 0 Network Lock Upload Phase Starting
+06/20/17-12:49:49:584 (7452) 0 Lock Upload Phase Complete
+06/20/17-12:49:49:584 (7452) 0 Processing Miscellaneous section
+06/20/17-12:49:49:590 (7462) 0 LMF Info:  Licensed for 50000 users.
+06/20/17-12:49:49:592 (7452) 0 init_gcr_seed:  gen_crypt_rand seeded from /dev/urandom:  64 bytes.
+06/20/17-12:49:49:592 (7452) 0 Processing Devices section
+06/20/17-12:49:49:592 (7452) 0 Processing DeviceSubTypes section
+06/20/17-12:49:49:592 (7452) 0 Processing MagTape section
+06/20/17-12:49:49:592 (7452) 0 Processing IO section
+06/20/17-12:49:49:592 (7452) 0 Processing SQL section
+06/20/17-12:49:49:593 (7452) 0 Executing ^ZSTU routine
+06/20/17-12:49:49:593 (7452) 0 Executing ^%ZSTART routine
+06/20/17-12:49:49:595 (7452) 0 Enabling logons
+06/20/17-12:49:49:711 (7463) 0 Private webserver started on 57772
+06/20/17-12:49:49:719 (7463) 0 Processing Shadows section (this system as shadow)
+06/20/17-12:49:49:720 (7463) 0 Processing Monitor section
+06/20/17-12:49:49:738 (7617) 0 [SYSTEM MONITOR] System Monitor started in %SYS
+06/20/17-12:49:52:473 (7462) 0 LMF Info:  License server started on port 4001
+06/20/17-12:49:54:485 (7462) 0 LMF Info:  Connected to license server 127.0.0.1,4001
+06/20/17-13:00:00:783 (8420) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/app-data/ (SFN 5) read-write.
+06/20/17-13:00:00:808 (8420) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/app/ (SFN 6) read-write.
+06/20/17-13:00:00:811 (8420) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/docbook/ (SFN 7) read-write.
+06/20/17-13:00:00:832 (8420) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/samples/ (SFN 8) read-write.
+06/20/17-13:00:01:012 (8420) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/user/ (SFN 9) read-write.
 
 </pre>
 </div>
@@ -5525,7 +5755,7 @@ Journaling switched to: /home/amarin/intersystems/cache20173/mgr/journal/2017062
     <tr>
       <td>
         <h4>Free Space</h4>
-        <p>158,006 MB </p>
+        <p>155,929 MB </p>
       </td>
     </tr>
     <tr>
@@ -5541,6 +5771,18 @@ Journaling switched to: /home/amarin/intersystems/cache20173/mgr/journal/2017062
   <tbody>
     <tr>
       <th>Name</th><th>Size in KB</th><th>Creation Time</th><th>Reason</th>
+    </tr>
+    <tr>
+      <td>/home/amarin/intersystems/cache20173/mgr/journal/20170620.003</td>
+      <td style="text-align:right">10,816</td>
+      <td>2017-06-20 12:49:49</td>
+      <td>by backup</td>
+    </tr>
+    <tr>
+      <td>/home/amarin/intersystems/cache20173/mgr/journal/20170620.002</td>
+      <td style="text-align:right">192</td>
+      <td>2017-06-20 12:45:27</td>
+      <td>by backup</td>
     </tr>
     <tr>
       <td>/home/amarin/intersystems/cache20173/mgr/journal/20170620.001</td>
