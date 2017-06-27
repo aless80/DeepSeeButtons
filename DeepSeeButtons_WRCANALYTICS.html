@@ -173,7 +173,7 @@
   <a href="#cubeinfo">Cube Info</a>
   <a class="cubelinks" href="#cubeinfoPROBLEMSCUBE">PROBLEMSCUBE</a>
   <a class="cubelinks" href="#cubeinfoMYPROBLEMSCUBE">MYPROBLEMSCUBE</a>
-  <a class="cubelinks" href="#cubeinfoPROBLEMSCUBECURRENTYEAR">PROBLEMSCUBECURRENTYEAR</a>
+  <a class="cubelinks" href="#cubeinfoSURVEYSCUBE">SURVEYSCUBE</a>
   <a class="cubelinks" href="#cubeinfoTECHCASE">TECHCASE</a>
   <a href="#querylog">Query Log</a>
   <a href="#dslog">DeepSee Log</a>
@@ -1491,7 +1491,7 @@ Error: <UNDEFINED>OSVer+11^DeepSeeButtons *uname
 <br>
 <a href="#cubeinfoMYPROBLEMSCUBE">MYPROBLEMSCUBE</a>
 <br>
-<a href="#cubeinfoPROBLEMSCUBECURRENTYEAR">PROBLEMSCUBECURRENTYEAR</a>
+<a href="#cubeinfoSURVEYSCUBE">SURVEYSCUBE</a>
 <br>
 <a href="#cubeinfoTECHCASE">TECHCASE</a>
 <br>
@@ -3726,16 +3726,15 @@ Lvl [WeekDayOpen].[H1].[OpenWeekDay]                               0    0.00%
       <tr>
   </tbody>
 </table>
-
 <hr size="4" noshade>
-<a name="cubeinfoPROBLEMSCUBECURRENTYEAR"></a>
-<h2>Cube Info for PROBLEMSCUBECURRENTYEAR</h2>
+<a name="cubeinfoSURVEYSCUBE"></a>
+<h2>Cube Info for SURVEYSCUBE</h2>
 <table id="CubeInfoTable" cellpadding="7" cellspacing="3" class="tableWithBorders tableTabbed">
   <tbody>
     <tr>
       <td>
         <h4>Cube Display Name</h4>
-        <p>ProblemsCubeCurrentYear</p>
+        <p>Surveys Cube</p>
       </td>
     </tr>
     <tr>
@@ -3747,7 +3746,7 @@ Lvl [WeekDayOpen].[H1].[OpenWeekDay]                               0    0.00%
     <tr>
       <td>
         <h4>Cube Class</h4>
-        <p>DSII.ProblemsCubeCurrentYear</p>
+        <p>DSII.SurveysCube</p>
       </td>
     </tr>
     <tr>
@@ -3759,55 +3758,249 @@ Lvl [WeekDayOpen].[H1].[OpenWeekDay]                               0    0.00%
     <tr>
       <td>
         <h4>Source Class</h4>
-        <p>User.Problem</p>
+        <p>User.Survey</p>
       </td>
     </tr>
     <tr>
       <td>
         <h4>SQL Table Name </h4>
-        <p>SQLUser.Problem</p>
+        <p>SQLUser.Survey</p>
       </td>
     </tr>
     <tr>
       <td>
         <h4>Fact Class</h4>
-        <p>DSII.ProblemsCubeCurrentYear.Fact</p>
+        <p>DSII.SurveysCube.Fact</p>
       </td>
     </tr>
     <tr>
       <td>
         <h4>Fact Count</h4>
-        <p>9736</p>
+        <p>24962</p>
       </td>
     </tr>
     <tr>
       <td>
         <h4>Last Modified</h4>
-        <p>02/17/2017 17:42:50</p>
+        <p>05/19/2016 17:16:20</p>
       </td>
     </tr>
     <tr>
       <td>
         <h4>Cube Registry</h4>
         <p>Cube is enabled in Cube Manager. Most Recent events:</p>
-        <p>Synch event: 21 facts synched on 2017-06-27 09:30:04 in 0 seconds</p>
-        <p>Build event: 9,701 facts built on 2017-06-26 21:00:44 in 42 seconds</p>
-        <p>Registry Update event: on 2017-03-21 11:35:30</p>
-        <p>Repair event: 2,150 facts built on 2017-02-09 16:02:33 in 13 seconds</p>
-      </td>
-    </tr>
-    <tr>
-      <td>
-        <h4>Build Errors</h4>
-        <p>0 build error(s) for 'PROBLEMSCUBECURRENTYEAR'
-        </p>
+        <p>Synch event: 4 facts synched on 2017-06-26 13:40:13 in 1 seconds</p>
+        <p>Build event: 24,900 facts built on 2017-06-23 21:04:26 in 28 seconds</p>
+        <p>Registry Update event: Not found</p>
+        <p>Repair event: 20,665 facts built on 2017-01-13 16:53:13 in 34 seconds</p>
       </td>
     </tr>
   </tbody>
 </table>
+<h4>Build Errors</h4>
+<div class="scrollable" style="border:1px solid #D0D0D0;height:400px;">
+        <pre>    1   Source ID: 94567
+        ERROR #8035: Source does not exist (extId: 24865)
+
+    2   Source ID: 94580
+        ERROR #8035: Source does not exist (extId: 24878)
+
+    3   Source ID: 94596
+        ERROR #8034: Source does not exist (srcId: 24892)
+
+    4   Source ID: 94605
+        ERROR #8035: Source does not exist (extId: 24901)
+
+    5   Source ID: 94607
+        ERROR #8035: Source does not exist (extId: 24902)
+
+    6   Source ID: 94608
+        ERROR #8035: Source does not exist (extId: 24903)
+
+    7   Source ID: 94609
+        ERROR #8035: Source does not exist (extId: 24904)
+
+    8   Source ID: 94610
+        ERROR #8035: Source does not exist (extId: 24905)
+
+    9   Source ID: 94611
+        ERROR #8035: Source does not exist (extId: 24906)
+
+   10   Source ID: 94612
+        ERROR #8034: Source does not exist (srcId: 24907)
+
+   11   Source ID: 94613
+        ERROR #8035: Source does not exist (extId: 24908)
+
+   12   Source ID: 94614
+        ERROR #8035: Source does not exist (extId: 24909)
+
+   13   Source ID: 94615
+        ERROR #8035: Source does not exist (extId: 24910)
+
+   14   Source ID: 94616
+        ERROR #8035: Source does not exist (extId: 24911)
+
+   15   Source ID: 94617
+        ERROR #8035: Source does not exist (extId: 24912)
+
+   16   Source ID: 94618
+        ERROR #8035: Source does not exist (extId: 24913)
+
+   17   Source ID: 94619
+        ERROR #8035: Source does not exist (extId: 24914)
+
+   18   Source ID: 94620
+        ERROR #8035: Source does not exist (extId: 24915)
+
+   19   Source ID: 94621
+        ERROR #8035: Source does not exist (extId: 24916)
+
+   20   Source ID: 94622
+        ERROR #8035: Source does not exist (extId: 24917)
+
+   21   Source ID: 94623
+        ERROR #8035: Source does not exist (extId: 24918)
+
+   22   Source ID: 94624
+        ERROR #8035: Source does not exist (extId: 24919)
+
+   23   Source ID: 94625
+        ERROR #8035: Source does not exist (extId: 24920)
+
+   24   Source ID: 94626
+        ERROR #8035: Source does not exist (extId: 24921)
+
+   25   Source ID: 94628
+        ERROR #8035: Source does not exist (extId: 24922)
+
+   26   Source ID: 94629
+        ERROR #8035: Source does not exist (extId: 24923)
+
+   27   Source ID: 94630
+        ERROR #8035: Source does not exist (extId: 24924)
+
+   28   Source ID: 94631
+        ERROR #8035: Source does not exist (extId: 24925)
+
+   29   Source ID: 94632
+        ERROR #8035: Source does not exist (extId: 24926)
+
+   30   Source ID: 94633
+        ERROR #8035: Source does not exist (extId: 24927)
+
+   31   Source ID: 94634
+        ERROR #8035: Source does not exist (extId: 24928)
+
+   32   Source ID: 94635
+        ERROR #8035: Source does not exist (extId: 24929)
+
+   33   Source ID: 94636
+        ERROR #8035: Source does not exist (extId: 24930)
+
+   34   Source ID: 94637
+        ERROR #8034: Source does not exist (srcId: 24931)
+
+   35   Source ID: 94638
+        ERROR #8035: Source does not exist (extId: 24932)
+
+   36   Source ID: 94640
+        ERROR #8035: Source does not exist (extId: 24933)
+
+   37   Source ID: 94641
+        ERROR #8035: Source does not exist (extId: 24934)
+
+   38   Source ID: 94642
+        ERROR #8035: Source does not exist (extId: 24935)
+
+   39   Source ID: 94643
+        ERROR #8035: Source does not exist (extId: 24936)
+
+   40   Source ID: 94644
+        ERROR #8034: Source does not exist (srcId: 24937)
+
+   41   Source ID: 94645
+        ERROR #8035: Source does not exist (extId: 24938)
+
+   42   Source ID: 94646
+        ERROR #8035: Source does not exist (extId: 24939)
+
+   43   Source ID: 94647
+        ERROR #8035: Source does not exist (extId: 24940)
+
+   44   Source ID: 94648
+        ERROR #8035: Source does not exist (extId: 24941)
+
+   45   Source ID: 94649
+        ERROR #8035: Source does not exist (extId: 24942)
+
+   46   Source ID: 94650
+        ERROR #8034: Source does not exist (srcId: 24943)
+
+   47   Source ID: 94651
+        ERROR #8034: Source does not exist (srcId: 24944)
+
+   48   Source ID: 94652
+        ERROR #8035: Source does not exist (extId: 24945)
+
+   49   Source ID: 94653
+        ERROR #8034: Source does not exist (srcId: 24946)
+
+   50   Source ID: 94654
+        ERROR #8035: Source does not exist (extId: 24947)
+
+   51   Source ID: 94655
+        ERROR #8034: Source does not exist (srcId: 24948)
+
+   52   Source ID: 94656
+        ERROR #8035: Source does not exist (extId: 24949)
+
+   53   Source ID: 94657
+        ERROR #8035: Source does not exist (extId: 24950)
+
+   54   Source ID: 94658
+        ERROR #8035: Source does not exist (extId: 24951)
+
+   55   Source ID: 94659
+        ERROR #8035: Source does not exist (extId: 24952)
+
+   56   Source ID: 94660
+        ERROR #8035: Source does not exist (extId: 24953)
+
+   57   Source ID: 94661
+        ERROR #8035: Source does not exist (extId: 24954)
+
+   58   Source ID: 94662
+        ERROR #8035: Source does not exist (extId: 24955)
+
+   59   Source ID: 94663
+        ERROR #8035: Source does not exist (extId: 24956)
+
+   60   Source ID: 94664
+        ERROR #8035: Source does not exist (extId: 24957)
+
+   61   Source ID: 94665
+        ERROR #8035: Source does not exist (extId: 24958)
+
+   62   Source ID: 94666
+        ERROR #8035: Source does not exist (extId: 24959)
+
+   63   Source ID: 94667
+        ERROR #8035: Source does not exist (extId: 24960)
+
+   64   Source ID: 94668
+        ERROR #8035: Source does not exist (extId: 24961)
+
+   65   Source ID: 94669
+        ERROR #8035: Source does not exist (extId: 24962)
+
+65 build error(s) for 'SURVEYSCUBE'
+
+        </pre>
+</div>
 <hr size="4" noshade>
-<a name="dimensionsPROBLEMSCUBECURRENTYEAR"></a>
-<h2>Dimensions for PROBLEMSCUBECURRENTYEAR</h2>
+<a name="dimensionsSURVEYSCUBE"></a>
+<h2>Dimensions for SURVEYSCUBE</h2>
 <h4>Dimension List</h4>
 <table id="DimensionTable" border="0" class="tableWithBorders" cellpadding="3" cellspacing="3">
   <tbody>
@@ -3825,638 +4018,166 @@ Lvl [WeekDayOpen].[H1].[OpenWeekDay]                               0    0.00%
     </tr>
     <tr>
       <td></td>
-      <td>CountTotals</td>
+      <td>TechKnowledge</td>
       <td></td>
       <td></td>
     </tr>
     <tr>
       <td></td>
-      <td>ActionsNo</td>
+      <td>ProfessionalCourtesy</td>
       <td></td>
       <td></td>
     </tr>
     <tr>
       <td></td>
-      <td>Duration</td>
+      <td>OverallSatisfaction</td>
       <td></td>
       <td></td>
     </tr>
     <tr>
       <td></td>
-      <td>DescText</td>
+      <td>Comments</td>
       <td></td>
       <td></td>
     </tr>
     <tr>
-      <td></td>
-      <td>NADateDiff</td>
-      <td></td>
-      <td></td>
-    </tr>
-    <tr>
-      <td></td>
-      <td>StaleFactor</td>
-      <td></td>
-      <td></td>
-    </tr>
-    <tr>
-      <td></td>
-      <td>NADateLADateDiff</td>
-      <td></td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>Contact</td>
+      <td>Satisfied</td>
       <td>H1</td>
-      <td>All Contact</td>
-      <td>[All level]</td>
-    </tr>
-    <tr>
-      <td></td>
-      <td></td>
-      <td>OrganizationLetter</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td></td>
-      <td></td>
-      <td>Org</td>
+      <td>Satisfied</td>
       <td></td>
     </tr>
     <tr>
       <td>
       </td>
       <td>H2</td>
-      <td>All Contact</td>
-      <td>[All level]</td>
-    </tr>
-    <tr>
-      <td></td>
-      <td></td>
-      <td>Contact</td>
+      <td>hasNumbers</td>
       <td></td>
     </tr>
     <tr>
       <td>
       </td>
       <td>H3</td>
-      <td>All Contact</td>
-      <td>[All level]</td>
-    </tr>
-    <tr>
-      <td></td>
-      <td></td>
-      <td>Org Primary Country</td>
+      <td>hasComments</td>
       <td></td>
     </tr>
     <tr>
       <td>
       </td>
       <td>H4</td>
-      <td>All Contact</td>
-      <td>[All level]</td>
-    </tr>
-    <tr>
-      <td></td>
-      <td></td>
-      <td>Org Continent</td>
+      <td>Ignored</td>
       <td></td>
     </tr>
     <tr>
       <td>
       </td>
       <td>H5</td>
-      <td>All Contact</td>
-      <td>[All level]</td>
-    </tr>
-    <tr>
-      <td></td>
-      <td></td>
-      <td>Org Language</td>
+      <td>hasMgrReview</td>
       <td></td>
     </tr>
     <tr>
-      <td>
-      </td>
-      <td>H6</td>
-      <td>All Contact</td>
-      <td>[All level]</td>
-    </tr>
-    <tr>
-      <td></td>
-      <td></td>
-      <td>Org TAM</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>
-      </td>
-      <td>H7</td>
-      <td>All Contact</td>
-      <td>[All level]</td>
-    </tr>
-    <tr>
-      <td></td>
-      <td></td>
-      <td>Org SalesRep</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>
-      </td>
-      <td>H8</td>
-      <td>All Contact</td>
-      <td>[All level]</td>
-    </tr>
-    <tr>
-      <td></td>
-      <td></td>
-      <td>Org Sec Name</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>
-      </td>
-      <td>H9</td>
-      <td>All Contact</td>
-      <td>[All level]</td>
-    </tr>
-    <tr>
-      <td></td>
-      <td></td>
-      <td>WRC Access</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>
-      </td>
-      <td>H10</td>
-      <td>All Contact</td>
-      <td>[All level]</td>
-    </tr>
-    <tr>
-      <td></td>
-      <td></td>
-      <td>Var</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>
-      </td>
-      <td>H11</td>
-      <td>All Contact</td>
-      <td>[All level]</td>
-    </tr>
-    <tr>
-      <td></td>
-      <td></td>
-      <td>Org Relationship</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>
-      </td>
-      <td>H12</td>
-      <td>All Contact</td>
-      <td>[All level]</td>
-    </tr>
-    <tr>
-      <td></td>
-      <td></td>
-      <td>Org State</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>OpenDate</td>
+      <td>ProfessionalCourtesy</td>
       <td>H1</td>
-      <td>All OpenDate</td>
+      <td>ProfessionalCourtesy</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>TechKnowledge</td>
+      <td>H1</td>
+      <td>All TechKnowledge</td>
       <td>[All level]</td>
     </tr>
     <tr>
       <td></td>
       <td></td>
-      <td>Open Year</td>
+      <td>TechKnowledge</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>SurveyDate</td>
+      <td>H1</td>
+      <td>Year</td>
       <td></td>
     </tr>
     <tr>
       <td></td>
       <td></td>
-      <td>Open Month Year</td>
+      <td>MonthYear</td>
       <td></td>
     </tr>
     <tr>
       <td></td>
       <td></td>
-      <td>Open Month</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td></td>
-      <td></td>
-      <td>Open Day</td>
+      <td>DayMonthYear</td>
       <td></td>
     </tr>
     <tr>
       <td>
       </td>
       <td>H2</td>
-      <td>All OpenDate</td>
-      <td>[All level]</td>
-    </tr>
-    <tr>
-      <td></td>
-      <td></td>
-      <td>Open Year</td>
+      <td>Month</td>
       <td></td>
     </tr>
     <tr>
-      <td></td>
-      <td></td>
-      <td>Open Month Year</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td></td>
-      <td></td>
-      <td>Open Month</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td></td>
-      <td></td>
-      <td>Open Day</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>OpenTime</td>
+      <td>Employee</td>
       <td>H1</td>
-      <td>OpenTime</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>CloseDate</td>
-      <td>H1</td>
-      <td>All CloseDate</td>
-      <td>[All level]</td>
-    </tr>
-    <tr>
-      <td></td>
-      <td></td>
-      <td>Close Year</td>
+      <td>DeptManagerName</td>
       <td></td>
     </tr>
     <tr>
       <td></td>
       <td></td>
-      <td>Close Month Year</td>
+      <td>ManagerName</td>
       <td></td>
     </tr>
     <tr>
       <td></td>
       <td></td>
-      <td>Close Month</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td></td>
-      <td></td>
-      <td>Close Day</td>
+      <td>Advisor</td>
       <td></td>
     </tr>
     <tr>
       <td>
       </td>
       <td>H2</td>
-      <td>All CloseDate</td>
-      <td>[All level]</td>
-    </tr>
-    <tr>
-      <td></td>
-      <td></td>
-      <td>Close Year</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td></td>
-      <td></td>
-      <td>Close Month Year</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td></td>
-      <td></td>
-      <td>Close Month</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td></td>
-      <td></td>
-      <td>Close Day</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>Lists</td>
-      <td>H1</td>
-      <td>DevChanges</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>
-      </td>
-      <td>H2</td>
-      <td>Prodlogs</td>
+      <td>isActive</td>
       <td></td>
     </tr>
     <tr>
       <td>
       </td>
       <td>H3</td>
-      <td>Adhocs</td>
+      <td>OrgTAM</td>
       <td></td>
     </tr>
     <tr>
-      <td>
-      </td>
-      <td>H5</td>
-      <td>Original Advisor</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>Problem</td>
+      <td>Contact</td>
       <td>H1</td>
-      <td>All Problem</td>
-      <td>[All level]</td>
-    </tr>
-    <tr>
-      <td></td>
-      <td></td>
-      <td>Status</td>
+      <td>Organization</td>
       <td></td>
     </tr>
     <tr>
       <td>
       </td>
       <td>H2</td>
-      <td>All Problem</td>
-      <td>[All level]</td>
-    </tr>
-    <tr>
-      <td></td>
-      <td></td>
-      <td>Priority</td>
+      <td>Customer</td>
       <td></td>
     </tr>
     <tr>
-      <td>
-      </td>
-      <td>H3</td>
-      <td>All Problem</td>
-      <td>[All level]</td>
-    </tr>
-    <tr>
-      <td></td>
-      <td></td>
-      <td>Owner</td>
+      <td>Comment entities</td>
+      <td>H1</td>
+      <td>Comment entity</td>
       <td></td>
     </tr>
     <tr>
-      <td>
-      </td>
-      <td>H4</td>
-      <td>All Problem</td>
-      <td>[All level]</td>
-    </tr>
-    <tr>
+      <td>Comments type</td>
+      <td>H1</td>
+      <td>Category</td>
       <td></td>
-      <td></td>
-      <td>ActiveAdvisor</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>
-      </td>
-      <td>H5</td>
-      <td>All Problem</td>
-      <td>[All level]</td>
-    </tr>
-    <tr>
-      <td></td>
-      <td></td>
-      <td>Consulting</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>
-      </td>
-      <td>H6</td>
-      <td>All Problem</td>
-      <td>[All level]</td>
-    </tr>
-    <tr>
-      <td></td>
-      <td></td>
-      <td>Manager</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>
-      </td>
-      <td>H7</td>
-      <td>All Problem</td>
-      <td>[All level]</td>
-    </tr>
-    <tr>
-      <td></td>
-      <td></td>
-      <td>Classification</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>
-      </td>
-      <td>H9</td>
-      <td>All Problem</td>
-      <td>[All level]</td>
-    </tr>
-    <tr>
-      <td></td>
-      <td></td>
-      <td>Platform</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>
-      </td>
-      <td>H10</td>
-      <td>All Problem</td>
-      <td>[All level]</td>
-    </tr>
-    <tr>
-      <td></td>
-      <td></td>
-      <td>OS Name</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>
-      </td>
-      <td>H11</td>
-      <td>All Problem</td>
-      <td>[All level]</td>
-    </tr>
-    <tr>
-      <td></td>
-      <td></td>
-      <td>Crisis</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>
-      </td>
-      <td>H12</td>
-      <td>All Problem</td>
-      <td>[All level]</td>
-    </tr>
-    <tr>
-      <td></td>
-      <td></td>
-      <td>Technology</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>
-      </td>
-      <td>H13</td>
-      <td>All Problem</td>
-      <td>[All level]</td>
     </tr>
     <tr>
       <td></td>
       <td></td>
       <td>Type</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>
-      </td>
-      <td>H14</td>
-      <td>All Problem</td>
-      <td>[All level]</td>
-    </tr>
-    <tr>
-      <td></td>
-      <td></td>
-      <td>ActionCount</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>
-      </td>
-      <td>H16</td>
-      <td>All Problem</td>
-      <td>[All level]</td>
-    </tr>
-    <tr>
-      <td></td>
-      <td></td>
-      <td>DiagnosisCategory</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>
-      </td>
-      <td>H15</td>
-      <td>All Problem</td>
-      <td>[All level]</td>
-    </tr>
-    <tr>
-      <td></td>
-      <td></td>
-      <td>SolutionCategory</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>
-      </td>
-      <td>H17</td>
-      <td>All Problem</td>
-      <td>[All level]</td>
-    </tr>
-    <tr>
-      <td></td>
-      <td></td>
-      <td>Compatibility</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>Location</td>
-      <td>H1</td>
-      <td>All Location</td>
-      <td>[All level]</td>
-    </tr>
-    <tr>
-      <td></td>
-      <td></td>
-      <td>ReasonCode</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>
-      </td>
-      <td>H2</td>
-      <td>All Location</td>
-      <td>[All level]</td>
-    </tr>
-    <tr>
-      <td></td>
-      <td></td>
-      <td>SameDay</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>Product info</td>
-      <td>H1</td>
-      <td>Product Name</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>
-      </td>
-      <td>H2</td>
-      <td>Product version</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>Desc Entities</td>
-      <td>H1</td>
-      <td>Description entity</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>Usage</td>
-      <td>H1</td>
-      <td>Keyword</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>
-      </td>
-      <td>H2</td>
-      <td>ZV String</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>
-      </td>
-      <td>H3</td>
-      <td>Product version</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>
-      </td>
-      <td>H4</td>
-      <td>HasProblemDescription</td>
       <td></td>
     </tr>
   </tbody>
@@ -4466,222 +4187,105 @@ Lvl [WeekDayOpen].[H1].[OpenWeekDay]                               0    0.00%
   <tbody>
     <tr>
       <td>
-        <pre>Do ##class(%DeepSee.Utils).%Analyze("PROBLEMSCUBECURRENTYEAR","fic",0)
+        <pre>Do ##class(%DeepSee.Utils).%Analyze("SURVEYSCUBE","fic",0)
 
 ----------------------------------------------------------------
     Index                         Approx. Size       Cardinality
-1   1                                      176                12
-2   Dx3154058514                        19,584                28
-3   DxOrganizationNameViaOrg            25,680             1,552
-4   Dx1270592527                        30,296             2,706
-5   Dx4064536537                         9,995                65
-6   Dx638984209                          6,352                 8
-7   Dx297132710                          7,377                12
-8   Dx5815685                            5,880                19
-9   Dx1816889307                        19,804                83
-10  Dx548336594                          7,418                 8
-11  Dx2370514226                         5,466                 2
-12  DxOrganizationNameViaVar             8,670               385
-13  DxRelationshipViaOrg                 6,075                 9
-14  DxNameViaPrimaryStateVia             7,788                78
-15  DxOpenDateFxYear                         6                 1
-16  DxOpenDateFxMonthYear               19,496                 6
-17  DxOpenDateFxMonthNumber             19,496                 6
-18  DxOpenDateFxDayNumber               19,596                31
-19  DxOpenDateFxDayMonthYear            20,184               178
-20  DxOpenTimeFxHourNumber              19,568                24
-21  DxCloseDateFxYear                    2,134                 2
-22  DxCloseDateFxMonthYear              19,500                 7
-23  DxCloseDateFxMonthNumber            19,500                 7
-24  DxCloseDateFxDayNumber              19,600                32
-25  DxCloseDateFxDayMonthYea            20,184               178
-26  DxDevchange                          4,844               586
-27  DxProdLog                            5,376               676
-28  DxAdhoc                              3,134               405
-29  DxOriginalAdvisor                    7,107               142
-30  DxStatus                             2,830                 4
-31  DxPriority                           7,978                 4
-32  DxNameViaProblemOwner               20,020               137
-33  Dx2964301300                         1,422                 3
-34  DxNameViaConsultingAdvis             5,898               110
-35  Dx4066287200                        19,576                26
-36  DxExtValueViaClassificat            19,976               126
-37  DxPlatformViaHardware                1,558                14
-38  DxOSNameViaHardware                  1,574                18
-39  DxCrisisRg2194606334                 1,682                 2
-40  Dx2804954423                        12,183                11
-41  DxType                               5,938                 7
-42  DxActionCount                       19,908               109
-43  Dx2256272102                             6                 1
-44  Dx2903132876                             6                 1
-45  DxCompatibility                        182                 3
-46  Location                             5,538                15
-47  Dx984570826                          2,443                 2
-48  DxNameViaProduct                     9,258                13
-49  DxReleaseViaProduct                 20,036               141
-51  Dx2846190658                         4,804                 4
-52  Dx1003925274                         2,443                 2
-53  Dx3394123629                         3,766                 2
-54  Dx3216333435                           602                 2
-55  55                                   5,658                 2
+1   1                                    9,375                 3
+2   DxSatisfiedRg400923481               6,536                 3
+3   Dx4146999874                         6,250                 2
+4   Dx917207115                          6,248                 2
+5   DxIgnoreRg582849959                    234                 2
+6   Dx920865183                            314                 2
+7   DxProfessionalCourtesy               7,316                11
+8   DxTechKnowledge                      7,494                11
+9   DxSurveyDateFxYear                   8,432                 5
+10  DxSurveyDateFxMonthYear             49,290                54
+11  DxSurveyDateFxDayMonthYe            54,822             1,243
+12  DxSurveyDateFxMonthNumbe            35,587                12
+13  DxDeptManagerName                    6,250                 2
+14  Dx915553774                         33,479                14
+15  Dx435491227                         50,424               125
+16  Dx667627859                          6,172                 2
+17  Dx919956114                         15,159                18
+18  DxOrganization                      60,092             2,542
+19  DxContact                           68,204             4,570
 $Fa Extent Index                             6                 0
-Cou CountTotalsSearch                        6                 1
-M1  CountTotals                             18                 3
-M2  Mx1564147041                        14,108                14
-M3  Mx2287023220                        15,989                13
-M4  MxDescription                        7,916                16
-M5  Mx2624450884                         5,034                15
-M6  Mx3412726730                         4,090                18
-M7  Mx1395107354                         5,000                19
-Mx2 Mx2287023220Search                  15,080               148
-Mx2 Mx2624450884Search                   2,294                89
+15& 15&13                                3,654                17
+15& 15&16                               13,830                17
+15& 15&17                               24,408                17
+16& 16&14                                3,654                17
+16& 16&17                               13,830                17
+16& 16&18                               24,408                17
+17& 17&15                                5,388                18
+17& 17&18                               15,258                18
+17& 17&19                               29,286                18
+M1  MxTechKnowledge                     10,301                 5
+M2  MxProfessionalCourtesy              10,121                 5
+M3  MxOverallSatisfaction               10,367                 5
 ----------------------------------------------------------------
-    Total:                             605,112 bytes        8343
+    Total:                             596,189 bytes        8794
 
-    Fact Table:                      2,149,092 bytes in 9,736 fact(s)
+    Fact Table:                      1,466,589 bytes in 24,962 fact(s)
     Cell Cache:                              0 cell(s) in 0 bucket(s)
 
 
-FieldNameToSpec("PROBLEMSCUBECURRENTYEAR")
+FieldNameToSpec("SURVEYSCUBE")
 
-    CountTotals                           [Measures].[CountTotals]
-    Mx1564147041                          [Measures].[ActionsNo]
-    Mx2287023220                          [Measures].[Duration]
-    MxDescription                         [Measures].[DescText]
-    Mx2624450884                          [Measures].[NADateDiff]
-    Mx3412726730                          [Measures].[StaleFactor]
-    Mx1395107354                          [Measures].[NADateLADateDiff]
-    Dx3154058514                          [Contact].[H1].[OrganizationLetter]
-    DxOrganizationNameViaOrg              [Contact].[H1].[Org]
-    Dx1270592527                          [Contact].[H2].[Contact]
-    Dx4064536537                          [Contact].[H3].[Org Primary Country]
-    Dx638984209                           [Contact].[H4].[Org Continent]
-    Dx297132710                           [Contact].[H5].[Org Language]
-    Dx5815685                             [Contact].[H6].[Org TAM]
-    Dx1816889307                          [Contact].[H7].[Org SalesRep]
-    Dx548336594                           [Contact].[H8].[Org Sec Name]
-    Dx2370514226                          [Contact].[H9].[WRC Access]
-    DxOrganizationNameViaVar              [Contact].[H10].[Var]
-    DxRelationshipViaOrg                  [Contact].[H11].[Org Relationship]
-    DxNameViaPrimaryStateViaOrg           [Contact].[H12].[Org State]
-    DxOpenDateFxYear                      [OpenDate].[H1].[Open Year]
-    DxOpenDateFxMonthYear                 [OpenDate].[H1].[Open Month Year]
-    DxOpenDateFxMonthNumber               [OpenDate].[H1].[Open Month]
-    DxOpenDateFxDayNumber                 [OpenDate].[H1].[Open Day]
-    DxOpenDateFxYear                      [OpenDate].[H2].[Open Year]
-    DxOpenDateFxMonthYear                 [OpenDate].[H2].[Open Month Year]
-    DxOpenDateFxMonthNumber               [OpenDate].[H2].[Open Month]
-    DxOpenDateFxDayMonthYear              [OpenDate].[H2].[Open Day]
-    DxOpenTimeFxHourNumber                [OpenTime].[H1].[OpenTime]
-    DxCloseDateFxYear                     [CloseDate].[H1].[Close Year]
-    DxCloseDateFxMonthYear                [CloseDate].[H1].[Close Month Year]
-    DxCloseDateFxMonthNumber              [CloseDate].[H1].[Close Month]
-    DxCloseDateFxDayNumber                [CloseDate].[H1].[Close Day]
-    DxCloseDateFxYear                     [CloseDate].[H2].[Close Year]
-    DxCloseDateFxMonthYear                [CloseDate].[H2].[Close Month Year]
-    DxCloseDateFxMonthNumber              [CloseDate].[H2].[Close Month]
-    DxCloseDateFxDayMonthYear             [CloseDate].[H2].[Close Day]
-    DxDevchange                           [Lists].[H1].[DevChanges]
-    DxProdLog                             [Lists].[H2].[Prodlogs]
-    DxAdhoc                               [Lists].[H3].[Adhocs]
-    DxOriginalAdvisor                     [Lists].[H5].[Original Advisor]
-    DxStatus                              [Problem].[H1].[Status]
-    DxPriority                            [Problem].[H2].[Priority]
-    DxNameViaProblemOwner                 [Problem].[H3].[Owner]
-    Dx2964301300                          [Problem].[H4].[ActiveAdvisor]
-    DxNameViaConsultingAdvisor            [Problem].[H5].[Consulting]
-    Dx4066287200                          [Problem].[H6].[Manager]
-    DxExtValueViaClassification           [Problem].[H7].[Classification]
-    DxPlatformViaHardware                 [Problem].[H9].[Platform]
-    DxOSNameViaHardware                   [Problem].[H10].[OS Name]
-    DxCrisisRg2194606334                  [Problem].[H11].[Crisis]
-    Dx2804954423                          [Problem].[H12].[Technology]
-    DxType                                [Problem].[H13].[Type]
-    DxActionCount                         [Problem].[H14].[ActionCount]
-    Dx2256272102                          [Problem].[H16].[DiagnosisCategory]
-    Dx2903132876                          [Problem].[H15].[SolutionCategory]
-    DxCompatibility                       [Problem].[H17].[Compatibility]
-    Location                              [Location].[H1].[ReasonCode]
-    Dx984570826                           [Location].[H2].[SameDay]
-    DxNameViaProduct                      [Product info].[H1].[Product Name]
-    DxReleaseViaProduct                   [Product info].[H2].[Product version]
-    DxDescriptionentity                   [Desc Entities].[H1].[Description entity]
-    Dx2846190658                          [Usage].[H1].[Keyword]
-    Dx1003925274                          [Usage].[H2].[ZV String]
-    Dx3394123629                          [Usage].[H3].[Product version]
-    Dx3216333435                          [Usage].[H4].[HasProblemDescription]
+    MxTechKnowledge                       [Measures].[TechKnowledge]
+    MxProfessionalCourtesy                [Measures].[ProfessionalCourtesy]
+    MxOverallSatisfaction                 [Measures].[OverallSatisfaction]
+    MxComments                            [Measures].[Comments]
+    DxSatisfiedRg400923481                [Satisfied].[H1].[Satisfied]
+    Dx4146999874                          [Satisfied].[H2].[hasNumbers]
+    Dx917207115                           [Satisfied].[H3].[hasComments]
+    DxIgnoreRg582849959                   [Satisfied].[H4].[Ignored]
+    Dx920865183                           [Satisfied].[H5].[hasMgrReview]
+    DxProfessionalCourtesy                [ProfessionalCourtesy].[H1].[ProfessionalCourtesy]
+    DxTechKnowledge                       [TechKnowledge].[H1].[TechKnowledge]
+    DxSurveyDateFxYear                    [SurveyDate].[H1].[Year]
+    DxSurveyDateFxMonthYear               [SurveyDate].[H1].[MonthYear]
+    DxSurveyDateFxDayMonthYear            [SurveyDate].[H1].[DayMonthYear]
+    DxSurveyDateFxMonthNumber             [SurveyDate].[H2].[Month]
+    DxDeptManagerName                     [Employee].[H1].[DeptManagerName]
+    Dx915553774                           [Employee].[H1].[ManagerName]
+    Dx435491227                           [Employee].[H1].[Advisor]
+    Dx667627859                           [Employee].[H2].[isActive]
+    Dx919956114                           [Employee].[H3].[OrgTAM]
+    DxOrganization                        [Contact].[H1].[Organization]
+    DxContact                             [Contact].[H2].[Customer]
+    DxCommententity                       [Comment entities].[H1].[Comment entity]
+    DxCategory                            [Comments type].[H1].[Category]
+    DxType                                [Comments type].[H1].[Type]
 
 
-Do ##class(%DeepSee.Utils).%AnalyzeMissing("PROBLEMSCUBECURRENTYEAR")
+Do ##class(%DeepSee.Utils).%AnalyzeMissing("SURVEYSCUBE")
 
 -----------------------------------------------------------------------------
     Level                                                   #Missing %Missing
-Lvl [CloseDate].[H1].[Close Day]                                 534    5.48%
-Lvl [CloseDate].[H1].[Close Month]                               534    5.48%
-Lvl [CloseDate].[H1].[Close Month Year]                          534    5.48%
-Lvl [CloseDate].[H1].[Close Year]                                534    5.48%
-Lvl [CloseDate].[H2].[Close Day]                                 534    5.48%
-Lvl [CloseDate].[H2].[Close Month]                               534    5.48%
-Lvl [CloseDate].[H2].[Close Month Year]                          534    5.48%
-Lvl [CloseDate].[H2].[Close Year]                                534    5.48%
-Lvl [Contact].[H1].[Org]                                          47    0.48%
-Lvl [Contact].[H1].[OrganizationLetter]                          105    1.08%
-Lvl [Contact].[H10].[Var]                                      6,780   69.64%
-Lvl [Contact].[H11].[Org Relationship]                           141    1.45%
-Lvl [Contact].[H12].[Org State]                                6,607   67.86%
-Lvl [Contact].[H2].[Contact]                                      84    0.86%
-Lvl [Contact].[H3].[Org Primary Country]                         218    2.24%
-Lvl [Contact].[H4].[Org Continent]                               399    4.10%
-Lvl [Contact].[H5].[Org Language]                                587    6.03%
-Lvl [Contact].[H6].[Org TAM]                                   7,443   76.45%
-Lvl [Contact].[H7].[Org SalesRep]                              1,896   19.47%
-Lvl [Contact].[H8].[Org Sec Name]                              7,890   81.04%
-Lvl [Contact].[H9].[WRC Access]                                1,364   14.01%
-Lvl [Lists].[H1].[DevChanges]                                  9,213   94.63%
-Lvl [Lists].[H2].[Prodlogs]                                    9,112   93.59%
-Lvl [Lists].[H3].[Adhocs]                                      9,401   96.56%
-Lvl [Lists].[H5].[Original Advisor]                            5,302   54.46%
-Lvl [Location].[H1].[ReasonCode]                                   0    0.00%
-Lvl [Location].[H2].[SameDay]                                      0    0.00%
-Msr [Measures].[ActionsNo]                                         0    0.00%
-Msr [Measures].[CountTotals]                                       0    0.00%
-Msr [Measures].[Duration]                                          0    0.00%
-Msr [Measures].[NADateDiff]                                        0    0.00%
-Msr [Measures].[NADateLADateDiff]                                  0    0.00%
-Msr [Measures].[StaleFactor]                                       0    0.00%
-Lvl [OpenDate].[H1].[Open Day]                                     0    0.00%
-Lvl [OpenDate].[H1].[Open Month]                                   0    0.00%
-Lvl [OpenDate].[H1].[Open Month Year]                              0    0.00%
-Lvl [OpenDate].[H1].[Open Year]                                    0    0.00%
-Lvl [OpenDate].[H2].[Open Day]                                     0    0.00%
-Lvl [OpenDate].[H2].[Open Month]                                   0    0.00%
-Lvl [OpenDate].[H2].[Open Month Year]                              0    0.00%
-Lvl [OpenDate].[H2].[Open Year]                                    0    0.00%
-Lvl [OpenTime].[H1].[OpenTime]                                     0    0.00%
-Lvl [Problem].[H1].[Status]                                        0    0.00%
-Lvl [Problem].[H10].[OS Name]                                  9,361   96.15%
-Lvl [Problem].[H11].[Crisis]                                       0    0.00%
-Lvl [Problem].[H12].[Technology]                                 193    1.98%
-Lvl [Problem].[H13].[Type]                                         0    0.00%
-Lvl [Problem].[H14].[ActionCount]                                  0    0.00%
-Lvl [Problem].[H15].[SolutionCategory]                         9,736  100.00%
-Lvl [Problem].[H16].[DiagnosisCategory]                        9,736  100.00%
-Lvl [Problem].[H17].[Compatibility]                                2    0.02%
-Lvl [Problem].[H2].[Priority]                                     86    0.88%
-Lvl [Problem].[H3].[Owner]                                        26    0.27%
-Lvl [Problem].[H4].[ActiveAdvisor]                                26    0.27%
-Lvl [Problem].[H5].[Consulting]                                8,372   85.99%
-Lvl [Problem].[H6].[Manager]                                      33    0.34%
-Lvl [Problem].[H7].[Classification]                              193    1.98%
-Lvl [Problem].[H9].[Platform]                                  9,361   96.15%
-Lvl [Product info].[H1].[Product Name]                           439    4.51%
-Lvl [Product info].[H2].[Product version]                        439    4.51%
-Lvl [Usage].[H1].[Keyword]                                         0    0.00%
-Lvl [Usage].[H2].[ZV String]                                       0    0.00%
-Lvl [Usage].[H3].[Product version]                                 0    0.00%
-Lvl [Usage].[H4].[HasProblemDescription]                           0    0.00%
+Lvl [Contact].[H1].[Organization]                                  0    0.00%
+Lvl [Contact].[H2].[Customer]                                     16    0.06%
+Lvl [Employee].[H1].[Advisor]                                      0    0.00%
+Lvl [Employee].[H1].[DeptManagerName]                              0    0.00%
+Lvl [Employee].[H1].[ManagerName]                                  0    0.00%
+Lvl [Employee].[H2].[isActive]                                     0    0.00%
+Lvl [Employee].[H3].[OrgTAM]                                  18,979   76.03%
+Msr [Measures].[OverallSatisfaction]                          21,857   87.56%
+Msr [Measures].[ProfessionalCourtesy]                         21,855   87.55%
+Msr [Measures].[TechKnowledge]                                21,866   87.60%
+Lvl [ProfessionalCourtesy].[H1].[ProfessionalCou              21,855   87.55%
+Lvl [Satisfied].[H1].[Satisfied]                               3,550   14.22%
+Lvl [Satisfied].[H2].[hasNumbers]                                  0    0.00%
+Lvl [Satisfied].[H3].[hasComments]                                 0    0.00%
+Lvl [Satisfied].[H4].[Ignored]                                     0    0.00%
+Lvl [Satisfied].[H5].[hasMgrReview]                                0    0.00%
+Lvl [SurveyDate].[H1].[DayMonthYear]                               0    0.00%
+Lvl [SurveyDate].[H1].[MonthYear]                                  0    0.00%
+Lvl [SurveyDate].[H1].[Year]                                       0    0.00%
+Lvl [SurveyDate].[H2].[Month]                                      0    0.00%
+Lvl [TechKnowledge].[H1].[TechKnowledge]                      21,866   87.60%
 
-    TOTAL FACTS                                                9,736
+    TOTAL FACTS                                               24,962
         </pre>
       </td>
     </tr>
@@ -4690,7 +4294,7 @@ Lvl [Usage].[H4].[HasProblemDescription]                           0    0.00%
 
 <hr noshade size="4" width="auto">
 <a name="otherelements"></a>
-<h2>Other Elements for PROBLEMSCUBECURRENTYEAR</h2>
+<h2>Other Elements for SURVEYSCUBE</h2>
 <h4>Pivot Variables</h4>
 <table id="PivotVarTable" cellpadding="5" cellspacing="5" class="tableWithBorders">
   <tbody>
@@ -4721,12 +4325,6 @@ Lvl [Usage].[H4].[HasProblemDescription]                           0    0.00%
       <td>&[63688]:&[63871]</td>
       <td>expression</td>
     </tr>
-    <tr>
-      <td>tAPName</td>
-      <td>Select AP Name</td>
-      <td>G.E. Healthcare</td>
-      <td>literal</td>
-    </tr>
   </tbody>
 </table>
 <h4>Named Sets</h4>
@@ -4739,84 +4337,126 @@ Lvl [Usage].[H4].[HasProblemDescription]                           0    0.00%
       <th>Listing Name</th>
       <th>Fields</th>
       </tr>
-        <td>Problem details (default)</td>
-        <td>ProblemNo</td>
+        <td>Survey Details (default)</td>
+        <td>CAST(%ID AS CHAR VARYING) as "Survey ID"</td>
       </tr>
       <tr>
       <tr>
         <td></td>
-<td>ProblemOwner->Name</td>
+<td>%EXTERNAL(SurveyDate) as SurveyDate</td>
       </tr>
       <tr>
         <td></td>
-<td>  Status</td>
+<td>CAST(ProblemRef AS CHAR VARYING) as WRC#</td>
       </tr>
       <tr>
         <td></td>
-<td>OpenDate</td>
+<td>$$$IKLINK[Comments]</td>
       </tr>
       <tr>
         <td></td>
-<td>CloseDate</td>
+<td>ProblemRef->ProblemOwner->Name</td>
       </tr>
       <tr>
         <td></td>
-<td>Keyword</td>
+<td>TechKnowledge as Tech</td>
       </tr>
       <tr>
         <td></td>
-<td> $$$IKLINK[DescText]</td>
+<td>Professional_Courtesy as Pro</td>
       </tr>
       <tr>
         <td></td>
-<td>Contact->Name AS Contact_Name</td>
+<td>Overall_Satisfaction as Overall</td>
       </tr>
       <tr>
         <td></td>
-<td> Contact->Organization->OrganizationName AS Contact_Org</td>
+<td>Satisfied</td>
       </tr>
       <tr>
         <td></td>
-<td>Classification</td>
+<td>ProblemRef->Org->OrganizationName</td>
       </tr>
       <tr>
         <td></td>
-<td>  Compatibility</td>
+<td>ProblemRef->Contact->Name</td>
       </tr>
       <tr>
         <td></td>
-<td> LastActionDate</td>
+<td>comments</td>
       </tr>
       <tr>
         <td></td>
-<td> NextActionDate</td>
+<td>ignore</td>
       </tr>
       <tr>
         <td></td>
-<td>$LISTTOSTRING(Prodlog</td>
+<td>MgrReview</td>
+      </tr>
+        <td>WRC Surveys</td>
+        <td>SurveyDate</td>
+      </tr>
+      <tr>
+      <tr>
+        <td></td>
+<td> ProblemRef->Org->OrganizationName as Organization</td>
       </tr>
       <tr>
         <td></td>
-<td>'</td>
+<td> ProblemRef->Contact->Name as Contact</td>
       </tr>
       <tr>
         <td></td>
-<td>') AS Prodlog</td>
+<td> ProblemClosed as Closed</td>
       </tr>
       <tr>
         <td></td>
-<td>Devchange</td>
+<td> Satisfied</td>
       </tr>
       <tr>
         <td></td>
-<td>Priority</td>
+<td> Overall_Satisfaction as OverallSatisfaction</td>
       </tr>
       <tr>
         <td></td>
-<td> consultingAdvisor->Name AS ConsultingAdvisor</td>
+<td> Professional_Courtesy as ProfessionalCourtesy</td>
+      </tr>
+      <tr>
+        <td></td>
+<td> TechKnowledge as TechnicalKnowledge</td>
+      </tr>
+      <tr>
+        <td></td>
+<td> ProblemRef->Keyword</td>
+      </tr>
+      <tr>
+        <td></td>
+<td> $$$IKLINK[Comments]</td>
+      </tr>
+      <tr>
+        <td></td>
+<td> ProblemRef->ProblemOwner->Name as Advisor</td>
+      </tr>
+      <tr>
+        <td></td>
+<td> CAST(ProblemRef->ProblemNo AS CHAR VARYING) as WRC#</td>
+      </tr>
+      <tr>
+        <td></td>
+<td>ProblemRef->Product</td>
+      </tr>
+      <tr>
+        <td></td>
+<td>$$$IKLINK[Comments]</td>
+      </tr>
+      <tr>
+        <td></td>
+<td>Comments</td>
       </tr>
   </tbody>
 </table>
+
+
 
 <hr size="4" noshade>
 <a name="cubeinfoTECHCASE"></a>
