@@ -165,7 +165,7 @@ GetLogsConfirm
 	ZN "%SYS"
 	Set getLogs=$ZCONVERT(getLogs,"U")
 	If (getLogs="") {
-		Write !, "Include cconsole.log, Query Log, and DeepSee log? [Y] "
+		Write !, "Include cconsole.log, Query Log, and DeepSee Logs? [Y] "
 		Read getLogs
 		Set getLogs=$ZCONVERT(getLogs,"U")
 		If (getLogs="") {
@@ -1460,7 +1460,7 @@ alertDstimeRW(DSTimeMapFrom,alerts) {
 		Set db=##Class(SYS.Database).%OpenId(prop("Directory"))
 		Set readonly = db.ReadOnly
 		If readonly {
-			Set pre="<p class=""red"" title=""After DevChange DTB422 ^OBJ.DSTIME and ^DeepSee.Update should be mapped to a Read-Write database"">"
+			Set pre="<p class=""red"" title=""In Caché versions including DevChange DTB422 ^OBJ.DSTIME and ^DeepSee.Update should be mapped to a Read-Write database"">"
 			Set alert = "Alert: ^OBJ.DSTIME and/or ^DeepSee.Update are stored in the "_DSTimeMapFrom_" database, which should be Read-Write"
 			Set alerts($I(alerts)) = alert
 			Do WriteLog(pre_alert_"</p>",8)
