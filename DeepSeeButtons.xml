@@ -1272,11 +1272,26 @@ LogDeepSeeSetupSection
  	ZN namespace
  	Set msgbuild=$$GetLastBuild("Build")						//Get last build, synch, and update info
  	Set msgsynch=$$GetLastBuild("Synch")
- 	Set msgupdate=$$GetLastBuild("Update") 
+ 	Set msgupdate=$$GetLastBuild("Update")
+ 	Set msgrepair=$$GetLastBuild("Repair")
+ 	Do WriteLog("<p>Build event:  "_msgbuild_"</p>",8)
+ 	Do WriteLog("<p>Synch event:  "_msgsynch_"</p>",8)
+ 	Do WriteLog("<p>Registry Update event: "_msgupdate_"</p>",8)
+ 	Do WriteLog("<p>Repair event: "_msgrepair_"</p>",8)
+ 	//Cycle through all enabled cubes in cube manager and alert if ther are no build or repair events
+ 	Set rs=##class(%ResultSet).%New("%DeepSee.CubeManager.RegistryMap:RegistryMapTableView")
+	Set registered = ""
+	Set state = ""	
+	Do rs.Execute()
+	While (rs.Next()) {
+		Set cube=rs.Get("CubeKey")
+		If ((rs.Get("IsRegistered")="Yes") && (rs.Get("Disabled")="No")) {
+			Set msgbuild=$$GetLastBuild("Build",cube)	//Get last build
+			Set msgrepair=$$GetLastBuild("Repair",cube)	//Get last repair
+			Do alertInitialBuildCubeManager(cube,msgrepair,msgbuild,.alerts)
+		}
+	} 	
  	ZN "%SYS"
- 	Do WriteLog("<p>Build events:  "_msgbuild_"</p>",8)
- 	Do WriteLog("<p>Synch events:  "_msgsynch_"</p>",8)
- 	Do WriteLog("<p>Registry update events: "_msgupdate_"</p>",8)
  	Do WriteLog("</td>",6)
 	Do WriteLog("</tr>",4)
  	/// Important Mappings subsection
@@ -1293,7 +1308,7 @@ LogDeepSeeSetupSection
 	For{
 		Use ConfigFile
 		Read x:FileReadTimeOut
-		If $p(x,".",1)="[Map"{				//Grab namespace we are mapping from
+		If $p(x,".",1)="[Map" {				//Grab namespace we are mapping from
 			Set NsMap=x 						//Returns eg [Map.Analytics]
 			Set NsMap=$p($p(NsMap,".",2),"]",1) 	//Returns eg Analytics
 			Set MapCount=0 					//Reset counter for number of mappings within this namespace 
@@ -1346,35 +1361,25 @@ LogDeepSeeSetupSection
 	Do WriteLog("<tr>",4)
 	Do WriteLog("<td>",6)
 	Do WriteHeader4("Important Mappings",8)
-	Do WriteLog("<p class=""bold"">^OBJ.DSTIME:</p>",8)
-	If '$D(DSTimeMapFrom){
-		Do WriteLog("<p>There are no mappings defined for ^OBJ.DSTIME</p>",8)
+	If '$D(DSTimeMapFrom(namespace)){
+		Do WriteLog("<p>^OBJ.DSTIME: no mappings defined</p>",8)
 	} Else{
-		Set NStemp=$O(DSTimeMapFrom(""))
-		While NStemp'="" {
-			Do WriteLog("<p>In "_NStemp_" mapped to "_DSTimeMapFrom(NStemp)_"</p>",8)
-			Set NStemp=$O(DSTimeMapFrom(NStemp))
-		}
-		
+		Do WriteLog("<p>^OBJ.DSTIME: mapped to "_DSTimeMapFrom((namespace))_"</p>",8)
 	}
 	//DeepSeeMap is structured as follows: DeepSeeMap(namespace,mapping number)
- 	If NsMap'=""{
-		Set NStemp=$O(DeepSeeMap(""))
-		While NStemp'="" {
-			If $D(DeepSeeMap(NStemp,1)){
-				Do WriteLog("<p class=""bold"">"_NStemp_" namespace:</p>",8)
-				Set NumMaps=$O(DeepSeeMap(NStemp,""))
-				While NumMaps {					
-					Do WriteLog("<p>"_DeepSeeMap(NStemp,NumMaps)_"</p>",8)
-					Set NumMaps=$O(DeepSeeMap(NStemp,NumMaps))
-				}
-			}	
-			Set NStemp=$O(DeepSeeMap(NStemp))
+ 	If NsMap'="" {
+		If $D(DeepSeeMap(namespace,1)){
+			Set NumMaps=$O(DeepSeeMap(namespace,""))
+			While NumMaps {					
+				Do WriteLog("<p>"_DeepSeeMap(namespace,NumMaps)_"</p>",8)
+				Set NumMaps=$O(DeepSeeMap(namespace,NumMaps))
+			}
 		}
-	}
-
-	Set sc = $$alertCacheMappings(.DeepSeeMap, .alerts)
-	
+		Set sc = $$alertCacheMappings(namespace,.DeepSeeMap,.alerts)
+		If $D(DSTimeMapFrom(namespace)){
+			Set sc = $$alertDstimeRW(DSTimeMapFrom(namespace),.alerts)
+		}
+	}	
 	Do WriteLog("</td>",6)
 	Do WriteLog("</tr>",4)
 	If ECPCount'=0{
@@ -1385,7 +1390,7 @@ LogDeepSeeSetupSection
 		For i=1:1:ECPCount{
 			Write ECPArray(i),!
 		}
-		Write "</p>"
+		Do WriteLog("</p>",8)
 		Do WriteLog("</td>",6)
 		Do WriteLog("</tr>",4)		
 	}
@@ -1432,6 +1437,8 @@ LogDeepSeeSetupSection
  			Do WriteLog("</table>",0)
 		} Else {
 			//If there are many overrides place them in a scrollable div
+			Do WriteLog("</tbody>",2)
+ 			Do WriteLog("</table>",0)
 		 	Do WriteLog("<hr noshade size=""4"" width=""auto"">")
 			Do WriteLog("<a name=""overrides""</a>")
 			Do WriteLog("<h2>DeepSee Overrides</h2>")
@@ -1444,37 +1451,54 @@ LogDeepSeeSetupSection
  		Do WriteLog("</table>",0)
 	}
 	Quit
-	
-	
 
-alertCacheMappings(DeepSeeMap, alerts) {
-	Set NStemp=$O(DeepSeeMap(""))
-		While NStemp'="" {
- 			Set mapcount=$O(DeepSeeMap(NStemp,""))
- 			While mapcount'="" {
- 				Set global=$P($P(DeepSeeMap(NStemp,mapcount),"_",2,*),"=",1)
-				Set DB=$P($P(DeepSeeMap(NStemp,mapcount),"_",2,*),"=",2,*)
-				If ((global="DeepSee.Cache.*") || (global="DeepSee.Cache*")) {
-					//Check if DB is journaled
-					set sc = ##class(Config.Databases).Get(DB, .prop)
-					Set db=##Class(SYS.Database).%OpenId(prop("Directory"))
-					Set journaled = (db.GlobalJournalState = 3)
-					If journaled {
-						Set pre="<p class=""red"" title=""Journaling the DeepSee cache leads to problems with disk size and query performance"">"
-						Set alert = "Alert: In the "_NStemp_" namespace the DeepSee cache stored in "_DB_" database is journaled"
-						Set alerts($I(alerts)) = alert
-						Do WriteLog(pre_alert_"</p>",8)
-					}
-				}
-				Set mapcount=$O(DeepSeeMap(NStemp,mapcount))
-			}
-			Set NStemp=$O(DeepSeeMap(NStemp))
+alertDstimeRW(DSTimeMapFrom,alerts) {
+	Try {
+		ZN "%SYS"
+		//Check if DB is Read-Write
+		Set sc = ##class(Config.Databases).Get(DSTimeMapFrom, .prop)
+		Set db=##Class(SYS.Database).%OpenId(prop("Directory"))
+		Set readonly = db.ReadOnly
+		If readonly {
+			Set pre="<p class=""red"" title=""After DevChange DTB422 ^OBJ.DSTIME and ^DeepSee.Update should be mapped to a Read-Write database"">"
+			Set alert = "Alert: ^OBJ.DSTIME and/or ^DeepSee.Update are stored in the "_DSTimeMapFrom_" database, which should be Read-Write"
+			Set alerts($I(alerts)) = alert
+			Do WriteLog(pre_alert_"</p>",8)
 		}
-		Quit 1
+		Set tSC = 1
+	} Catch (exc) {
+		Set tSC = exc.AsStatus()
 	}
-	
-	
-	
+	Quit tSC
+}
+
+alertCacheMappings(ns,DeepSeeMap,alerts) {
+	Try {
+		Set mapcount=$O(DeepSeeMap(ns,""))
+ 		While mapcount'="" {
+ 			Set global=$P($P(DeepSeeMap(ns,mapcount),"_",2,*),"=",1)
+			Set DB=$P($P(DeepSeeMap(ns,mapcount),"_",2,*),"=",2,*)
+			If ((global="DeepSee.Cache.*") || (global="DeepSee.Cache*")) {
+				//Check if DB is journaled
+				Set sc = ##class(Config.Databases).Get(DB, .prop)
+				Set db=##Class(SYS.Database).%OpenId(prop("Directory"))
+				Set journaled = (db.GlobalJournalState = 3)
+				If journaled {
+					Set pre="<p class=""red"" title=""Journaling the DeepSee cache leads to problems with disk size and query performance"">"
+					Set alert = "Alert: The DeepSee cache stored in the "_DB_" database is journaled"
+					Set alerts($I(alerts)) = alert
+					Do WriteLog(pre_alert_"</p>",8)
+				}
+			}
+			Set mapcount=$O(DeepSeeMap(ns,mapcount))
+		}
+		Set tSC = $$$OK
+	} Catch (exc) {
+		Set tSC = ex.AsStatus()
+	}
+	Quit tSC
+}
+
 CountNodes(namespace,g){
 	ZN namespace
 	Quit:'$D(@g)
@@ -1521,8 +1545,7 @@ CubeData
 		 	If ##class(%DeepSee.CubeManager.Utils).GetActiveRegistry()=""{
 			 	Do WriteLog("<p>No active registry so BuildTime and BuildRate will not be populated.</p>")
 			 	Do WriteLog("")
-		 	}
-		 	Else{
+		 	} Else {
 			 	Do WriteLog("<p>A value of 'N/A' for BuildTime and BuildRate means the cube has not been built from Cube Manager.</p>")
 		 	} 	
 		 	Do WriteLog("<table id=""CubeTable"" border=""0"" cellpadding=""7"" cellspacing=""3"" class=""zebraStriped"">")
@@ -1534,13 +1557,12 @@ CubeData
 		 	Set storageList=""
 			Set inheritList=""
 			Set abstractcount = 0
-			For{
+			For {
 				QUIT:cubenode=""				//Do the work to get info and write out the table
-				Set cubename=$list(plist(cubenode))
-				If '##class(%DeepSee.Utils).%IsCubeAbstract(cubenode){		//if cube is not abstract
+				Set cubename=$list(plist(cubenode),1)
+				If (cubename'="" && '##class(%DeepSee.Utils).%IsCubeAbstract(cubenode)) {		//if cube is not abstract
 					Do WriteLog("<tr>",4)
-					Do WriteLog("<td>"_cubename_"</td>",6)					//cubename				
-					
+					Do WriteLog("<td>"_cubename_"</td>",6)					//cubename					
 					Set cubecaption=##class(%DeepSee.Utils).%GetCubeCaption(cubename)
 					Do WriteLog("<td>"_cubecaption_"</td>",6)
 					Set cubeclass=##class(%DeepSee.Utils).%GetCubeClass(cubename) //cube class
@@ -1571,8 +1593,7 @@ CubeData
 					}
 					Else{
 						Set lastSync="N/A"
-					}
-					
+					}					
 					Set buildtime=$$GetBuildTime(cubename)
 					Do WriteLog("<td>"_buildtime_"</td>",6)
 					Do WriteLog("<td>"_facts_"</td>",6)
@@ -1661,16 +1682,17 @@ GetLastBuild(CubeEvent,cubename) [cubename,CubeEvent,cubekey,cubeevent,totaltime
 	}
 	IF SQLCODE=0 {
 		If CubeEvent="Synch"{
-    		Set string=$fnumber(factsupdated,",")_" facts synched on "_finishtime_" in "_totaltime_" seconds for the "_cubekey_" cube"
+    		Set string=$fnumber(factsupdated,",")_" facts synched on "_finishtime_" in "_totaltime_" seconds"
 		} ElseIf CubeEvent="Build"{
-			Set string=$fnumber(cubesize,",")_" facts built on "_finishtime_" in "_totaltime_" seconds for the "_cubekey_" cube"
+			Set string=$fnumber(cubesize,",")_" facts built on "_finishtime_" in "_totaltime_" seconds"
 		} ElseIf CubeEvent="Update"{
-			Set string=cubekey_" on "_finishtime
+			Set string="on "_finishtime
 		} ElseIf CubeEvent="Repair"{
-			Set string=$fnumber(cubesize,",")_" facts built on "_finishtime_" in "_totaltime_" seconds for the "_cubekey_" cube"
+			Set string=$fnumber(cubesize,",")_" facts built on "_finishtime_" in "_totaltime_" seconds"
 		} Else {			
 			Set string=CubeEvent_" event on "_finishtime_" in "_totaltime
 		}
+		Set:'$D(cubename) string = string_" for the "_cubekey_" cube"
    	} ElseIf SQLCODE=100 {
 	   	Set string = "Not found"
    	} Else {
@@ -1860,7 +1882,7 @@ GetCubeRegistry
 		For {
 			Quit:'rs.Next()		
 			Do WriteLog("<tr class="""_$S(rs.Get("IsRegistered")="No":"darkgrey",rs.Get("Disabled")="Yes":"grey",1:"")_""">",4)
-			Do WriteLog("<td>"_rs.Get("CubeKey")_"</td>",8)
+			Do WriteLog("<td>"_rs.Get("CubeKey")_"</td>",6)
 			Do WriteLog("<td>"_rs.Get("MgmtGroup")_"</td>",6)
 			Do WriteLog("<td>"_rs.Get("IsRegistered")_"</td>",6)
 			Do WriteLog("<td>"_rs.Get("Disabled")_"</td>",6)
@@ -2184,7 +2206,6 @@ GetCubeInfo
 	Do WriteLog("<p>"_moddate_"</p>",8)
     Do WriteLog("</td>",6)
     Do WriteLog("</tr>",4)
-    
     //Cube Registry
     Do WriteLog("<tr>",4)
     Do WriteLog("<td>",6)
@@ -2203,43 +2224,43 @@ GetCubeInfo
 				Set state = $S(state="Yes":"disabled",state="No":"enabled",1:"unknown")
 			}
 		}
-	}
-	
+	}	
 	If (registered="not registered") {
-		Do WriteLog("<p>Cube is "_registered_" in Cube Manager</p>")
+		Do WriteLog("<p>Cube is "_registered_" in Cube Manager</p>",8)
 	} Else {
-		Do WriteLog("<p>Cube is "_state_" in Cube Manager</p>")
 		If (state="enabled") {
 			Set msgsynch=$$GetLastBuild("Synch",cube)	//Get last synch
 			Set msgbuild=$$GetLastBuild("Build",cube)	//Get last build		
 			Set msgupdate=$$GetLastBuild("Update",cube)	//Get last update
 			Set msgrepair=$$GetLastBuild("Repair",cube)	//Get last repair
-			If ((msgrepair="Not found") && (msgbuild="Not found")) {
-				Do WriteLog("<p>Rapair or Build events not found</p>")
-			}
-			Do WriteLog("<p>Most Recent events for "_cube_":</p>")
-			Do WriteLog("<p>Synch event: "_msgbuild_"</p>")
-			Do WriteLog("<p>Build event: "_msgbuild_"</p>")
-			Do WriteLog("<p>Registry update event: "_msgupdate_"</p>")
-			Do WriteLog("<p>Repair event: "_msgrepair_"</p>")
+			Do WriteLog("<p>Cube is "_state_" in Cube Manager. Most Recent events:</p>",8)
+			Do WriteLog("<p>Synch event: "_msgsynch_"</p>",8)
+			Do WriteLog("<p>Build event: "_msgbuild_"</p>",8)
+			Do WriteLog("<p>Registry Update event: "_msgupdate_"</p>",8)
+			Do WriteLog("<p>Repair event: "_msgrepair_"</p>",8)
+			Do alertInitialBuildCubeManager(cube,msgrepair,msgbuild,.alerts)
+		} Else {
+			Do WriteLog("<p>Cube is "_state_" in Cube Manager</p>",8)
 		}
 	}
 	Do WriteLog("</td>",6)
     Do WriteLog("</tr>",4)
-    
-    
-    
+
     //Build errors
 	If ($D(^DeepSee.BuildErrors(cube)) && ^DeepSee.BuildErrors(cube)) {
 		Do WriteLog("</tbody>",2)
     	Do WriteLog("</table>",0)
-    	Do WriteLog("<h4>Build Errors</h4>",8)
-    	Do WriteLog("<div class=""scrollable"" style=""width:100%;height:400px;"">")
+    	Do WriteLog("<h4>Build Errors</h4>",0)
+    	If ($D(^DeepSee.BuildErrors(cube)) && ^DeepSee.BuildErrors(cube) <4) {
+			Do WriteLog("<div class=""scrollable"" style=""border:1px solid #D0D0D0;height:400px;"">")
+    	} Else {
+    		Do WriteLog("<div class=""scrollable"" style=""width:100%;height:400px;"">")
+    	}
 		Do WriteLog("<pre>",8)
 		Do ##class(%DeepSee.Utils).%PrintBuildErrors(cube)
 		Do WriteLog("</pre>",8)
 		Do WriteLog("</div>") 
-    } Else {
+	} Else {
 	    Do WriteLog("<tr>",4)
     	Do WriteLog("<td>",6)
     	Do WriteLog("<h4>Build Errors</h4>",8)
@@ -2253,6 +2274,25 @@ GetCubeInfo
     }
 	ZN "%SYS"
 	Quit
+
+
+alertInitialBuildCubeManager(cube,msgrepair,msgbuild,alerts) {
+	Try {
+		If ((msgrepair="Not found") && (msgbuild="Not found")) {
+			Set pre="<p class=""red"" title=""Before you synchronize cubes from the Cube Manager, it is necessary to build the cubes at least once from the Cube Manager."">"
+			Set alert = "Alert: there is no record for the initial build of "_cube_" from Cube Manager. Check if the cube is updating"
+			Set alerts($I(alerts)) = alert
+			Do WriteLog(pre_alert_"</p>",8)
+		}
+		Set tSC = 1
+	} Catch(ex) {
+		Set pre="<p class=""red"" title=""Before you synchronize cubes from the Cube Manager, it is necessary to build the cubes at least once from the Cube Manager."">"
+			Set alert = Ext
+			Set alerts($I(alerts)) = alert
+			Do WriteLog(pre_alert_"</p>",8)
+		Set tSC = ex.AsStatus()
+	}
+}
 
 Dimensions
 	Use LogFile
@@ -2350,7 +2390,7 @@ Dimensions
 	Do WriteLog("<tr>",4)
 	Do WriteLog("<td>",6)
 	Do WriteLog("<pre>",8)
-	Write "Do ##class(%DeepSee.Utils).%Analyze(""",cube,""",""fic"",0)",!
+	Write "Do ##class(%DeepSee.Utils).%Analyze("""_cube_""",""fic"",0)",!
 	Do ##class(%DeepSee.Utils).%Analyze(cube,"fic",0)
 	Do WriteLog("")
 	Do WriteLog("")
