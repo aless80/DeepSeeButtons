@@ -3,10 +3,22 @@
 <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
 <head>
   <title>
-    Caché Diagnostic Log. Filename: /home/amarin/intersystems/cache20173/mgr/DeepSeeButtons_ISC_20170629_1616.html
+    Caché Diagnostic Log. Filename: /home/amarin/Desktop/DSbuttons.html
   </title>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <script type="text/javascript">
+    function toggle(showHideDiv, switchTextDiv) {
+      var ele = document.getElementById(showHideDiv);
+      var text = document.getElementById(switchTextDiv);
+      if(ele.style.display == "block") {
+        ele.style.display = "none";
+        text.innerHTML = "&rtrif; Expand";
+      }
+      else {
+        ele.style.display = "block";
+        text.innerHTML = "&dtrif; Collapse";
+      }
+    }
     function openNav() {
       document.getElementById("mySidenav").style.width = "250px";
       document.getElementById("main").style.marginLeft = "250px";
@@ -166,19 +178,19 @@
   <font face="Arial, Helvetica, sans-serif" size="9" color="#ff3300">
     <b>Beta!</b>
   </font>
-  <a href="#deepseesetup">DeepSee Setup</a>
-  <a href="#serverdetails">Server Details</a>
-  <a href="#cubelist">Cubes</a>
+  <a href="#deepseesetup" title="General setting relevant for DeepSee">DeepSee Setup</a>
+  <a href="#serverdetails" title="Information on the hosting machine">Server Details</a>
+  <a href="#cubelist" title="Information on all cubes in the namespace">Cubes</a>
   <a href="#cuberegistry">Cube Registry</a>
-  <a href="#cubeinfo">Cube Info</a>
+  <a href="#cubeinfo" title="Detailed information on cubes">Cube Info</a>
   <a class="cubelinks" href="#cubeinfoPATIENTS">PATIENTS</a>
   <a class="cubelinks" href="#cubeinfoERDBEBEN">ERDBEBEN</a>
-  <a href="#querylog">Query Log</a>
-  <a href="#dslog">DeepSee Logs</a>
-  <a href="#cpf">cache.cpf</a>
-  <a href="#cconsole">cconsole.log</a>
+  <a href="#querylog" title="Last 5 MDX queries run by each users in the system">Query Log</a>
+  <a href="#dslog" title="A log file with cube builds and errors occurred in the system">DeepSee Logs</a>
+  <a href="#cpf" title="The Caché Parameter File containing recording the Caché configuration">cache.cpf</a>
+  <a href="#cconsole" title="cconsole.log file containing general messages and errors">cconsole.log</a>
   <a href="#LocalDB">Local Databases</a>
-  <a href="#Journaling">Journaling</a>
+  <a href="#Journaling" title="Information on database journaling for the instance">Journaling</a>
 </div>
 <div id="main">
 <a name="top"></a>
@@ -204,9 +216,9 @@
     <tr>
       <td>
         <h4>Most Recent Activity in Cube Manager</h4>
-        <p>Build event:  9 facts built on 2017-06-29 08:45:05 in 2 seconds for the CITIES cube</p>
-        <p>Synch event:  0 facts synched on 2017-06-29 16:16:00 in 0 seconds for the RELATEDCUBES/CITYRAINFALL cube</p>
-        <p>Registry Update event: on 2017-06-29 14:54:41 for the RELATEDCUBES/ALLERGIES cube</p>
+        <p>Build event:  9 facts built on 2017-07-06 09:00:21 in 2 seconds for the CITIES cube</p>
+        <p>Synch event:  0 facts synched on 2017-07-06 10:54:00 in 0 seconds for the RELATEDCUBES/CITYRAINFALL cube</p>
+        <p>Registry Update event: on 2017-07-06 10:02:01 for the ERDBEBEN cube</p>
         <p>Repair event: 775 facts built on 2017-06-29 13:42:28 in 3 seconds for the RELATEDCUBES/ALLERGIES cube</p>
         <p class="red" title="Before you synchronize cubes from the Cube Manager, it is necessary to build the cubes at least once from the Cube Manager.">Alert: there is no record for the initial build of ERDBEBEN from Cube Manager. Check if the cube is updating</p>
       </td>
@@ -283,13 +295,13 @@
     <tr>
       <td>
         <h4>Log created by User</h4>
-        <p>amarin on Jun 29 2017 at  4:16 PM</p>
+        <p>amarin on Jul 06 2017 at 10:54 AM</p>
       </td>
     </tr>
     <tr>
       <td>
         <h4>Last Caché Startup</h4>
-        <p>06/28/2017 16:16:56. As of this report Caché has been up for 0 days 23 hours 59 minutes 44 seconds</p>
+        <p>07/05/2017 15:16:57. As of this report Caché has been up for 0 days 19 hours 37 minutes 55 seconds</p>
       </td>
     </tr>
     <tr>
@@ -308,7 +320,7 @@
       <td>
         <h4>Operating System Version</h4>
         <p>
-Linux amarin-Latitude-E7470 4.4.0-81-generic #104-Ubuntu SMP Wed Jun 14 08:17:06 UTC 2017 x86_64 x86_64 x86_64 GNU/Linux
+Linux amarin-Latitude-E7470 4.4.0-83-generic #106-Ubuntu SMP Mon Jun 26 17:54:43 UTC 2017 x86_64 x86_64 x86_64 GNU/Linux
         </p>
       </td>
     </tr>
@@ -434,9 +446,9 @@ Linux amarin-Latitude-E7470 4.4.0-81-generic #104-Ubuntu SMP Wed Jun 14 08:17:06
     <tr>
       <td>Patients</td>
       <td>Patients</td>
-      <td>3</td>
+      <td>119</td>
       <td>1000</td>
-      <td>333.33</td>
+      <td>8.40</td>
       <td>06/28/2017 17:20:57</td>
       <td>DeepSee.Study.Patient</td>
       <td>DeepSee.Model.PatientsCube</td>
@@ -482,9 +494,9 @@ Linux amarin-Latitude-E7470 4.4.0-81-generic #104-Ubuntu SMP Wed Jun 14 08:17:06
     <tr>
       <td>RelatedCubes/CityRainfall</td>
       <td>RelatedCubes/CityRainfall</td>
-      <td>3</td>
+      <td>0</td>
       <td>12744</td>
-      <td>4,248.00</td>
+      <td>N/A</td>
       <td>06/28/2017 17:20:57</td>
       <td>DeepSee.Study.CityRainfall</td>
       <td>DeepSee.Model.RelCubes.RCityRainfall</td>
@@ -494,9 +506,9 @@ Linux amarin-Latitude-E7470 4.4.0-81-generic #104-Ubuntu SMP Wed Jun 14 08:17:06
     <tr>
       <td>RelatedCubes/Doctors</td>
       <td>RelatedCubes/Doctors</td>
-      <td>N/A</td>
+      <td>2</td>
       <td>40</td>
-      <td>N/A</td>
+      <td>20.00</td>
       <td>06/28/2017 17:20:57</td>
       <td>DeepSee.Study.Doctor</td>
       <td>DeepSee.Model.RelCubes.RDoctors</td>
@@ -506,7 +518,7 @@ Linux amarin-Latitude-E7470 4.4.0-81-generic #104-Ubuntu SMP Wed Jun 14 08:17:06
     <tr>
       <td>RelatedCubes/Patients</td>
       <td>RelatedCubes/Patients</td>
-      <td>N/A</td>
+      <td>0</td>
       <td>1000</td>
       <td>N/A</td>
       <td>06/28/2017 17:20:58</td>
@@ -551,19 +563,8 @@ Linux amarin-Latitude-E7470 4.4.0-81-generic #104-Ubuntu SMP Wed Jun 14 08:17:06
       <th>Synch Every</th>
     </tr>
     <tr class="">
-      <td>ERDBEBEN</td>
-      <td>Group 8</td>
-      <td>Yes</td>
-      <td>No</td>
-      <td>1</td>
-      <td>Build Only</td>
-      <td>No</td>
-      <td>1 Week</td>
-      <td></td>
-    </tr>
-    <tr class="">
       <td>PATIENTS</td>
-      <td>Group 9</td>
+      <td>Group PATIENTS</td>
       <td>Yes</td>
       <td>No</td>
       <td>1</td>
@@ -630,6 +631,17 @@ Linux amarin-Latitude-E7470 4.4.0-81-generic #104-Ubuntu SMP Wed Jun 14 08:17:06
     <tr class="">
       <td>CITIES</td>
       <td>Group 3</td>
+      <td>Yes</td>
+      <td>No</td>
+      <td>1</td>
+      <td>Build Only</td>
+      <td>No</td>
+      <td>1 Week</td>
+      <td></td>
+    </tr>
+    <tr class="">
+      <td>ERDBEBEN</td>
+      <td>Group 9</td>
       <td>Yes</td>
       <td>No</td>
       <td>1</td>
@@ -799,9 +811,9 @@ Linux amarin-Latitude-E7470 4.4.0-81-generic #104-Ubuntu SMP Wed Jun 14 08:17:06
       <td>
         <h4>Cube Registry</h4>
         <p>Cube is enabled in Cube Manager. Most Recent events:</p>
-        <p>Synch event: 0 facts synched on 2017-06-29 16:00:01 in 0 seconds</p>
-        <p>Build event: 1,000 facts built on 2017-06-28 14:53:12 in 3 seconds</p>
-        <p>Registry Update event: on 2017-06-28 14:51:23</p>
+        <p>Synch event: 0 facts synched on 2017-07-06 10:00:00 in 0 seconds</p>
+        <p>Build event: 1,000 facts built on 2017-07-06 09:00:15 in 119 seconds</p>
+        <p>Registry Update event: on 2017-07-06 10:01:03</p>
         <p>Repair event: Not found</p>
       </td>
     </tr>
@@ -1390,7 +1402,7 @@ Lvl [ProfD].[H1].[Profession]                                    569   56.90%
         <p>Cube is enabled in Cube Manager. Most Recent events:</p>
         <p>Synch event: Not found</p>
         <p>Build event: Not found</p>
-        <p>Registry Update event: on 2017-06-28 14:48:43</p>
+        <p>Registry Update event: on 2017-07-06 10:02:01</p>
         <p>Repair event: Not found</p>
         <p class="red" title="Before you synchronize cubes from the Cube Manager, it is necessary to build the cubes at least once from the Cube Manager.">Alert: there is no record for the initial build of ERDBEBEN from Cube Manager. Check if the cube is updating</p>
       </td>
@@ -1629,23 +1641,25 @@ Last 5 of 22 MDX queries by User: SuperUser
 4) SELECT NON EMPTY NONEMPTYCROSSJOIN([PatGrpD].[H1].[Tested].Members,[Measures].[%COUNT]) ON 0,NON EMPTY [GenD].[H1].[Gender].Members ON 1 FROM [RELATEDCUBES/PATIENTS] %FILTER NONEMPTYCROSSJOIN([RELATEDCUBES/CITIES].[CitiesD].[H1].[ZIP].&[32007],%OR({[RELATEDCUBES/DOCTORS].[DOCD].[H1].[DOCTOR GROUP].&[<null>],[RELATEDCUBES/DOCTORS].[DOCD].[H1].[DOCTOR GROUP].&[II]}))
 5) SELECT NON EMPTY NONEMPTYCROSSJOIN([PatGrpD].[H1].[Tested].Members,[Measures].[%COUNT]) ON 0,NON EMPTY [GenD].[H1].[Gender].Members ON 1 FROM [RELATEDCUBES/PATIENTS] %FILTER NONEMPTYCROSSJOIN([RELATEDCUBES/CITIES].[CitiesD].[H1].[ZIP].&[32007],[RELATEDCUBES/DOCTORS].[DOCD].[H1].[DOCTOR GROUP].&[<null>])
 
-Last 5 of 5 MDX queries by User: UnknownUser
+Last 4 of 4 MDX queries by User: UnknownUser
 1) SELECT  FROM [RELATEDCUBES/PATIENTS]
-2) SELECT  FROM [RELATEDCUBES/PATIENTS]
-3) SELECT  FROM [CITYRAINFALL]
-4) SELECT  FROM [PATIENTS]
+2) SELECT  FROM [CITYRAINFALL]
+3) SELECT  FROM [PATIENTS]
+4) SELECT  FROM [CITIES]
 
 Last 5 of 5 MDX queries by User: rhanson
 1) SELECT NON EMPTY NONEMPTYCROSSJOIN([GenD].[H1].[Gender].Members,{[Measures].[%Count],[MEASURES].[AVG ALLERGY COUNT]}) ON 0,NON EMPTY HEAD(NONEMPTYCROSSJOIN([AgeD].[H1].[Age Group].Members,[AgeD].[H1].[Age Bucket].Members),2000,SAMPLE) ON 1 FROM [PATIENTS]
 2) SELECT NON EMPTY NONEMPTYCROSSJOIN([GenD].[H1].[Gender].Members,{[Measures].[%Count],[MEASURES].[AVG ALLERGY COUNT]}) ON 0,NON EMPTY HEAD(NONEMPTYCROSSJOIN([AgeD].[H1].[Age Group].Members,[AgeD].[H1].[Age Bucket].Members),2000,SAMPLE) ON 1 FROM [PATIENTS]
 3) SELECT NON EMPTY NONEMPTYCROSSJOIN([GenD].[H1].[Gender].Members,{[Measures].[%Count],[MEASURES].[AVG ALLERGY COUNT]}) ON 0,NON EMPTY HEAD(NONEMPTYCROSSJOIN([AgeD].[H1].[Age Group].Members,[AgeD].[H1].[Age Bucket].Members),2000,SAMPLE) ON 1 FROM [PATIENTS]
 4) SELECT NON EMPTY [Measures].[%COUNT] ON 0,NON EMPTY [ColorD].[H1].[Favorite Color].Members ON 1 FROM [PATIENTS]
+5) SELECT NON EMPTY NONEMPTYCROSSJOIN([GenD].[H1].[Gender].Members,{[Measures].[%Count],[MEASURES].[AVG ALLERGY COUNT]}) ON 0,NON EMPTY HEAD(NONEMPTYCROSSJOIN([AgeD].[H1].[Age Group].Members,[AgeD].[H1].[Age Bucket].Members),2000,SAMPLE) ON 1 FROM [PATIENTS]
 
 </pre>
 <hr noshade size="4" width="auto">
 <a name="dslog"></a>
 <h2>DeepSee Logs</h2>
-<div class="scrollable" style="width:100%;height:400px;">
+<h4 id="dslogtoggle" onclick="javascript:toggle('dslogdiv','dslogtoggle');">&rtrif; Expand</h4>
+<div id="dslogdiv" style="display:none;">
   <pre>
 DeepSee Logs File /home/amarin/intersystems/cache20173/mgr/DeepSeeTasks_APP.log:
 2017-06-28 16:33:53.365      13112 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
@@ -14532,6 +14546,268 @@ DeepSee Logs File /home/amarin/intersystems/cache20173/mgr/DeepSeeTasks_APP.log:
 2017-06-29 16:16:41.029       3959 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
 2017-06-29 16:16:41.030       3959 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
 2017-06-29 16:16:41.034       3959 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.ErdbebenCube:APP
+2017-07-06 08:58:15.994      18201 BuildGroup ERROR #5002: Cache error: <CLASS DOES NOT EXIST>%BuildCube+452^%DeepSee.Utils.1 *Ale.ErdbebenCube:APP
+2017-07-06 08:59:00.331      18375 SynchGroup Skipping Synch of Group 9 since its cubes are locked for building:APP
+2017-07-06 09:00:15.226      18201 TaskMaster Agent missing and removed from global: 14674
+2017-07-06 09:00:15.226      18201 TaskMaster Agent missing and removed from global: 14676
+2017-07-06 09:00:15.226      18201 TaskMaster Agent missing and removed from global: 14677
+2017-07-06 09:00:15.226      18201 TaskMaster Agent missing and removed from global: 14678
+2017-07-06 09:00:15.226      18201 TaskMaster Agent missing and removed from global: 14682
+2017-07-06 09:00:15.227      18201 TaskMaster Agent missing and removed from global: 14683
+2017-07-06 09:00:15.227      18201 TaskMaster Agent missing and removed from global: 14689
+2017-07-06 09:00:15.227      18201 TaskMaster Agent missing and removed from global: 14690
+2017-07-06 09:00:15.227      18201 TaskMaster Agent missing and removed from global: 14691
+2017-07-06 09:00:15.227      18201 TaskMaster Agent missing and removed from global: 14692
+2017-07-06 09:00:15.227      18201 TaskMaster Agent missing and removed from global: 14693
+2017-07-06 09:00:15.227      18201 TaskMaster Agent missing and removed from global: 14694
+2017-07-06 09:00:15.228      18201 TaskMaster Agent missing and removed from global: 14695
+2017-07-06 09:00:15.228      18201 TaskMaster Agent missing and removed from global: 14696
+2017-07-06 09:00:15.228      18201 TaskMaster Agent missing and removed from global: 14697
+2017-07-06 09:00:15.228      18201 TaskMaster Agent missing and removed from global: 14699
+2017-07-06 09:00:15.228      18201 TaskMaster Create Background agents..
+2017-07-06 09:00:15.340      18201 TaskMaster Background agents created: 16
+2017-07-06 09:00:19.495      18201 BuildGroup ERROR #5001: Cube is currently excluded from updates:RELATEDCUBES/ALLERGIES:APP
+2017-07-06 09:30:30.500      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:30:30.501      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:30:30.506      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.ErdbebenCube:APP
+2017-07-06 09:30:30.507      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:30:30.507      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:30:30.571      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:30:30.572      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:30:30.575      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.ErdbebenCube:APP
+2017-07-06 09:30:30.576      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:30:30.576      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:30:30.593      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:30:30.593      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:31:42.586      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:31:42.587      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:31:42.593      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.ErdbebenCube:APP
+2017-07-06 09:31:42.593      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:31:42.593      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:31:42.630      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:31:42.631      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:31:42.634      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.ErdbebenCube:APP
+2017-07-06 09:31:42.634      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:31:42.635      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:31:42.651      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:31:42.652      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:34:01.497      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:34:01.498      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:34:01.502      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.ErdbebenCube:APP
+2017-07-06 09:34:01.503      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:34:01.503      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:34:01.539      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:34:01.540      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:34:01.543      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.ErdbebenCube:APP
+2017-07-06 09:34:01.543      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:34:01.543      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:34:01.560      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:34:01.561      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:37:22.631      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:37:22.632      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:37:22.638      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.ErdbebenCube:APP
+2017-07-06 09:37:22.638      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:37:22.638      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:37:22.675      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:37:22.676      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:37:22.679      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.ErdbebenCube:APP
+2017-07-06 09:37:22.680      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:37:22.680      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:37:22.696      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:37:22.697      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:38:24.936      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:38:24.937      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:38:24.941      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.ErdbebenCube:APP
+2017-07-06 09:38:24.942      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:38:24.942      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:38:24.980      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:38:24.981      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:38:24.984      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.ErdbebenCube:APP
+2017-07-06 09:38:24.984      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:38:24.985      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:38:25.002      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:38:25.003      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:46:34.235      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:46:34.236      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:46:34.241      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.ErdbebenCube:APP
+2017-07-06 09:46:34.241      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:46:34.241      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:46:34.280      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:46:34.280      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:46:34.284      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.ErdbebenCube:APP
+2017-07-06 09:46:34.284      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:46:34.284      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:46:34.301      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:46:34.302      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:48:03.277      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:48:03.278      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:48:03.283      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.ErdbebenCube:APP
+2017-07-06 09:48:03.284      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:48:03.284      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:48:03.322      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:48:03.323      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:48:03.326      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.ErdbebenCube:APP
+2017-07-06 09:48:03.326      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:48:03.326      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:48:03.343      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:48:03.344      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:48:32.553      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:48:32.554      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:48:32.559      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.ErdbebenCube:APP
+2017-07-06 09:48:32.559      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:48:32.559      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:48:32.596      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:48:32.597      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:48:32.600      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.ErdbebenCube:APP
+2017-07-06 09:48:32.601      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:48:32.601      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:48:32.617      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:48:32.618      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:53:00.646      23660 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:53:00.653      23660 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:53:00.713      23660 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:53:00.714      23660 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:53:00.746      23660 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.ErdbebenCube:APP
+2017-07-06 09:53:00.756      23660 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:53:00.758      23660 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:53:00.993      23651 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:53:00.994      23651 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:55:31.348      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:55:31.349      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:55:31.354      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.ErdbebenCube:APP
+2017-07-06 09:55:31.354      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:55:31.354      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:55:31.399      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:55:31.399      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:55:31.405      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.ErdbebenCube:APP
+2017-07-06 09:55:31.405      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:55:31.405      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:55:31.428      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:55:31.429      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:55:58.896      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:55:58.896      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:55:58.901      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.ErdbebenCube:APP
+2017-07-06 09:55:58.901      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:55:58.901      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:55:58.941      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:55:58.942      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:55:58.945      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.ErdbebenCube:APP
+2017-07-06 09:55:58.946      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:55:58.946      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:55:58.963      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:55:58.964      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:55:59.069      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:55:59.070      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:55:59.073      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.ErdbebenCube:APP
+2017-07-06 09:59:30.599      23651 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.ErdbebenCube:APP
+2017-07-06 09:59:30.616      23651 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:59:30.618      23651 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:59:30.676      23655 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:59:30.677      23655 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:59:30.682      23655 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.ErdbebenCube:APP
+2017-07-06 09:59:30.706      23660 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:59:30.707      23660 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:59:30.712      23660 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.ErdbebenCube:APP
+2017-07-06 09:59:30.720      23660 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:59:30.723      23660 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:59:30.729      23660 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.ErdbebenCube:APP
+2017-07-06 09:59:58.776      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:59:58.777      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:59:58.781      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.ErdbebenCube:APP
+2017-07-06 09:59:58.783      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:59:58.783      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:59:58.783      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.ErdbebenCube:APP
+2017-07-06 09:59:58.819      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:59:58.820      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:59:58.823      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.ErdbebenCube:APP
+2017-07-06 09:59:58.824      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:59:58.825      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:59:58.825      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.ErdbebenCube:APP
+2017-07-06 09:59:58.840      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:59:58.841      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:59:58.846      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.ErdbebenCube:APP
+2017-07-06 09:59:58.943      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 09:59:58.944      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 09:59:58.947      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.ErdbebenCube:APP
+2017-07-06 09:59:58.948      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.ErdbebenCube:APP
+2017-07-06 10:00:21.902      23651 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 10:00:21.904      23651 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 10:00:21.912      23651 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.ErdbebenCube:APP
+2017-07-06 10:00:21.962      23660 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 10:00:21.964      23660 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 10:00:21.969      23660 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.ErdbebenCube:APP
+2017-07-06 10:00:24.871      23651 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 10:00:24.873      23651 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 10:00:24.885      23651 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.ErdbebenCube:APP
+2017-07-06 10:00:24.934      23651 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 10:00:24.935      23651 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 10:00:24.943      23651 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.ErdbebenCube:APP
+2017-07-06 10:00:24.957      23651 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 10:00:24.959      23651 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 10:00:24.969      23651 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.ErdbebenCube:APP
+2017-07-06 10:00:25.155      23651 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 10:00:25.156      23651 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 10:00:25.164      23651 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.ErdbebenCube:APP
+2017-07-06 10:00:47.710      23660 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 10:00:47.711      23660 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 10:00:47.717      23660 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.ErdbebenCube:APP
+2017-07-06 10:00:55.812      23660 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 10:00:55.813      23660 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 10:00:55.819      23660 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.ErdbebenCube:APP
+2017-07-06 10:01:03.350      23660 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 10:01:03.351      23660 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 10:01:03.357      23660 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.ErdbebenCube:APP
+2017-07-06 10:01:07.538      23660 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 10:01:07.540      23660 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 10:01:07.547      23660 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.ErdbebenCube:APP
+2017-07-06 10:01:07.551      23660 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.ErdbebenCube:APP
+2017-07-06 10:01:07.553      23660 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.ErdbebenCube:APP
+2017-07-06 10:01:07.599      23651 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 10:01:07.600      23651 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 10:02:01.080      23651 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 10:02:01.084      23651 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 10:02:01.098      23651 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.ErdbebenCube:APP
+2017-07-06 10:02:01.105      23651 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.ErdbebenCube:APP
+2017-07-06 10:02:01.108      23651 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.ErdbebenCube:APP
+2017-07-06 10:02:06.394      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 10:02:06.395      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 10:02:06.400      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.ErdbebenCube:APP
+2017-07-06 10:02:06.400      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 10:02:06.400      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 10:02:06.438      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 10:02:06.439      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 10:02:06.442      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.ErdbebenCube:APP
+2017-07-06 10:02:06.442      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 10:02:06.442      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 10:02:06.460      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 10:02:06.461      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 10:02:06.565      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 10:02:06.565      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 10:02:06.569      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.ErdbebenCube:APP
+2017-07-06 10:53:48.507      23651 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 10:53:48.511      23651 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 10:53:48.570      23651 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 10:53:48.571      23651 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 10:53:48.598      23651 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.ErdbebenCube:APP
+2017-07-06 10:53:48.600      23651 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 10:53:48.602      23651 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 10:53:48.836      23660 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 10:53:48.838      23660 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 10:54:52.683      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 10:54:52.684      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 10:54:52.688      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.ErdbebenCube:APP
+2017-07-06 10:54:52.688      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 10:54:52.689      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 10:54:52.726      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 10:54:52.727      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 10:54:52.732      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.ErdbebenCube:APP
+2017-07-06 10:54:52.732      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 10:54:52.732      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 10:54:52.758      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 10:54:52.759      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 10:54:52.870      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AleAbstract:APP
+2017-07-06 10:54:52.870      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.AbstractChild:APP
+2017-07-06 10:54:52.874      22469 DSTimeEnab ERROR #5002: Cache error: <CLASS DOES NOT EXIST>zDSTimeEnabledGet+5^%DeepSee.CubeManager.RegistryMapCube.1 *Ale.ErdbebenCube:APP
 
   </pre>
 </div>
@@ -14539,8 +14815,9 @@ DeepSee Logs File /home/amarin/intersystems/cache20173/mgr/DeepSeeTasks_APP.log:
 <a name="cpf"></a>
 <h2>cache.cpf file</h2>
 
-<pre>Caché Configuration File /home/amarin/intersystems/cache20173/cache.cpf:</pre>
-<div class="scrollable" style="width:100%;height:400px;">
+<h4 id="cpftoggle" onclick="javascript:toggle('cpfdiv','cpftoggle');">&rtrif; Expand</h4>
+<div id="cpfdiv" style="display:none;">
+  <p>Caché Configuration File /home/amarin/intersystems/cache20173/cache.cpf:</p>
   <pre>[ConfigFile]
 Version=2017.21
 
@@ -14616,7 +14893,7 @@ CallinHalt=1
 CallinStart=1
 CliSysName=
 DBSizesAllowed=8192
-DefaultPort=1972
+DefaultPort=56773
 DefaultPortBindAddress=
 EnsembleAutoStart=0
 ErrorPurge=30
@@ -14636,7 +14913,7 @@ TempDirectory=Temp
 TerminalPrompt=8,2
 WebServer=1
 WebServerName=
-WebServerPort=57772
+WebServerPort=57773
 WebServerURLPrefix=
 ZSTU=1
 
@@ -14926,9 +15203,10 @@ LastConvertTime=2017-05-08 01:37:15
 <hr noshade size="4" width="auto">
 <a name="cconsole"></a>
 <h2>cconsole.log</h2>
-<div class="scrollable" style="width:100%;height:400px;">
+<h4 id="cconsoletoggle" onclick="javascript:toggle('cconsolediv','cconsoletoggle');">&rtrif; Expand</h4>
+<div id="cconsolediv" style="display:none;">
   <pre>
-Caché cconsole.log on Jun 29 2017 at  4:16 PM:
+Caché cconsole.log on Jul 06 2017 at 10:54 AM:
 05/19/17-21:07:53:412 (1252) 2 Cache license file (cache.key) missing or unreadable.
 05/19/17-21:07:53:437 (1252) 0 Allocated 165MB shared memory: 2MB global buffers, 35MB routine buffers
 05/19/17-21:07:53:438 (1252) 0 Intel Sandy Bridge AES-NI instructions detected.
@@ -18896,6 +19174,393 @@ Journaling switched to: /home/amarin/intersystems/cache20173/mgr/journal/2017062
 06/29/17-13:28:19:057 (12935) 0 Expansion completed for database /home/amarin/intersystems/cache20173/mgr/app-cache/. Expanded by 10 MB.
 06/29/17-13:30:34:566 (12935) 0 Starting Expansion for database /home/amarin/intersystems/cache20173/mgr/cacheaudit/. 10 MB requested.
 06/29/17-13:30:34:607 (12935) 0 Expansion completed for database /home/amarin/intersystems/cache20173/mgr/cacheaudit/. Expanded by 10 MB.
+06/29/17-17:15:42:111 (12940) 0 Receive daemon exited due to SIGTERM received
+06/29/17-17:15:42:111 (12937) 0 Cache MONITOR exited due to SIGTERM received
+06/29/17-17:15:42:112 (12942) 0 Super Server exited due to SIGTERM received
+06/29/17-17:15:42:112 (12941) 0 ECP Worker daemon exited due to SIGTERM received
+06/29/17-17:15:42:115 (12945) 0 CSP daemon exited due to SIGTERM received
+06/29/17-17:15:42:118 (13100) 0 Application Monitor exited due to SIGTERM received
+06/29/17-17:15:42:118 (12938) 0 Clean daemon. exited due to SIGTERM received
+06/29/17-17:15:42:119 (13101) 0 Task Manager exited due to SIGTERM received
+06/29/17-17:15:42:131 (12944) 0 LMFMON exited due to SIGTERM received
+06/29/17-17:15:43:367 (13324) 1 ECP: connection to &#39;ECP2LIVE&#39; dropped (172.16.146.201:56774)
+
+
+
+*** Recovery started at Wed Jul  5 09:15:13 2017
+     Current default directory: /home/amarin/intersystems/cache20173/mgr
+     Log file directory: /home/amarin/intersystems/cache20173/mgr/
+     WIJ file spec: ./CACHE.WIJ
+Recovering local (./CACHE.WIJ) image journal file...
+Starting WIJ recovery for &#39;./CACHE.WIJ&#39;.
+  0 blocks pending in this WIJ.
+WIJ pass # is 0.
+Starting fast WIJ compare
+Finished comparing 9 blocks in 0 seconds
+Exiting with status 3 (Success)
+07/05/17-09:15:13:662 (2515) 0 Automatically configuring buffers
+07/05/17-09:15:13:737 (2515) 0 Allocated 1236MB shared memory: 1024MB global buffers, 35MB routine buffers
+07/05/17-09:15:13:747 (2515) 0 Intel Sandy Bridge AES-NI instructions detected.
+07/05/17-09:15:13:897 (2515) 0 Jrn info from prior WIJ (imflags: 0):
+	wdpass: 0
+	jrnwdpass: 851
+	fspec: /home/amarin/intersystems/cache20173/mgr/journal/20170629.001
+	filecnt: 47
+	fileoff: 257346560
+	prevfcnt: 47
+	prevfileoeff: 257346560
+	min trans cnt: 47
+	min trans index: 256947320
+07/05/17-09:15:13:898 (2515) 0 
+CSTART of Cache for UNIX (SUSE Linux Enterprise Server for x86-64) 2017.3 (Build 587) Mon May 8 2017 01:37:27 EDT.
+	in /home/amarin/intersystems/cache20173/mgr
+	with wij: /home/amarin/intersystems/cache20173/mgr/CACHE.WIJ
+	from: /home/amarin/intersystems/cache20173/mgr/
+  OS=[Linux], version=[#104-Ubuntu SMP Wed Jun 14 08:17:06 UTC 2017], release=[4.4.0-81-generic], machine=[x86_64]
+  nodename=[amarin-Latitude-E7470].
+  numasyncwijbuf: 0, swdwrtmax: 0, wijdirectio: off, synctype: 3
+  System Initialized.
+07/05/17-09:15:13:916 (2558) 0 Write daemon started.
+07/05/17-09:15:13:974 (2583) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/ (SFN 0) read-write.
+07/05/17-09:15:13:989 (2583) 0 Instance &#39;C173&#39; starting on node amarin-Latitude-E7470 by user cacheusr
+07/05/17-09:15:13:989 (2583) 0 Using parameters from file &#39;/home/amarin/intersystems/cache20173/cache.cpf&#39;
+07/05/17-09:15:13:990 (2583) 0 Loading DLLs
+07/05/17-09:15:13:990 (2583) 0 Switching to temporary %SYS Namespace
+07/05/17-09:15:13:991 (2583) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/cachelib/ (SFN 1) read-write.
+07/05/17-09:15:14:033 (2583) 0 Loading Locale enu8 (English, United States, Latin1 (ISO 8859-1)) from objects
+07/05/17-09:15:14:066 (2583) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/cachetemp/ (SFN 2) read-write.
+07/05/17-09:15:14:088 (2583) 0 /home/amarin/intersystems/cache20173/mgr/cachetemp/ initialized as CACHETEMP
+07/05/17-09:15:14:091 (2583) 0 Switching to default %SYS Namespace
+07/05/17-09:15:14:092 (2583) 0 Added ethernet device enp0s31f6,wlp1s0 to default list
+07/05/17-09:15:14:140 (2618) 0 Cache MONITOR Started
+07/05/17-09:15:14:233 (2583) 2 Previous system shutdown was abnormal, system forced down or crashed
+07/05/17-09:15:14:234 (2583) 0 Enabling long strings
+07/05/17-09:15:14:264 (2628) 0 Clean Daemon Started
+07/05/17-09:15:14:266 (2583) 0 Updating configuration information from /home/amarin/intersystems/cache20173/cache.cpf
+07/05/17-09:15:14:400 (2583) 0 Performing Journal Recovery
+07/05/17-09:15:16:540 (2583) 0 Restoring from journal /home/amarin/intersystems/cache20173/mgr/journal/20170629.001
+07/05/17-09:15:16:543 (2583) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/cacheaudit/ (SFN 3) read-write.
+07/05/17-09:15:16:543 (2583) 1 [JOURNAL RESTORE] Not restoring /home/amarin/intersystems/cache20173/mgr/app/ because the database is not journaled
+07/05/17-09:15:16:543 (2583) 1 [JOURNAL RESTORE] Not restoring /home/amarin/intersystems/cache20173/mgr/app-data/ because the database is not journaled
+07/05/17-09:15:16:583 (2583) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/app-deepsee/ (SFN 4) read-write.
+07/05/17-09:15:16:584 (2583) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/app-index/ (SFN 5) read-write.
+07/05/17-09:15:16:584 (2583) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/app-fact/ (SFN 6) read-write.
+07/05/17-09:15:16:584 (2583) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/app-cache/ (SFN 7) read-write.
+07/05/17-09:15:16:584 (2583) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/user/ (SFN 8) read-write.
+07/05/17-09:15:16:589 (2583) 0 Performing Transaction Rollback if necessary
+07/05/17-09:15:16:589 (2650) 0 JrnRest Dejournal Prefetch Daemon startup failed
+07/05/17-09:15:16:591 (2583) 0   Scanning /home/amarin/intersystems/cache20173/mgr/journal/20170629.001
+07/05/17-09:15:16:610 (2583) 0 No open transactions to roll back
+07/05/17-09:15:16:622 (2583) 0 START: /home/amarin/intersystems/cache20173/mgr/journal/20170705.001
+07/05/17-09:15:16:622 (2583) 1 Warning: Alternate and primary journal directories are the same
+07/05/17-09:15:16:637 (2583) 0 CACHE JOURNALING SYSTEM MESSAGE
+Journaling started to: /home/amarin/intersystems/cache20173/mgr/journal/20170705.001
+07/05/17-09:15:16:637 (2583) 0 Journaling to /home/amarin/intersystems/cache20173/mgr/journal/20170705.001 started.
+07/05/17-09:15:16:644 (2583) 0 Processing Startup section
+07/05/17-09:15:16:699 (3130) 0 Purging old application errors
+07/05/17-09:15:16:710 (2583) 0 Initializing Security system
+07/05/17-09:15:16:799 (3130) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/cache/ (SFN 9) read-write.
+07/05/17-09:15:16:908 (2583) 0 Processing Network section
+07/05/17-09:15:16:908 (2583) 0 Activating Network
+07/05/17-09:15:16:921 (2583) 0 ECP-0 sys 1 - &#39;ECP2LIVE&#39; (172.16.146.201:56774) 
+07/05/17-09:15:17:171 (2583) 0 Processing Databases section
+07/05/17-09:15:17:175 (2583) 0 Processing Namespaces section
+07/05/17-09:15:17:176 (2583) 0 Namespaces are up to date
+07/05/17-09:15:17:176 (2583) 0 Activating namespaces
+07/05/17-09:15:17:176 (2583) 0 Activating new namespace map
+07/05/17-09:15:17:636 (2583) 0 Namespace changes have been activated
+07/05/17-09:15:17:671 (2583) 0 Auditing to /home/amarin/intersystems/cache20173/mgr/cacheaudit/
+07/05/17-09:15:17:717 (2583) 0 Starting Super Server on port 1972
+07/05/17-09:15:17:782 (2583) 0 Network Lock Upload Phase Starting
+07/05/17-09:15:17:782 (2583) 0 Lock Upload Phase Complete
+07/05/17-09:15:17:782 (2583) 0 Processing Miscellaneous section
+07/05/17-09:15:17:991 (3197) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/samples/ (SFN 10) read-write.
+07/05/17-09:15:18:036 (3196) 0 LMF Info:  Licensed for 50000 users.
+07/05/17-09:15:18:150 (2583) 0 init_gcr_seed:  gen_crypt_rand seeded from /dev/urandom:  64 bytes.
+07/05/17-09:15:18:150 (2583) 0 Processing Devices section
+07/05/17-09:15:18:150 (2583) 0 Processing DeviceSubTypes section
+07/05/17-09:15:18:150 (2583) 0 Processing MagTape section
+07/05/17-09:15:18:154 (2583) 0 Processing IO section
+07/05/17-09:15:18:154 (2583) 0 Processing SQL section
+07/05/17-09:15:18:156 (2583) 0 Executing ^ZSTU routine
+07/05/17-09:15:18:156 (2583) 0 Executing ^%ZSTART routine
+07/05/17-09:15:18:162 (2583) 0 Enabling logons
+07/05/17-09:15:18:616 (3199) 0 Private webserver started on 57772
+07/05/17-09:15:18:675 (3199) 0 Processing Shadows section (this system as shadow)
+07/05/17-09:15:18:676 (3199) 0 Processing Monitor section
+07/05/17-09:15:18:821 (3427) 0 [SYSTEM MONITOR] System Monitor started in %SYS
+07/05/17-09:15:18:830 (3199) 0 DELETE: /home/amarin/intersystems/cache20173/mgr/journal/20170626.001
+07/05/17-09:15:18:831 (3199) 0 DELETE: /home/amarin/intersystems/cache20173/mgr/journal/20170627.001
+07/05/17-09:15:18:832 (3199) 0 DELETE: /home/amarin/intersystems/cache20173/mgr/journal/20170628.001
+07/05/17-09:15:18:832 (3199) 0 DELETE: /home/amarin/intersystems/cache20173/mgr/journal/20170628.002
+07/05/17-09:15:20:040 (3196) 0 LMF Info:  License server started on port 4001
+07/05/17-09:15:17:986 (3196) 0 LMF Info:  Connected to license server 127.0.0.1,4001
+07/05/17-09:15:18:729 (3887) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/app-data/ (SFN 11) read-write.
+07/05/17-09:16:00:766 (5674) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/docbook/ (SFN 12) read-write.
+07/05/17-09:16:01:216 (5674) 0 %SYS.Task.FeatureTracker transferred data to ats.intersystems.com
+07/05/17-09:16:01:424 (5661) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/app/ (SFN 13) read-write.
+07/05/17-09:16:01:759 (5661) 0 ECP: Starting connection to &#39;ECP2LIVE&#39; (172.16.146.201:56774)
+07/05/17-09:16:01:775 (5705) 0 ECP: &#39;ECP2LIVE&#39; is connected to (172.16.146.201:56774)
+07/05/17-09:16:01:982 (5661) 0 Mounted remote database ^ECP2LIVE^/home/amarin/intersystems/cache20172/mgr/live-dstime/ (SFN 14) read-only.
+07/05/17-09:45:49:646 (3427) 0 [SYSTEM MONITOR] Alert state cleared.
+07/05/17-10:32:21:590 (6999) 0 Shutting down Cache
+07/05/17-10:32:21:627 (3427) 0 [SYSTEM MONITOR] System Monitor stopped in %SYS
+07/05/17-10:32:22:628 (6999) 0 Notifying Clients
+07/05/17-10:32:22:628 (6999) 0 No user shutdown routines to execute
+07/05/17-10:32:22:630 (6999) 0 Stopping User Jobs
+07/05/17-10:32:26:162 (6999) 0 Stopping Network Servers
+07/05/17-10:32:26:164 (6999) 0 Withdrawing from License Domain
+07/05/17-10:32:26:164 (6999) 0 Waiting for users to stop
+07/05/17-10:32:28:165 (6999) 0 0 user processes remain
+07/05/17-10:32:30:166 (6999) 0 Auditing stopped
+07/05/17-10:32:30:166 (6999) 0 Stopping Client Networking
+07/05/17-10:32:31:167 (6999) 0 Removing database locks
+07/05/17-10:32:31:179 (6999) 0 Updating Journal File
+07/05/17-10:32:31:382 (6999) 0 Journal restore not required at next startup
+07/05/17-10:32:31:382 (6999) 0 Transaction rollback not required at next startup
+07/05/17-10:32:31:699 (5705) 0 ECP: connection to &#39;ECP2LIVE&#39; dropped (172.16.146.201:56774)
+07/05/17-10:32:32:585 (6999) 0 Waiting for database updates to complete
+07/05/17-10:32:32:585 (6999) 0 Database updates complete
+07/05/17-10:32:32:585 (6999) 0 Stopping System Jobs
+07/05/17-10:32:32:690 (2568) 0 EXPDMN exited due to system shutdown
+07/05/17-10:32:32:690 (2560) 0 JRNDMN exited due to system shutdown
+07/05/17-10:32:32:690 (2559) 0 GARCOL exited due to system shutdown
+07/05/17-10:32:32:791 (2561) 0 SWRTDMN #1 exited due to system shutdown
+07/05/17-10:32:32:791 (2563) 0 SWRTDMN #3 exited due to system shutdown
+07/05/17-10:32:32:792 (2562) 0 SWRTDMN #2 exited due to system shutdown
+07/05/17-10:32:32:792 (2565) 0 SWRTDMN #5 exited due to system shutdown
+07/05/17-10:32:32:792 (2566) 0 SWRTDMN #6 exited due to system shutdown
+07/05/17-10:32:32:792 (2564) 0 SWRTDMN #4 exited due to system shutdown
+07/05/17-10:32:32:792 (2567) 0 SWRTDMN #7 exited due to system shutdown
+07/05/17-10:32:33:301 (2558) 0 No blocks pending in WIJ file
+07/05/17-10:32:33:303 (2558) 0 WRTDMN exited due to system shutdown
+07/05/17-10:32:33:393 (2515) 0 CONTROL exited due to system shutdown
+07/05/17-10:32:34:493 (6999) 0 Shutdown complete
+
+
+
+*** Recovery started at Wed Jul  5 10:34:19 2017
+     Current default directory: /home/amarin/intersystems/cache20173/mgr
+     Log file directory: /home/amarin/intersystems/cache20173/mgr/
+     WIJ file spec: ./CACHE.WIJ
+Recovering local (./CACHE.WIJ) image journal file...
+Starting WIJ recovery for &#39;./CACHE.WIJ&#39;.
+  0 blocks pending in this WIJ.
+Exiting with status 3 (Success)
+07/05/17-10:34:19:962 (7577) 0 Automatically configuring buffers
+07/05/17-10:34:19:995 (7577) 0 Allocated 1236MB shared memory: 1024MB global buffers, 35MB routine buffers
+07/05/17-10:34:19:997 (7577) 0 Intel Sandy Bridge AES-NI instructions detected.
+07/05/17-10:34:20:026 (7577) 0 Jrn info from prior WIJ (imflags: 0):
+	wdpass: 0
+	jrnwdpass: 150
+	fspec: /home/amarin/intersystems/cache20173/mgr/journal/20170705.001
+	filecnt: 48
+	fileoff: 0
+	prevfcnt: 48
+	prevfileoeff: 0
+	min trans cnt: 48
+	min trans index: 1426916
+07/05/17-10:34:20:027 (7577) 0 
+CSTART of Cache for UNIX (SUSE Linux Enterprise Server for x86-64) 2017.3 (Build 587) Mon May 8 2017 01:37:27 EDT.
+	in /home/amarin/intersystems/cache20173/mgr
+	with wij: /home/amarin/intersystems/cache20173/mgr/CACHE.WIJ
+	from: /home/amarin/intersystems/cache20173/mgr/
+  OS=[Linux], version=[#104-Ubuntu SMP Wed Jun 14 08:17:06 UTC 2017], release=[4.4.0-81-generic], machine=[x86_64]
+  nodename=[amarin-Latitude-E7470].
+  numasyncwijbuf: 0, swdwrtmax: 0, wijdirectio: off, synctype: 3
+  System Initialized.
+07/05/17-10:34:20:038 (7594) 0 Write daemon started.
+07/05/17-10:34:20:040 (7606) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/ (SFN 0) read-write.
+07/05/17-10:34:20:043 (7606) 0 Instance &#39;C173&#39; starting on node amarin-Latitude-E7470 by user cacheusr
+07/05/17-10:34:20:043 (7606) 0 Using parameters from file &#39;/home/amarin/intersystems/cache20173/cache.cpf&#39;
+07/05/17-10:34:20:044 (7606) 0 Loading DLLs
+07/05/17-10:34:20:044 (7606) 0 Switching to temporary %SYS Namespace
+07/05/17-10:34:20:044 (7606) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/cachelib/ (SFN 1) read-write.
+07/05/17-10:34:20:072 (7606) 0 Loading Locale enu8 (English, United States, Latin1 (ISO 8859-1)) from objects
+07/05/17-10:34:20:099 (7606) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/cachetemp/ (SFN 2) read-write.
+07/05/17-10:34:20:114 (7606) 0 /home/amarin/intersystems/cache20173/mgr/cachetemp/ initialized as CACHETEMP
+07/05/17-10:34:20:119 (7606) 0 Switching to default %SYS Namespace
+07/05/17-10:34:20:122 (7606) 0 Added ethernet device enp0s31f6,vboxnet1,wlp1s0 to default list
+07/05/17-10:34:20:131 (7607) 0 Cache MONITOR Started
+07/05/17-10:34:20:231 (7606) 0 Enabling long strings
+07/05/17-10:34:20:239 (7608) 0 Clean Daemon Started
+07/05/17-10:34:20:243 (7606) 1 Configuration file /home/amarin/intersystems/cache20173/cache.cpf is not the same as when last shut down
+07/05/17-10:34:20:357 (7606) 0 Updating configuration information from /home/amarin/intersystems/cache20173/cache.cpf
+07/05/17-10:34:20:367 (7606) 0 Performing Journal Recovery
+07/05/17-10:34:20:369 (7606) 0 WIJ indicates no open transactions
+07/05/17-10:34:20:370 (7606) 0 START: /home/amarin/intersystems/cache20173/mgr/journal/20170705.002
+07/05/17-10:34:20:370 (7606) 1 Warning: Alternate and primary journal directories are the same
+07/05/17-10:34:20:384 (7606) 0 CACHE JOURNALING SYSTEM MESSAGE
+Journaling started to: /home/amarin/intersystems/cache20173/mgr/journal/20170705.002
+07/05/17-10:34:20:384 (7606) 0 Journaling to /home/amarin/intersystems/cache20173/mgr/journal/20170705.002 started.
+07/05/17-10:34:20:392 (7606) 0 Processing Startup section
+07/05/17-10:34:20:400 (7609) 0 Purging old application errors
+07/05/17-10:34:20:416 (7609) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/cache/ (SFN 3) read-write.
+07/05/17-10:34:20:420 (7606) 0 Initializing Security system
+07/05/17-10:34:20:454 (7606) 0 Processing Network section
+07/05/17-10:34:20:455 (7606) 0 Activating Network
+07/05/17-10:34:20:460 (7606) 0 ECP-0 sys 1 - &#39;ECP2LIVE&#39; (172.16.146.201:56774) 
+07/05/17-10:34:20:664 (7606) 0 Processing Databases section
+07/05/17-10:34:20:670 (7606) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/cacheaudit/ (SFN 4) read-write.
+07/05/17-10:34:20:673 (7606) 0 Processing Namespaces section
+07/05/17-10:34:20:673 (7606) 0 Namespaces are up to date
+07/05/17-10:34:20:673 (7606) 0 Activating namespaces
+07/05/17-10:34:20:673 (7606) 0 Activating new namespace map
+07/05/17-10:34:20:733 (7606) 0 Namespace changes have been activated
+07/05/17-10:34:20:734 (7606) 0 Auditing to /home/amarin/intersystems/cache20173/mgr/cacheaudit/
+07/05/17-10:34:20:740 (7606) 0 Starting Super Server on port 56773
+07/05/17-10:34:20:743 (7606) 0 Network Lock Upload Phase Starting
+07/05/17-10:34:20:743 (7606) 0 Lock Upload Phase Complete
+07/05/17-10:34:20:743 (7606) 0 Processing Miscellaneous section
+07/05/17-10:34:20:753 (7606) 0 init_gcr_seed:  gen_crypt_rand seeded from /dev/urandom:  64 bytes.
+07/05/17-10:34:20:753 (7606) 0 Processing Devices section
+07/05/17-10:34:20:753 (7606) 0 Processing DeviceSubTypes section
+07/05/17-10:34:20:753 (7606) 0 Processing MagTape section
+07/05/17-10:34:20:756 (7614) 0 LMF Info:  Licensed for 50000 users.
+07/05/17-10:34:20:756 (7606) 0 Processing IO section
+07/05/17-10:34:20:756 (7606) 0 Processing SQL section
+07/05/17-10:34:20:767 (7606) 0 Executing ^ZSTU routine
+07/05/17-10:34:20:769 (7606) 0 Executing ^%ZSTART routine
+07/05/17-10:34:20:774 (7606) 0 Enabling logons
+07/05/17-10:34:20:885 (7615) 0 Private webserver started on 57773
+07/05/17-10:34:20:894 (7615) 0 Processing Shadows section (this system as shadow)
+07/05/17-10:34:20:895 (7615) 0 Processing Monitor section
+07/05/17-10:34:20:915 (7771) 0 [SYSTEM MONITOR] System Monitor started in %SYS
+07/05/17-10:34:22:767 (7614) 0 LMF Info:  License server started on port 4001
+07/05/17-10:34:24:778 (7614) 0 LMF Info:  Connected to license server 127.0.0.1,4001
+07/05/17-10:35:00:934 (8373) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/samples/ (SFN 5) read-write.
+07/05/17-10:35:00:957 (8374) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/app-data/ (SFN 6) read-write.
+07/05/17-10:35:00:964 (8374) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/app-deepsee/ (SFN 7) read-write.
+07/05/17-10:35:00:991 (8374) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/app/ (SFN 8) read-write.
+07/05/17-10:35:01:356 (8374) 0 ECP: Starting connection to &#39;ECP2LIVE&#39; (172.16.146.201:56774)
+07/05/17-10:35:01:363 (8375) 0 ECP: &#39;ECP2LIVE&#39; is connected to (172.16.146.201:56774)
+07/05/17-10:35:01:565 (8374) 0 Mounted remote database ^ECP2LIVE^/home/amarin/intersystems/cache20172/mgr/live-dstime/ (SFN 9) read-only.
+07/05/17-10:35:01:569 (8374) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/app-index/ (SFN 10) read-write.
+07/05/17-11:00:00:439 (10204) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/docbook/ (SFN 11) read-write.
+07/05/17-11:00:00:646 (10204) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/user/ (SFN 12) read-write.
+
+
+
+*** Recovery started at Wed Jul  5 15:16:57 2017
+     Current default directory: /home/amarin/intersystems/cache20173/mgr
+     Log file directory: /home/amarin/intersystems/cache20173/mgr/
+     WIJ file spec: ./CACHE.WIJ
+Recovering local (./CACHE.WIJ) image journal file...
+Starting WIJ recovery for &#39;./CACHE.WIJ&#39;.
+  0 blocks pending in this WIJ.
+WIJ pass # is 0.
+Starting fast WIJ compare
+Finished comparing 13 blocks in 0 seconds
+Exiting with status 3 (Success)
+07/05/17-15:16:57:219 (2522) 0 Automatically configuring buffers
+07/05/17-15:16:57:276 (2522) 0 Allocated 1236MB shared memory: 1024MB global buffers, 35MB routine buffers
+07/05/17-15:16:57:292 (2522) 0 Intel Sandy Bridge AES-NI instructions detected.
+07/05/17-15:16:57:472 (2522) 0 Jrn info from prior WIJ (imflags: 0):
+	wdpass: 0
+	jrnwdpass: 356
+	fspec: /home/amarin/intersystems/cache20173/mgr/journal/20170705.002
+	filecnt: 49
+	fileoff: 4675808
+	prevfcnt: 49
+	prevfileoeff: 4661880
+	min trans cnt: 49
+	min trans index: 4661880
+07/05/17-15:16:57:473 (2522) 0 
+CSTART of Cache for UNIX (SUSE Linux Enterprise Server for x86-64) 2017.3 (Build 587) Mon May 8 2017 01:37:27 EDT.
+	in /home/amarin/intersystems/cache20173/mgr
+	with wij: /home/amarin/intersystems/cache20173/mgr/CACHE.WIJ
+	from: /home/amarin/intersystems/cache20173/mgr/
+  OS=[Linux], version=[#106-Ubuntu SMP Mon Jun 26 17:54:43 UTC 2017], release=[4.4.0-83-generic], machine=[x86_64]
+  nodename=[amarin-Latitude-E7470].
+  numasyncwijbuf: 0, swdwrtmax: 0, wijdirectio: off, synctype: 3
+  System Initialized.
+07/05/17-15:16:57:505 (2571) 0 Write daemon started.
+07/05/17-15:16:57:527 (2598) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/ (SFN 0) read-write.
+07/05/17-15:16:57:537 (2598) 0 Instance &#39;C173&#39; starting on node amarin-Latitude-E7470 by user cacheusr
+07/05/17-15:16:57:537 (2598) 0 Using parameters from file &#39;/home/amarin/intersystems/cache20173/cache.cpf&#39;
+07/05/17-15:16:57:541 (2598) 0 Loading DLLs
+07/05/17-15:16:57:541 (2598) 0 Switching to temporary %SYS Namespace
+07/05/17-15:16:57:542 (2598) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/cachelib/ (SFN 1) read-write.
+07/05/17-15:16:57:574 (2598) 0 Loading Locale enu8 (English, United States, Latin1 (ISO 8859-1)) from objects
+07/05/17-15:16:57:635 (2598) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/cachetemp/ (SFN 2) read-write.
+07/05/17-15:16:57:652 (2598) 0 /home/amarin/intersystems/cache20173/mgr/cachetemp/ initialized as CACHETEMP
+07/05/17-15:16:57:654 (2598) 0 Switching to default %SYS Namespace
+07/05/17-15:16:57:657 (2598) 0 Added ethernet device enp0s31f6,wlp1s0 to default list
+07/05/17-15:16:57:694 (2623) 0 Cache MONITOR Started
+07/05/17-15:16:57:796 (2598) 2 Previous system shutdown was abnormal, system forced down or crashed
+07/05/17-15:16:57:796 (2598) 0 Enabling long strings
+07/05/17-15:16:57:859 (2644) 0 Clean Daemon Started
+07/05/17-15:16:57:861 (2598) 0 Updating configuration information from /home/amarin/intersystems/cache20173/cache.cpf
+07/05/17-15:16:57:952 (2598) 0 Performing Journal Recovery
+07/05/17-15:17:00:174 (2598) 0 Restoring from journal /home/amarin/intersystems/cache20173/mgr/journal/20170705.002
+07/05/17-15:17:00:203 (2598) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/cacheaudit/ (SFN 3) read-write.
+07/05/17-15:17:00:203 (2598) 1 [JOURNAL RESTORE] Not restoring /home/amarin/intersystems/cache20173/mgr/app-data/ because the database is not journaled
+07/05/17-15:17:00:259 (2598) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/app-deepsee/ (SFN 4) read-write.
+07/05/17-15:17:00:259 (2598) 1 [JOURNAL RESTORE] Not restoring /home/amarin/intersystems/cache20173/mgr/app/ because the database is not journaled
+07/05/17-15:17:00:274 (2598) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/app-index/ (SFN 5) read-write.
+07/05/17-15:17:00:287 (2598) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/user/ (SFN 6) read-write.
+07/05/17-15:17:00:345 (2598) 0 Performing Transaction Rollback if necessary
+07/05/17-15:17:00:346 (2598) 0   Scanning /home/amarin/intersystems/cache20173/mgr/journal/20170705.002
+07/05/17-15:17:00:347 (2598) 0 No open transactions to roll back
+07/05/17-15:17:00:349 (2598) 0 START: /home/amarin/intersystems/cache20173/mgr/journal/20170705.003
+07/05/17-15:17:00:349 (2598) 1 Warning: Alternate and primary journal directories are the same
+07/05/17-15:17:00:366 (2598) 0 CACHE JOURNALING SYSTEM MESSAGE
+Journaling started to: /home/amarin/intersystems/cache20173/mgr/journal/20170705.003
+07/05/17-15:17:00:366 (2598) 0 Journaling to /home/amarin/intersystems/cache20173/mgr/journal/20170705.003 started.
+07/05/17-15:17:00:386 (2598) 0 Processing Startup section
+07/05/17-15:17:00:489 (3186) 0 Purging old application errors
+07/05/17-15:17:00:495 (2598) 0 Initializing Security system
+07/05/17-15:17:00:578 (3186) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/cache/ (SFN 7) read-write.
+07/05/17-15:17:00:608 (2598) 0 Processing Network section
+07/05/17-15:17:00:645 (2598) 0 Activating Network
+07/05/17-15:17:00:676 (2598) 0 ECP-0 sys 1 - &#39;ECP2LIVE&#39; (172.16.146.201:56774) 
+07/05/17-15:17:00:910 (2598) 0 Processing Databases section
+07/05/17-15:17:00:956 (2598) 0 Processing Namespaces section
+07/05/17-15:17:00:956 (2598) 0 Namespaces are up to date
+07/05/17-15:17:00:956 (2598) 0 Activating namespaces
+07/05/17-15:17:00:956 (2598) 0 Activating new namespace map
+07/05/17-15:17:01:152 (2598) 0 Namespace changes have been activated
+07/05/17-15:17:01:154 (2598) 0 Auditing to /home/amarin/intersystems/cache20173/mgr/cacheaudit/
+07/05/17-15:17:01:222 (2598) 0 Starting Super Server on port 56773
+07/05/17-15:17:01:259 (2598) 0 Network Lock Upload Phase Starting
+07/05/17-15:17:01:259 (2598) 0 Lock Upload Phase Complete
+07/05/17-15:17:01:259 (2598) 0 Processing Miscellaneous section
+07/05/17-15:17:01:307 (3226) 0 LMF Info:  Licensed for 50000 users.
+07/05/17-15:17:01:328 (2598) 0 init_gcr_seed:  gen_crypt_rand seeded from /dev/urandom:  64 bytes.
+07/05/17-15:17:01:328 (2598) 0 Processing Devices section
+07/05/17-15:17:01:328 (2598) 0 Processing DeviceSubTypes section
+07/05/17-15:17:01:329 (2598) 0 Processing MagTape section
+07/05/17-15:17:01:329 (2598) 0 Processing IO section
+07/05/17-15:17:01:329 (2598) 0 Processing SQL section
+07/05/17-15:17:01:331 (2598) 0 Executing ^ZSTU routine
+07/05/17-15:17:01:331 (2598) 0 Executing ^%ZSTART routine
+07/05/17-15:17:01:335 (2598) 0 Enabling logons
+07/05/17-15:17:01:614 (3229) 0 Private webserver started on 57773
+07/05/17-15:17:01:624 (3229) 0 Processing Shadows section (this system as shadow)
+07/05/17-15:17:01:625 (3229) 0 Processing Monitor section
+07/05/17-15:17:01:670 (3407) 0 [SYSTEM MONITOR] System Monitor started in %SYS
+07/05/17-15:17:03:309 (3226) 0 LMF Info:  License server started on port 4001
+07/05/17-15:17:05:312 (3226) 0 LMF Info:  Connected to license server 127.0.0.1,4001
+07/05/17-15:18:00:689 (6038) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/samples/ (SFN 8) read-write.
+07/05/17-15:18:00:725 (6039) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/app-data/ (SFN 9) read-write.
+07/05/17-15:18:00:729 (6040) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/app/ (SFN 10) read-write.
+07/05/17-15:18:00:812 (6040) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/docbook/ (SFN 11) read-write.
+07/05/17-15:18:01:229 (6039) 0 ECP: Starting connection to &#39;ECP2LIVE&#39; (172.16.146.201:56774)
+07/05/17-15:18:01:241 (6043) 0 ECP: &#39;ECP2LIVE&#39; is connected to (172.16.146.201:56774)
+07/05/17-15:18:01:263 (6039) 0 Mounted remote database ^ECP2LIVE^/home/amarin/intersystems/cache20172/mgr/live-dstime/ (SFN 12) read-only.
+07/05/17-15:47:31:985 (3407) 0 [SYSTEM MONITOR] Alert state cleared.
+07/06/17-08:58:04:124 (6043) 1 ECP client: Connection(172.16.146.201) timeout
+07/06/17-08:58:04:124 (6043) 1 ECP: connection to &#39;ECP2LIVE&#39; dropped (172.16.146.201:56774)
+07/06/17-08:58:04:124 (6043) 1 ECP_C: connection to &#39;ECP2LIVE&#39; failed (172.16.146.201:56774)
+07/06/17-08:58:14:126 (6043) 0 ECPcliR: Connection to &#39;ECP2LIVE&#39; failed: 56774:172.16.146.201, hosts.
+07/06/17-08:58:15:924 (2573) 1 Warning: Alternate and primary journal directories are the same
+07/06/17-08:58:15:987 (18204) 0 CACHE JOURNALING SYSTEM MESSAGE
+Journaling switched to: /home/amarin/intersystems/cache20173/mgr/journal/20170706.001
+07/06/17-08:58:16:001 (18213) 0 Purging old application errors
+07/06/17-08:58:16:020 (18201) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/app-cache/ (SFN 13) read-write.
+07/06/17-09:00:15:219 (18201) 0 Mounted database /home/amarin/intersystems/cache20173/mgr/app-fact/ (SFN 14) read-write.
+07/06/17-09:00:18:680 (6043) 1 ECP Disable Connection for bignetsys #(1) waited 3 seconds, but 1 answer buffers are still not free.  We will shut down this connection anyway, but this might be a sign that there are dead jobs holding some of the resources for this connection.
+07/06/17-09:00:18:932 (6043) 0 ECP: &#39;ECP2LIVE&#39; is connected to (172.16.146.201:56774)
 
 </pre>
 </div>
@@ -19056,7 +19721,7 @@ Journaling switched to: /home/amarin/intersystems/cache20173/mgr/journal/2017062
     <tr>
       <td>
         <h4>Free Space</h4>
-        <p>152,761 MB </p>
+        <p>145,149 MB </p>
       </td>
     </tr>
     <tr>
@@ -19074,33 +19739,33 @@ Journaling switched to: /home/amarin/intersystems/cache20173/mgr/journal/2017062
       <th>Name</th><th>Size in KB</th><th>Creation Time</th><th>Reason</th>
     </tr>
     <tr>
+      <td>/home/amarin/intersystems/cache20173/mgr/journal/20170706.001</td>
+      <td style="text-align:right">18,240</td>
+      <td>2017-07-06 08:58:15</td>
+      <td>by backup</td>
+    </tr>
+    <tr>
+      <td>/home/amarin/intersystems/cache20173/mgr/journal/20170705.003</td>
+      <td style="text-align:right">23,424</td>
+      <td>2017-07-05 15:17:00</td>
+      <td>by backup</td>
+    </tr>
+    <tr>
+      <td>/home/amarin/intersystems/cache20173/mgr/journal/20170705.002</td>
+      <td style="text-align:right">4,608</td>
+      <td>2017-07-05 10:34:20</td>
+      <td>by backup</td>
+    </tr>
+    <tr>
+      <td>/home/amarin/intersystems/cache20173/mgr/journal/20170705.001</td>
+      <td style="text-align:right">1,408</td>
+      <td>2017-07-05 09:15:16</td>
+      <td>by backup</td>
+    </tr>
+    <tr>
       <td>/home/amarin/intersystems/cache20173/mgr/journal/20170629.001</td>
-      <td style="text-align:right">250,496</td>
+      <td style="text-align:right">251,392</td>
       <td>2017-06-29 08:45:03</td>
-      <td>by backup</td>
-    </tr>
-    <tr>
-      <td>/home/amarin/intersystems/cache20173/mgr/journal/20170628.002</td>
-      <td style="text-align:right">13,824</td>
-      <td>2017-06-28 16:16:56</td>
-      <td>by backup</td>
-    </tr>
-    <tr>
-      <td>/home/amarin/intersystems/cache20173/mgr/journal/20170628.001</td>
-      <td style="text-align:right">83,648</td>
-      <td>2017-06-28 08:56:43</td>
-      <td>by backup</td>
-    </tr>
-    <tr>
-      <td>/home/amarin/intersystems/cache20173/mgr/journal/20170627.001</td>
-      <td style="text-align:right">4,096</td>
-      <td>2017-06-27 08:53:31</td>
-      <td>by backup</td>
-    </tr>
-    <tr>
-      <td>/home/amarin/intersystems/cache20173/mgr/journal/20170626.001</td>
-      <td style="text-align:right">73,728</td>
-      <td>2017-06-26 09:12:35</td>
       <td>by backup</td>
     </tr>
   </tbody>
