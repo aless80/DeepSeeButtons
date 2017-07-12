@@ -2426,7 +2426,9 @@ Dimensions
 	Do WriteLog("")
 	Do WriteLog("")
 	// Translate the filed names in %Analyze to actual specs
-	Write "FieldNameToSpec("""_cube_""")",!
+	Do WriteLog("FieldNameToSpec("""_cube_""")")
+	Do WriteLog("")
+	Do WriteLog("----------------------------------------------------------------")
 	DO FieldNameToSpec(cube)  //worked
 	Do WriteLog("")
 	Do WriteLog("")
