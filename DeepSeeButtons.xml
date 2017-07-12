@@ -16,7 +16,7 @@ DeepSeeButtons(namespace="",cubeString="", getLogs="", LogFile="", proceed="") ;
 	;You can use the following optional arguments:
 	;namespace:		namespace where this routine will run, e.g. "SAMPLES"
 	;cubeString: 	comma separated list of cubes, e.g. "patients,holefoods"
-	;getLogs:		""/0/1 to ask to/do not/do  include cconsole.log, Query Log, and DeepSee log, respectively
+	;getLogs:		""/0/1 to ask to/do not/do  include cconsole.log, Query Log, and DeepSee logs, respectively
 	;LogFile:		output file. By default the output file will be stored in the /mgr directory
 	;proceed:		1 to skip the last prompt before launching DeepSeeButtons
 	;
@@ -473,6 +473,21 @@ LogHeader(cubeList,getLogs)
 #; CFL1524	
 	Do WriteLog("<meta http-equiv=""Content-Type"" content=""text/html; charset=UTF-8"">",2)
 	Do WriteLog("<script type=""text/javascript"">",2)
+	
+	
+	Do WriteLog("function toggle(showHideDiv, switchTextDiv) {",4)
+	Do WriteLog("var ele = document.getElementById(showHideDiv);",6)
+	Do WriteLog("var text = document.getElementById(switchTextDiv);",6)
+	Do WriteLog("if(ele.style.display == ""block"") {",6)
+    Do WriteLog("ele.style.display = ""none"";",8)
+    Do WriteLog("text.innerHTML = ""&rtrif; Expand"";",8)
+    Do WriteLog("}",6)
+	Do WriteLog("else {",6)
+    Do WriteLog("ele.style.display = ""block"";",8)
+    Do WriteLog("text.innerHTML = ""&dtrif; Collapse"";",8)
+	Do WriteLog("}",6)
+	Do WriteLog("}",4)
+	
     Do WriteLog("function openNav() {",4)
     Do WriteLog("document.getElementById(""mySidenav"").style.width = ""250px"";",6)
     Do WriteLog("document.getElementById(""main"").style.marginLeft = ""250px"";",6)
@@ -564,6 +579,7 @@ LogHeader(cubeList,getLogs)
 	Do WriteLog("}",4)
     
     Do WriteLog(".scrollable {",4)
+    //Do WriteLog("display:none;",6)
     Do WriteLog("overflow:auto;",6)
     Do WriteLog("resize:both;",6)
 	Do WriteLog("}",4)
@@ -638,7 +654,7 @@ LogHeader(cubeList,getLogs)
 	Do WriteLog("<font face=""Arial, Helvetica, sans-serif"" size=""9"" color=""#ff3300"">",2)
 	Do WriteLog("<b>Beta!</b>",4)
 	Do WriteLog("</font>",2)	
-	Do WriteLog("<a href=""#deepseesetup"">DeepSee Setup</a>",2)
+	Do WriteLog("<a href=""#deepseesetup"" title=""General setting relevant for DeepSee"">DeepSee Setup</a>",2)
 	Set isInsight=$$isHealthInsight(namespace) 	//Determine if this is a Health Insight namespace (1 if yes)
 	Set isTrak=$$isTrak(namespace) 	//Determine if this is a Health Insight namespace (1 if yes)
 	If (isInsight || isTrak) {
@@ -647,11 +663,11 @@ LogHeader(cubeList,getLogs)
 			Do WriteLog("<a href=""#overrides"">DeepSee Overrides</a>",2)
 		}
 	}	
-	Do WriteLog("<a href=""#serverdetails"">Server Details</a>",2)
-	Do WriteLog("<a href=""#cubelist"">Cubes</a>",2)
+	Do WriteLog("<a href=""#serverdetails"" title=""Information on the hosting machine"">Server Details</a>",2)
+	Do WriteLog("<a href=""#cubelist"" title=""Information on all cubes in the namespace"">Cubes</a>",2)
 	Do WriteLog("<a href=""#cuberegistry"">Cube Registry</a>",2)
 	If (($D(cubeList)'=0) && (cubeList'="")) {
-		Do WriteLog("<a href=""#cubeinfo"">Cube Info</a>",2)
+		Do WriteLog("<a href=""#cubeinfo"" title=""Detailed information on cubes"">Cube Info</a>",2)
 		Set cubeListLength=$ll(cubeList)
  		For i=1:1:cubeListLength{
 			Set cube=$lg(cubeList,i)
@@ -661,15 +677,15 @@ LogHeader(cubeList,getLogs)
 		}		
 	}
 	If getLogs{
-		Do WriteLog("<a href=""#querylog"">Query Log</a>",2)
-		Do WriteLog("<a href=""#dslog"">DeepSee Log</a>",2)	
+		Do WriteLog("<a href=""#querylog"" title=""Last 5 MDX queries run by each users in the system"">Query Log</a>",2)
+		Do WriteLog("<a href=""#dslog"" title=""A log file with cube builds and errors occurred in the system"">DeepSee Logs</a>",2)	
 	}
-	Do WriteLog("<a href=""#cpf"">cache.cpf</a>",2)
+	Do WriteLog("<a href=""#cpf"" title=""The Caché Parameter File containing recording the Caché configuration"">cache.cpf</a>",2)
 	If getLogs{
-		Do WriteLog("<a href=""#cconsole"">cconsole.log</a>",2)
+		Do WriteLog("<a href=""#cconsole"" title=""cconsole.log file containing general messages and errors"">cconsole.log</a>",2)
 	}
   	Do WriteLog("<a href=""#LocalDB"">Local Databases</a>",2)
-  	Do WriteLog("<a href=""#Journaling"">Journaling</a>",2)
+  	Do WriteLog("<a href=""#Journaling"" title=""Information on database journaling for the instance"">Journaling</a>",2)
   	Do WriteLog("</div>")
   	Do WriteLog("<div id=""main"">")
 	Do WriteLog("<a name=""top""></a>")
@@ -1131,9 +1147,11 @@ CPF
 	//Do WriteLog("<pre>"
 	Use PDev
 	Do WriteLog("")
-	Do WriteLog("<pre>Caché Configuration File "_ConfigFile_":"_"</pre>")
-	Do WriteLog("<div class=""scrollable"" style=""width:100%;height:400px;"">")
-	Do WriteLog("  <pre>")
+	Do WriteLog("<h4 id=""cpftoggle"" onclick=""javascript:toggle('cpfdiv','cpftoggle');"">&rtrif; Expand</h4>",0)
+	//Do WriteLog("<div id=""cpfdiv"" class=""scrollable"" style=""width:100%;height:400px;"">")
+	Do WriteLog("<div id=""cpfdiv"" style=""display:none;"">")
+	Do WriteLog("<p>Caché Configuration File "_ConfigFile_":"_"</p>",2)
+	Do WriteLog("<pre>",2)
 	Set $ZTrap="CPFErr"
 	Open ConfigFile:"R":FileOpenTimeOut
 	If '$Test Do  Quit
@@ -1194,7 +1212,9 @@ cconsole
 	; Processes cconsole.log
 	New cconsoleFile,cconsoleSize,x
 	Do WriteParagraph("cconsole","cconsole.log")
-	Do WriteLog("<div class=""scrollable"" style=""width:100%;height:400px;"">")
+	Do WriteLog("<h4 id=""cconsoletoggle"" onclick=""javascript:toggle('cconsolediv','cconsoletoggle');"">&rtrif; Expand</h4>",0)	
+	//Do WriteLog("<div id=""cconsolediv"" class=""scrollable"" style=""width:100%;height:400px;"">")
+	Do WriteLog("<div id=""cconsolediv"" style=""display:none;"">")
 	Do WriteLog("<pre>",2)
 	Use PDev
 	If $Data(NoRun("cconsole")) Do  Quit
@@ -1361,6 +1381,13 @@ LogDeepSeeSetupSection
 	Do WriteLog("<tr>",4)
 	Do WriteLog("<td>",6)
 	Do WriteHeader4("Important Mappings",8)
+	
+	ZN "%SYS"
+	Set status=##Class(Config.Namespaces).Get(namespace,.nsprop)
+	If status=1 {
+		Do WriteLog("<p> Default DBs for globals and routines: "_nsprop("Globals")_", "_nsprop("Routines"),8)
+	}
+	
 	If '$D(DSTimeMapFrom(namespace)){
 		Do WriteLog("<p>^OBJ.DSTIME: no mappings defined</p>",8)
 	} Else{
@@ -1377,7 +1404,7 @@ LogDeepSeeSetupSection
 		}
 		Set sc = $$alertCacheMappings(namespace,.DeepSeeMap,.alerts)
 		If $D(DSTimeMapFrom(namespace)){
-			Set sc = $$alertDstimeRW(DSTimeMapFrom(namespace),.alerts)
+			Set sc = $$alertDStimeRW(DSTimeMapFrom(namespace),.alerts)
 		}
 	}	
 	Do WriteLog("</td>",6)
@@ -1452,7 +1479,7 @@ LogDeepSeeSetupSection
 	}
 	Quit
 
-alertDstimeRW(DSTimeMapFrom,alerts) {
+alertDStimeRW(DSTimeMapFrom,alerts) {
 	Try {
 		ZN "%SYS"
 		//Check if DB is Read-Write
@@ -1735,12 +1762,13 @@ QueryLog
 	For k=1:1{
 		Set username=$O(^[namespace]DeepSee.QueryLog(username),1)
 		If username="" Quit
-		Set numqueries=$Get(^[namespace]DeepSee.QueryLog(username))
-		Set totqueries=$O(^[namespace]DeepSee.QueryLog(username,""),-1)		
-		Do WriteLog("Last 5 of "_totqueries_" MDX queries by User: "_username)
+		Set totqueries=$O(^[namespace]DeepSee.QueryLog(username,""),-1)
+		Set numqueries = 5
+		Set:totqueries<5 numqueries = totqueries
+		Do WriteLog("Last "_numqueries_" of "_totqueries_" MDX queries by User: "_username)
 		Set counter=""
-		For i=1:1:5{
-			Quit:i=numqueries					//User has fewer than 5 queries
+		For i=1:1:numqueries{
+			Quit:i>totqueries				//User has fewer than 5 queries
 			Set counter=$O(^[namespace]DeepSee.QueryLog(username,counter),-1)
 			Set query=$Get(^[namespace]DeepSee.QueryLog(username,counter))
 			If query'=""{
@@ -1906,15 +1934,17 @@ DSLog
 	; Processes DeepSee Log file
 	New x
 	Set DSFile=$zu(12)_"DeepSeeTasks_"_namespace_".log"
-	Do WriteParagraph("dslog","DeepSee Log")
-	Do WriteLog("<div class=""scrollable"" style=""width:100%;height:400px;"">")
+	Do WriteParagraph("dslog","DeepSee Logs")
+	Do WriteLog("<h4 id=""dslogtoggle"" onclick=""javascript:toggle('dslogdiv','dslogtoggle');"">&rtrif; Expand</h4>",0)	
+	//Do WriteLog("<div id=""dslogdiv"" class=""scrollable"" style=""width:100%;height:400px;"">")
+	Do WriteLog("<div id=""dslogdiv"" style=""display:none;"">")
 	Do WriteLog("<pre>",2)
 	Use PDev	
-	Do WriteLog("DeepSee Log File "_DSFile_":"),WriteLog("")
+	Do WriteLog("DeepSee Logs File "_DSFile_":"),WriteLog("")
 	Set $ZTrap="DSLogErr"
 	Open DSFile:"R":FileOpenTimeOut
 	If '$Test Do  Quit
-	.	Do WriteLog("Error: could not open DeepSee Log File "_DSFile)
+	.	Do WriteLog("Error: could not open DeepSee Logs File "_DSFile)
 	.	Use LogFile Do WriteLog("</pre>") Use PDev
 	.	Quit
 	; Read timeout added to prevent the case where neither <ENDOFFILE> error nor $ZEOF terminate the loop
