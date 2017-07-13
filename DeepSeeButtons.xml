@@ -2426,10 +2426,8 @@ Dimensions
 	Do WriteLog("")
 	Do WriteLog("")
 	// Translate the filed names in %Analyze to actual specs
-	Do WriteLog("FieldNameToSpec("""_cube_""")")
-	Do WriteLog("")
-	Do WriteLog("----------------------------------------------------------------")
-	DO FieldNameToSpec(cube)  //worked
+	Write "FieldNameToSpec("""_cube_""")",!
+	Do FieldNameToSpec(cube)  //worked
 	Do WriteLog("")
 	Do WriteLog("")
 	Do WriteLog("")
@@ -2572,7 +2570,7 @@ OtherElements
 	Quit	
 
 FieldNameToSpec(pCubeName) {	
-	Set tSC = 1
+	Set tSC = $$$OK
 	Q:pCubeName=""
 	Try {	
 		Set tCube = $G(^DeepSee.Cubes("cubes",$zu(28,pCubeName,5),"indexName"),$zu(28,pCubeName,5))		
@@ -2601,6 +2599,11 @@ FieldNameToSpec(pCubeName) {
 		 				} ElseIf ((type="m") && (tIndex'="")) { //e.g. COUNT has no tIndex 
 		 					Set dimname = $LG(list,2) 	//this is always "Measures"
 		 					Set measname = $LG(list,3)
+		 					If '$D(fieldname2spec(tIndexName)) {
+		 						Set fieldname2spec(tIndexName) = "["_dimname_"].["_measname_"]"
+ 							} Else {
+	 							Set fieldname2spec(tIndexName) = fieldname2spec(tIndexName)_", ["_dimname_"].["_measname_"]"
+							}
 		 					Set fieldname2spec(tIndexName) = "["_dimname_"].["_measname_"]"
 		 					W !,?4,tIndexName,?41," ",fieldname2spec(tIndexName)
 		 				} ElseIf (type="r") {
@@ -2615,7 +2618,7 @@ FieldNameToSpec(pCubeName) {
 		 	}	
 			Set indD = $O(^DeepSee.Cubes("cubes",tCube,"mbr#",indD))
 		}
-		Set tSC = 1
+		Set tSC = $$$OK
 	}
 	Catch(ex) {
 		Set tSC = ex.AsStatus()
