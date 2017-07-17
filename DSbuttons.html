@@ -547,6 +547,9 @@ Linux amarin-Latitude-E7470 4.4.0-83-generic #106-Ubuntu SMP Mon Jun 26 17:54:43
 <h4>Cubes Based on Data Connectors</h4>
 <p>CONNECTORCUBE</p>
 <p>PATIENTSQUERYCUBE</p>
+<h4>BuildErrors</h4>
+<p class="red" title="Build errors are logged in the ^DeepSee.BuildErrors global.">Alert: 1000 build error(s) found</p>
+<p>1000 build error(s) for 'VERSIONED/PATIENTS:100'</p>
 <hr noshade size="4" width="auto">
 <a name="cuberegistry"></a>
 <h2>Cube Registry</h2>
@@ -1635,7 +1638,7 @@ ERROR #5002: Cache error: <CLASS DOES NOT EXIST>%GetCubeLevels+54^%DeepSee.Utils
 SELECT NON EMPTY NONEMPTYCROSSJOIN([PatGrpD].[H1].[Tested].Members,[Measures].[%COUNT]) ON 0,NON EMPTY [GenD].[H1].[Gender].Members ON 1 FROM [RELATEDCUBES/PATIENTS] %FILTER NONEMPTYCROSSJOIN([RELATEDCUBES/CITIES].[CitiesD].[H1].[ZIP].&[32007],%OR({[RELATEDCUBES/DOCTORS].[DOCD].[H1].[DOCTOR GROUP].&[<null>],[RELATEDCUBES/DOCTORS].[DOCD].[H1].[DOCTOR GROUP].&[II]}))
 </pre>
 <h4>MDX queries by user</h4>
-<h4>count querylog users=3</h4>
+<h4>Count querylog users = 3</h4>
 <pre class="wrapped">
 Last 5 of 22 MDX queries by User: SuperUser
 1) SELECT NON EMPTY NONEMPTYCROSSJOIN([PatGrpD].[H1].[Tested].Members,[Measures].[%COUNT]) ON 0,NON EMPTY [GenD].[H1].[Gender].Members ON 1 FROM [RELATEDCUBES/PATIENTS] %FILTER NONEMPTYCROSSJOIN([RELATEDCUBES/CITIES].[CitiesD].[H1].[ZIP].&[32007],%OR({[RELATEDCUBES/DOCTORS].[DOCD].[H1].[DOCTOR GROUP].&[<null>],[RELATEDCUBES/DOCTORS].[DOCD].[H1].[DOCTOR GROUP].&[II]}))
