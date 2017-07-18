@@ -98,7 +98,7 @@ GetCubesToLog(namespace) {
 	ZN namespace
 	Do ##class(%DeepSee.Utils).%GetCubeList(.cubeList,,1)
 	If '$d(cubeList){
-		Write "There are no cubes in this namespace!"
+		Write !,"There are no cubes in this namespace!"
 		Set cubeList=""
 		Quit cubeList
 	}
@@ -200,7 +200,8 @@ LaunchLogs(LogDirectory,Quiet,Debug,Big,CacheDir,Body,namespace,cubeList,getLogs
 	.	If 'Quiet Use PDev Write:$X ! Write !,Message
 	.	Set Return="0|"_Message
 	.	Quit	
-	If 'Quiet Use PDev Write:$X ! Write !,"Collecting information, please do not interrupt this process.",!,"Do not close terminal until the process has completed"
+	If 'Quiet Use PDev Write:$X ! 
+	Write "Collecting information, please do not interrupt this process.",!,"Do not close terminal until the process has completed"
  	Break 0
 	Set $ZTrap="MainErr"
 	Set EOF=$ZUtil(68,40)	
@@ -256,17 +257,20 @@ StartLogging(cubeList,getLogs,LogFile)
 		}
 	}
 	If getLogs=1{
+		Do WriteUpdate("Getting Query Log, DeepSee logs, and cconsole.log..")
 		Do QueryLog
-	}
-	If getLogs=1{
 		Do DSLog
 	}
 	Do CPF
 	If getLogs=1{
 		Do cconsole
 	}
+	Do WriteUpdate("Getting local databases information..")
+	Do DataBases
+	Do WriteUpdate("Getting journaling information..")
 	Do Journal
 	Do LogTrailer 
+	Do WriteUpdate("")
 	ZN "%SYS"
 	Close LogFile
 	Quit LogFile 
@@ -285,8 +289,8 @@ ListCubes(){
 	Write !, "Select a cube name or press enter to continue: "
 	Read cube
 	If cube'=""{
-		Write !,"Gathering detailed information on "_cube
-		hang 1
+		Write !,"Getting detailed information on "_cube
+		Hang 1
 	}
 	Quit cube		//returns "" if no cube number entered
 }
@@ -1036,6 +1040,11 @@ WriteHeader4(header,spaces)
 	Do WriteLog("<h4>"_header_"</h4>",spaces)
 	//Note: do not add !
 	
+WriteUpdate(msg)
+	Use PDev
+	Write $C(13,27)_"[0J"_msg
+	Use LogFile
+	
 ExternalCmd(Command)
 	; Executes an external program and adds its output to LogFile
 	; Requires the full specification of the Exe file
@@ -1045,7 +1054,7 @@ ExternalCmd(Command)
 	If OS?1"Win".e!(OS="VMS") Do ExtCmdFile
 	Use PDev
 	Quit
- 
+
 ExtCmdPipe
 	; Executing an OS command through a pipe works on UNIX
 	; It should also work on 32-bit Windows (NT, 2000 and XP), but I found inconsistent behavior on these platforms
@@ -1058,13 +1067,13 @@ ExtCmdPipe
 	Set $ZError=""
 	Close Command
 	Quit
- 
+
 ExtCmdPipeEOF
 	Set $ZTrap=""
 	Set $ZError=""
 	Close Command
 	Quit
- 
+
 ExtCmdFile
 	; Only to be executed when OS is Windows or VMS, when either pipes don't work or behave inconsistently
 	New Date,File,Time
@@ -1098,7 +1107,6 @@ ExtCmdFile
 	.	Quit
 	Set x=$ZUtil(140,5,File) ; Delete temporary scratch file
 	Quit
- 
 ExtCmdFileEOF
 	Set $ZTrap=""
 	Set $ZError=""
@@ -1109,12 +1117,12 @@ ExtCmdFileEOF
 	.	Quit
 	Set x=$ZUtil(140,5,File) ; Delete temporary scratch file
 	Quit
- 
+
 ExtCmdNoFile
 	Set $ZTrap=""
 	Set $ZError=""
 	Quit
- 
+
 CurDate()
 	; Returns Current Date as YYYYMMDD
 	New
@@ -1125,7 +1133,7 @@ CurDate()
 	Set Year=+$Piece(%DAT," ",3) If Year?2n Set Year=2000+Year
 	Set Month=$Find("JANFEBMARAPRMAYJUNJULAUGSEPOCTNOVDEC",MonthName)\3 If Month?1n Set Month=0_Month
 	Quit Year_Month_Day
- 
+
 CurTime()
 	; Returns Current Time as HHMM
 	New
@@ -1196,7 +1204,7 @@ CPF
 	Do WriteLog("</div>")
 	Use PDev
 	Quit
- 
+
 CPFErr
 	Set $ZTrap=""
 	Close ConfigFile
@@ -1246,15 +1254,16 @@ cconsole
 	Do WriteLog("</div>")
 	Use PDev
 	Quit
- 
+
 cconsoleErr
 	Set $ZTrap=""
 	Do WriteLog("Error: "_$ZError)
 	Quit 
- 
- 
+
+
  //////////DeepSee Setup section///////////
 LogDeepSeeSetupSection
+	Do WriteUpdate("Getting system information..")
 	Do WriteParagraph("deepseesetup","DeepSee Setup in "_namespace,0)
  	//Agent Count
  	ZN namespace
@@ -1528,7 +1537,7 @@ alertCacheMappings(ns,DeepSeeMap,alerts) {
 
 CountNodes(namespace,g){
 	ZN namespace
-	Quit:'$D(@g)
+	Return:'$D(@g) 0
 	For count=$D(@g)#10:1 Set g=$Query(@g) Quit:g=""
 	Return count
 }
@@ -1555,6 +1564,7 @@ PrintGlobal(namespace,glob,spaces){
 
 CubeData
 	try {
+		Do WriteUpdate("Getting information on cubes and cube registry..")
 		Do WriteParagraph("cubelist","Cubes in "_namespace)
 		Use PDev
 		ZN namespace
@@ -1566,8 +1576,7 @@ CubeData
 		 	Do WriteLog("There are no cubes in this namespace")
 		 	Write "</p>"  Use PDev
 		 	Quit
-	 	}
-	 	Else{
+	 	} Else {
 		 	Use LogFile
 		 	If ##class(%DeepSee.CubeManager.Utils).GetActiveRegistry()=""{
 			 	Do WriteLog("<p>No active registry so BuildTime and BuildRate will not be populated.</p>")
@@ -1582,11 +1591,11 @@ CubeData
 		 	  "<th>Source Class</th><th>Cube Class</th><th>Last Build/Synch</th><th>Related Cubes</th>",6)
 		 	Do WriteLog("</tr>",4)
 		 	Set storageList=""
-			Set inheritList=""
+			Set inheritList=""			
 			Set abstractcount = 0
 			For {
 				QUIT:cubenode=""				//Do the work to get info and write out the table
-				Set cubename=$list(plist(cubenode),1)
+				Set cubename=$list(plist(cubenode),1) 
 				If (cubename'="" && '##class(%DeepSee.Utils).%IsCubeAbstract(cubenode)) {		//if cube is not abstract
 					Do WriteLog("<tr>",4)
 					Do WriteLog("<td>"_cubename_"</td>",6)					//cubename					
@@ -1682,7 +1691,29 @@ CubeData
 					}
 			}
 	 	}
- 	} 
+	 	//Build Errors section
+	 	Do WriteHeader4("BuildErrors")
+	 	Set tCube = $O(^DeepSee.BuildErrors(""))
+	 	Set errs = 0
+	 	While (tCube'="") {
+		 	If (^DeepSee.BuildErrors(tCube)) {
+			 	Set errs(tCube) = ^DeepSee.BuildErrors(tCube)
+			 	Set errs = errs + errs(tCube)
+		 	}
+		 	Set tCube = $O(^DeepSee.BuildErrors(tCube))
+		}
+		If (errs) {
+			Set pre="<p class=""red"" title=""Build errors are logged in the ^DeepSee.BuildErrors global."">"
+			Set alert = "Alert: "_errs_" build error(s) found</p>"
+			Set alerts($I(alerts)) = alert
+			Do WriteLog(pre_alert,0)
+			Set tCube = $O(errs(""))
+			While (tCube'="") {
+				Do WriteLog("<p>"_errs(tCube)_" build error(s) for '"_tCube_"'</p>")
+				Set tCube = $O(errs(tCube))
+			}
+		}
+ 	}
  	catch exc {
 	 	Use PDev
 	 	zw exc
@@ -1752,7 +1783,7 @@ QueryLog
 		Set i=$O(^DeepSee.QueryLog(i))
 		Set users=$I(users)
  	}
- 	Do WriteHeader4("count querylog users="_users)
+ 	Do WriteHeader4("Count users = "_users)
  	ZN "%SYS"
  	If (users > 5) Do WriteLog("<div class=""scrollable"" style=""width:100%;height:400px;"">")
  	
@@ -1945,7 +1976,10 @@ DSLog
 	Open DSFile:"R":FileOpenTimeOut
 	If '$Test Do  Quit
 	.	Do WriteLog("Error: could not open DeepSee Logs File "_DSFile)
-	.	Use LogFile Do WriteLog("</pre>") Use PDev
+	.	Use LogFile 
+	.	Do WriteLog("</pre>")
+	.	Do WriteLog("</div>")
+	.	Use PDev
 	.	Quit
 	; Read timeout added to prevent the case where neither <ENDOFFILE> error nor $ZEOF terminate the loop
 	For  Use DSFile Read x:FileReadTimeOut Set ZEOF=$ZEof Use PDev Quit:'$Test!(ZEOF)  Use LogFile Write x,CRLF Use PDev
@@ -2008,10 +2042,9 @@ FindOrphanedCubes()
 		}
 	}
 }
-	   
-	   
-Journal
-	Set $ZTrap="JournalErr"
+
+DataBases
+	Set $ZTrap="DataBasesErr"
 	; CKEY^%SYS.LICENSE
 	Do WriteParagraph("LocalDB","Local Databases")
 	Do WriteLog("<br>")
@@ -2042,7 +2075,11 @@ Journal
 	If ('sc) Do DisplayError^%apiOBJ(sc)
 	Do WriteLog("</tbody>",2)
 	Do WriteLog("</table>")
+	Quit $$$OK
+
 	
+Journal
+	Set $ZTrap="JournalErr"
 	Do WriteParagraph("Journaling","Journaling")
 	ZN "%SYS"
 	Try{
@@ -2119,13 +2156,15 @@ Journal
 	}
 	Quit
 	
-JournalErr
+DataBasesErr
 	Set $ZTrap=""
 	Do WriteLog^Buttons("Error: "_$ZError)
 	Quit 
 
-
-
+JournalErr
+	Set $ZTrap=""
+	Do WriteLog^Buttons("Error: "_$ZError)
+	Quit 
 
 CubeSpec(namespace,cube,PDev,LogFile)
 	ZN namespace
@@ -2137,6 +2176,7 @@ CubeSpec(namespace,cube,PDev,LogFile)
 
 
 GetCubeInfo
+	Do WriteUpdate("Getting detailed cube information for "_cube)
 	Use LogFile
 	ZN namespace
 	Do WriteLog("<hr size=""4"" noshade>")
