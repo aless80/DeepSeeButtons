@@ -267,6 +267,8 @@ StartLogging(cubeList,getLogs,LogFile)
 	}
 	Do WriteUpdate("Getting local databases information..")
 	Do DataBases
+	Do WriteUpdate("Getting background tasks information..")
+	Do Tasks
 	Do WriteUpdate("Getting journaling information..")
 	Do Journal
 	Do LogTrailer 
@@ -684,11 +686,18 @@ LogHeader(cubeList,getLogs)
 		Do WriteLog("<a href=""#querylog"" title=""Last 5 MDX queries run by each users in the system"">Query Log</a>",2)
 		Do WriteLog("<a href=""#dslog"" title=""A log file with cube builds and errors occurred in the system"">DeepSee Logs</a>",2)	
 	}
+	/*
+	<hr noshade size="4" width="auto">
+<a name="Journaling"></a>
+<h2>Journaling</h2>
+<table id="journalinfoTable" cellpadding="7" cellspacing="3" class="tableWithBorders tableTabbed">
+  <tbody>*/
 	Do WriteLog("<a href=""#cpf"" title=""The Caché Parameter File containing recording the Caché configuration"">cache.cpf</a>",2)
 	If getLogs{
 		Do WriteLog("<a href=""#cconsole"" title=""cconsole.log file containing general messages and errors"">cconsole.log</a>",2)
 	}
   	Do WriteLog("<a href=""#LocalDB"">Local Databases</a>",2)
+  	Do WriteLog("<a href=""#Taskschedule"" title=""Information on background tasks"">Task Schedule</a>",2)
   	Do WriteLog("<a href=""#Journaling"" title=""Information on database journaling for the instance"">Journaling</a>",2)
   	Do WriteLog("</div>")
   	Do WriteLog("<div id=""main"">")
@@ -732,7 +741,7 @@ LogServerSetup()
 	Do WriteLog("<tr>",4)
 	Do WriteLog("<td>",6)
 	Do WriteHeader4("Log created by User",8)
-	Do WriteLog("<p>"_CurUser_" on "_%DAT_" at "_%TIM_"</p>",8)
+	Do WriteLog("<p>"_CurUser_" on "_$ZD($ZDH(%DAT,7),3)_" at "_%TIM_"</p>",8)
 	Do WriteLog("</td>",6)
 	Do WriteLog("</tr>",4)	
 	Do WriteLog("<tr>",4)
@@ -799,7 +808,7 @@ isTrak(namespace){
  
 LogTrailer
 	; Records a Trailer record to LogFile
-	Do WriteParagraph("end","End of Caché Diagnostic Log")	
+	Do WriteParagraph("end","End of DeepSeeButtons")	
 	Do WriteLog("<p>"_ConfigName_" on Machine """_HostName_"""</p>")
 	Do WriteLog("</div>")
 	Do WriteLog("</body>")
@@ -828,7 +837,7 @@ Timeup
 	//Do WriteLog("Started on "_$ZDATETIME(oh))
 	//W !,"<p>Caché Started on "_$ZDATETIME(oh)_". As of this report Caché has been up for "_days_" days "_hours_" hours "_minutes_" minutes "_seconds_" seconds"_"</p>"
 	Do WriteHeader4("Last Caché Startup",8)
-	Do WriteLog("<p>"_$ZDATETIME(oh)_". As of this report Caché has been up for "_days_" days "_hours_" hours "_minutes_" minutes "_seconds_" seconds"_"</p>",8)
+	Do WriteLog("<p>"_$ZDATETIME(oh,3)_". As of this report Caché has been up for "_days_" days "_hours_" hours "_minutes_" minutes "_seconds_" seconds"_"</p>",8)
 	Quit
 	
 TimeupErr
@@ -926,7 +935,7 @@ OSVer
 	Do WriteLog("<p>",8)
 	Do ExternalCmd(Cmd)
 	If OS="UNIX" Set uname=$$uname()
-	If uname?1"AIX".e {
+	If ($D(uname) && (uname?1"AIX".e)) {
 		Do WriteLog(" -- ",8)
 		Do ExternalCmd("lsattr -El proc0")
 	}
@@ -1595,19 +1604,19 @@ CubeData
 			Set abstractcount = 0
 			For {
 				QUIT:cubenode=""				//Do the work to get info and write out the table
-				Set cubename=$list(plist(cubenode),1) 
+				Set cubename=$list(plist(cubenode),1)
 				If (cubename'="" && '##class(%DeepSee.Utils).%IsCubeAbstract(cubenode)) {		//if cube is not abstract
 					Do WriteLog("<tr>",4)
 					Do WriteLog("<td>"_cubename_"</td>",6)					//cubename					
 					Set cubecaption=##class(%DeepSee.Utils).%GetCubeCaption(cubename)
 					Do WriteLog("<td>"_cubecaption_"</td>",6)
 					Set cubeclass=##class(%DeepSee.Utils).%GetCubeClass(cubename) //cube class
-					Set lastmod=$zdt($lg(plist(cubenode),3))				//last cube compile
+					Set lastmod=$zdt($lg(plist(cubenode),3),3)				//last cube compile
 					Set type=$lg(plist(cubenode),4)							//subject area or cube?					
 					Set facts=##class(%DeepSee.Utils).%GetCubeFactCount(cubename)	//number of facts					
-					Set moddate=$p(lastmod," ",1)
-					Set modtime=$p(lastmod," ",2)
-					Set lastmod=moddate_" "_modtime
+					//Set moddate=$p(lastmod," ",1)
+					//Set modtime=$p(lastmod," ",2)
+					//Set lastmod=moddate_" "_modtime
   					//DTB422 moved ^DeepSee.Cubes to ^DeepSee.Update
 					If ($d(^DeepSee.Cubes("cubes",cubenode,"lastDataUpdate"))=1) {
 						Set lastDataUpdate = ^DeepSee.Cubes("cubes",cubenode,"lastDataUpdate")
@@ -1617,11 +1626,10 @@ CubeData
 						Set lastDataUpdate = 0
 					}
 					If (lastDataUpdate'=0){
-						Set lastSync=$zdt(lastDataUpdate)	//Last cube sync from cube global
-						If lastSync="12/31/1840"{
+						Set lastSync=$zdt(lastDataUpdate,3)	//Last cube sync from cube global
+						If lastSync="1840-12-31"{
 							Set lastSync="-"
-						}
-						Else{
+						} Else{
 							Set syncdate=$p(lastSync," ",1)
 							Set synctime=$p(lastSync," ",2)
 							Set lastSync=syncdate_" "_synctime
@@ -1631,13 +1639,13 @@ CubeData
 						Set lastSync="N/A"
 					}					
 					Set buildtime=$$GetBuildTime(cubename)
-					Do WriteLog("<td>"_buildtime_"</td>",6)
-					Do WriteLog("<td>"_facts_"</td>",6)
+					Do WriteLog("<td>"_$FNUMBER(buildtime,",")_"</td>",6)
+					Do WriteLog("<td>"_$FNUMBER(facts,",")_"</td>",6)
 					Try {
 						If ((buildtime="N/A") || (facts=0)) {
 							Set rate="N/A"
 						} Else {
-							Set rate=$fnumber(facts/buildtime,",",2)
+							Set rate=$FNUMBER(facts/buildtime,",",2)
 						}
 					} Catch {
 						Set rate="N/A"
@@ -1740,13 +1748,13 @@ GetLastBuild(CubeEvent,cubename) [cubename,CubeEvent,cubekey,cubeevent,totaltime
 	}
 	IF SQLCODE=0 {
 		If CubeEvent="Synch"{
-    		Set string=$fnumber(factsupdated,",")_" facts synched on "_finishtime_" in "_totaltime_" seconds"
+    		Set string=$FNUMBER(factsupdated,",")_" facts synched on "_finishtime_" in "_totaltime_" seconds"
 		} ElseIf CubeEvent="Build"{
-			Set string=$fnumber(cubesize,",")_" facts built on "_finishtime_" in "_totaltime_" seconds"
+			Set string=$FNUMBER(cubesize,",")_" facts built on "_finishtime_" in "_totaltime_" seconds"
 		} ElseIf CubeEvent="Update"{
 			Set string="on "_finishtime
 		} ElseIf CubeEvent="Repair"{
-			Set string=$fnumber(cubesize,",")_" facts built on "_finishtime_" in "_totaltime_" seconds"
+			Set string=$FNUMBER(cubesize,",")_" facts built on "_finishtime_" in "_totaltime_" seconds"
 		} Else {			
 			Set string=CubeEvent_" event on "_finishtime_" in "_totaltime
 		}
@@ -1763,7 +1771,47 @@ GetLastBuild(CubeEvent,cubename) [cubename,CubeEvent,cubekey,cubeevent,totaltime
  //Get last 5 queries run by each user
 QueryLog
 	Do WriteParagraph("querylog","Query Log")
-	Do WriteHeader4("Last query")
+	
+	//Do WriteParagraph("cconsole","cconsole.log")
+	Do WriteLog("<h4 id=""querylogtoggle"" onclick=""javascript:toggle('querylogdiv','querylogtoggle');"">&rtrif; Expand</h4>",0)
+	//Do WriteLog("<div id=""cconsolediv"" class=""scrollable"" style=""width:100%;height:400px;"">")
+	Do WriteLog("<div id=""querylogdiv"" style=""display:none;"">")
+	
+	
+	
+	
+	//Get usercount in ^DeepSee.QueryLog
+ 	ZN namespace
+ 	Set user=$O(^DeepSee.QueryLog(""))
+ 	Set usercount=0
+ 	While (user'="") {
+ 		Set userqueries(user)=$G(^DeepSee.QueryLog(user))
+		Set usercount=$I(usercount)
+		Set user=$O(^DeepSee.QueryLog(user))
+ 	}
+ 	//Show table with number of queries run by users
+ 	Do WriteHeader4("Users running MDX queries")
+ 	Do WriteLog("<p>Number of users = "_usercount_"</p>")
+ 	If $D(userqueries) {
+ 		Do WriteLog("<table id=""QueryLogTable"" cellpadding=""5"" cellspacing=""5"" class=""tableWithBorders"">")
+		Do WriteLog("<tbody>",2)
+		Do WriteLog("<tr>",4)
+		Do WriteLog("<th>User</th>",6)
+		Do WriteLog("<th>Queries run</th>",6)
+		Do WriteLog("</tr>",4)
+		Set u = $O(userqueries(""))
+		While (u'="") {
+			Do WriteLog("<tr>",4)
+			Do WriteLog("<td>"_u_"</td>",6)
+			Do WriteLog("<td>"_userqueries(u)_"</td>",6)
+			Do WriteLog("</tr>",4)
+			Set u = $O(userqueries(u))		
+		}	
+ 		Do WriteLog("</tbody>",2)
+ 		Do WriteLog("</table>")
+ 	}
+ 	//Last Query subsection
+ 	Do WriteHeader4("Last query")
 	Do WriteLog("<pre>")
 	Use PDev
 	Set lastquery=$g(^[namespace]DeepSee.LastQuery)		//Display last query
@@ -1773,20 +1821,10 @@ QueryLog
 	}
 	Use LogFile
 	Do WriteLog("</pre>")
-	Do WriteHeader4("MDX queries by user")
-	
-	//Count users in ^DeepSee.QueryLog
- 	ZN namespace
- 	Set i=$O(^DeepSee.QueryLog(""))
- 	Set users=0
- 	While (i'="") {
-		Set i=$O(^DeepSee.QueryLog(i))
-		Set users=$I(users)
- 	}
- 	Do WriteHeader4("Count users = "_users)
+	//Subsection with 5 last queries for each user
+ 	Do WriteHeader4("MDX queries by user")
  	ZN "%SYS"
- 	If (users > 5) Do WriteLog("<div class=""scrollable"" style=""width:100%;height:400px;"">")
- 	
+ 	//If (usercount > 5) Do WriteLog("<div class=""scrollable"" style=""width:100%;height:400px;"">")
 	Do WriteLog("<pre class=""wrapped"">")
 	Use PDev
 	Set username=""
@@ -1811,7 +1849,8 @@ QueryLog
 	}
 	Use LogFile
 	Do WriteLog("</pre>")
- 	If (users > 5) Do WriteLog("</div>")
+ 	//If (usercount > 5) Do WriteLog("</div>") 	
+ 	Do WriteLog("</div>") //Close Expand/Collapse div	
 	Use PDev
 	Quit
 	
@@ -2048,7 +2087,7 @@ DataBases
 	; CKEY^%SYS.LICENSE
 	Do WriteParagraph("LocalDB","Local Databases")
 	Do WriteLog("<br>")
-	Do WriteLog("<table id=""journalTable"" border=""0"" cellpadding=""7"" cellspacing=""3"" class=""zebraStriped"">")
+	Do WriteLog("<table id=""databaseTable"" border=""0"" cellpadding=""7"" cellspacing=""3"" class=""zebraStriped"">")
 	Do WriteLog("<tbody>",2)
 	Do WriteLog("<tr>",4)
 	Do WriteLog("<th>Database</th><th>Directory</th><th>Size in MB</th><th>Status</th><th>Resource</th><th>Encrypted</th><th>Journal</th>",6)
@@ -2065,7 +2104,7 @@ DataBases
 		Do WriteLog("<tr>",6)
 		Do WriteLog("<td>"_result.Data("Name")_"</td>",8)
 		Do WriteLog("<td>"_result.Data("Directory")_"</td>",8)
-		Do WriteLog("<td>"_result.Data("Size in MB")_"</td>",8)
+		Do WriteLog("<td>"_$FNUMBER(result.Data("Size in MB"),",",0)_"</td>",8)
 		Do WriteLog("<td>"_result.Data("Status")_"</td>",8)
 		Do WriteLog("<td>"_result.Data("Resource")_"</td>",8)
 		Do WriteLog("<td>"_result.Data("Encrypted")_"</td>",8)
@@ -2077,6 +2116,39 @@ DataBases
 	Do WriteLog("</table>")
 	Quit $$$OK
 
+Tasks
+	Set $ZTrap="TasksErr"
+	Do WriteParagraph("Taskschedule","Task schedule")
+	Use LogFile
+	ZN namespace
+	ZN "%SYS"	
+	Try {
+		Set rs = ##class(%ResultSet).%New("%SYS.Task:TaskListFilter")
+		Do rs.Execute()
+		Do WriteLog("<table id=""tasksTable"" border=""0"" cellpadding=""7"" cellspacing=""3"" class=""zebraStriped"">")
+		Do WriteLog("<tbody>",2)
+		Do WriteLog("<tr>",4)
+		Do WriteLog("<th>Task Name</th><th>Task Type</th><th>Namespace</th><th>Description</th><th>ID</th><th>Suspended</th><th>Last Finished</th><th>Next Scheduled</th>",6)
+
+		Do WriteLog("</tr>",4)
+		While (rs.Next()) {
+	Do WriteLog("<tr>",4)
+	Do WriteLog("<td>"_rs.%Get("Task Name")_"</td>",6)
+	Do WriteLog("<td>"_rs.%Get("Task Type")_"</td>",6)
+	Do WriteLog("<td>"_rs.%Get("Namespace")_"</td>",6)
+	Do WriteLog("<td>"_rs.%Get("Description")_"</td>",6)
+	Do WriteLog("<td>"_rs.%Get("ID")_"</td>",6)
+	Do WriteLog("<td>"_rs.%Get("Suspended")_"</td>",6)
+	Do WriteLog("<td>"_rs.%Get("Last Finished")_"</td>",6)
+	Do WriteLog("<td>"_rs.%Get("Next Scheduled")_"</td>",6)
+	Do WriteLog("</tr>",4)
+		}
+		Do WriteLog("</tbody>",2)
+		Do WriteLog("</table>",0)
+	} Catch {
+		Do WriteLog("<p>An error occurred</p>")
+	}
+	Quit
 	
 Journal
 	Set $ZTrap="JournalErr"
@@ -2161,6 +2233,11 @@ DataBasesErr
 	Do WriteLog^Buttons("Error: "_$ZError)
 	Quit 
 
+TasksErr
+	Set $ZTrap=""
+	Do WriteLog^Buttons("Error: "_$ZError)
+	Quit 
+	
 JournalErr
 	Set $ZTrap=""
 	Do WriteLog^Buttons("Error: "_$ZError)
@@ -2267,20 +2344,20 @@ GetCubeInfo
     Do WriteLog("<tr>",4)
     Do WriteLog("<td>",6)
     Do WriteLog("<h4>Fact Count</h4>",8)
-	Do WriteLog("<p>"_factcount_"</p>",8)
+	Do WriteLog("<p>"_$FNUMBER(factcount,",")_"</p>",8)
 	Do WriteLog("</td>",6)
     Do WriteLog("</tr>",4)
     Do WriteLog("<tr>",4)
     Do WriteLog("<td>",6)
 	Do WriteLog("<h4>Last Modified</h4>",8)
-	Do WriteLog("<p>"_moddate_"</p>",8)
+	Do WriteLog("<p>"_$ZDT($ZDTH(moddate),3)_"</p>",8)
     Do WriteLog("</td>",6)
     Do WriteLog("</tr>",4)
     //Cube Registry
     Do WriteLog("<tr>",4)
     Do WriteLog("<td>",6)
     Do WriteLog("<h4>Cube Registry</h4>",8)
-    S rs=##class(%ResultSet).%New("%DeepSee.CubeManager.RegistryMap:RegistryMapTableView")
+    S rs = ##class(%ResultSet).%New("%DeepSee.CubeManager.RegistryMap:RegistryMapTableView")
 	Set registered = ""
 	Set state = ""	
 	Do rs.Execute(cube)
@@ -2579,7 +2656,7 @@ OtherElements
 				Do WriteLog("<td>"_node_"</td>",8)				//Listing name
 			}
 			Set fieldString=$LG(listings(node),2)
-			If fieldString=""{
+			If fieldString="" {
 				Set fieldString="*No Fields - Custom SQL Listing*"
 			}
 			Set fieldList=$LFS(fieldString,",")
