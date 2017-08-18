@@ -1718,12 +1718,12 @@ CubeData
 		}
 		If (errs) {
 			Set pre="title=""Build errors are logged in the ^DeepSee.BuildErrors global."">"
-			Set alert = "Alert: "_errs_" build error(s) found"
+			Set alert = "Alert: "_$FNUMBER(errs,",")_" build error(s) found"
 			Set alerts($I(alerts)) = pre_alert
 			Do WriteLog("<p class=""red"" "_pre_alert_"</p>",0)
 			Set tCube = $O(errs(""))
 			While (tCube'="") {
-				Do WriteLog("<p>"_errs(tCube)_" build error(s) for '"_tCube_"'</p>")
+				Do WriteLog("<p>"_$FNUMBER(errs(tCube),",")_" build error(s) for '"_tCube_"'</p>")
 				Set tCube = $O(errs(tCube))
 			}
 		}
