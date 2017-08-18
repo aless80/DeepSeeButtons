@@ -271,6 +271,7 @@ StartLogging(cubeList,getLogs,LogFile)
 	Do Tasks
 	Do WriteUpdate("Getting journaling information..")
 	Do Journal
+	Do Alerts
 	Do LogTrailer 
 	Do WriteUpdate("")
 	ZN "%SYS"
@@ -476,7 +477,6 @@ LogHeader(cubeList,getLogs)
 	Do WriteLog("<title>",2)
 	Do WriteLog("Caché Diagnostic Log. Filename: "_LogFile,4)
 	Do WriteLog("</title>",2)
-#; CFL1524	
 	Do WriteLog("<meta http-equiv=""Content-Type"" content=""text/html; charset=UTF-8"">",2)
 	Do WriteLog("<script type=""text/javascript"">",2)
 	
@@ -502,7 +502,6 @@ LogHeader(cubeList,getLogs)
     Do WriteLog("document.getElementById(""mySidenav"").style.width = ""0px"";",6)
     Do WriteLog("document.getElementById(""main"").style.marginLeft= ""0px"";",6)
     Do WriteLog("}",4)
-    Do WriteLog("window.onload = openNav;",4)
 
     Do WriteLog("function sortTable(id,n) {",4)
   	Do WriteLog("var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;",6)
@@ -547,7 +546,21 @@ LogHeader(cubeList,getLogs)
 	Do WriteLog("}",10)
     Do WriteLog("}",8)
 	Do WriteLog("}",6)
+	Do WriteLog("//Show or remove the arrows",6)
+	Do WriteLog("console.log(n,dir)",6)
+	Do WriteLog("var ths = table.getElementsByTagName('TH')",8)
+	Do WriteLog("for (i = 0; i < ths.length; i++) {",8)
+	Do WriteLog("ths[i].innerHTML = ths[i].innerHTML.replace(' \u25B4','');",10)
+	Do WriteLog("ths[i].innerHTML = ths[i].innerHTML.replace(' \u25BE','');",10)
+	Do WriteLog("if (i == n) {",10)
+	Do WriteLog("ths[i].innerHTML = ths[i].innerHTML + ((dir == 'asc') ? ' &#x25BE;': ' &#x25B4;');",12)
+	Do WriteLog("}",10)
+	Do WriteLog("}",8)
+	
+	
 	Do WriteLog("}",4)
+	
+	Do WriteLog("window.onload = openNav;",4)
   	Do WriteLog("</script>",2)
   	
 	Do WriteLog("<style>",2)
@@ -631,7 +644,6 @@ LogHeader(cubeList,getLogs)
 	Do WriteLog("}",4)
     
     Do WriteLog(".scrollable {",4)
-    //Do WriteLog("display:none;",6)
     Do WriteLog("overflow:auto;",6)
     Do WriteLog("resize:both;",6)
 	Do WriteLog("}",4)
@@ -732,19 +744,12 @@ LogHeader(cubeList,getLogs)
 		Do WriteLog("<a href=""#querylog"" title=""Last 5 MDX queries run by each users in the system"">Query Log</a>",2)
 		Do WriteLog("<a href=""#dslog"" title=""A log file with cube builds and errors occurred in the system"">DeepSee Logs</a>",2)	
 	}
-	/*
-	<hr noshade size="4" width="auto">
-<a name="Journaling"></a>
-<h2>Journaling</h2>
-<table id="journalinfoTable" cellpadding="7" cellspacing="3" class="tableWithBorders tableTabbed">
-  <tbody>*/
 	Do WriteLog("<a href=""#cpf"" title=""The Caché Parameter File containing recording the Caché configuration"">cache.cpf</a>",2)
-	If getLogs{
-		Do WriteLog("<a href=""#cconsole"" title=""cconsole.log file containing general messages and errors"">cconsole.log</a>",2)
-	}
+	Do:getLogs WriteLog("<a href=""#cconsole"" title=""cconsole.log file containing general messages and errors"">cconsole.log</a>",2)
   	Do WriteLog("<a href=""#LocalDB"">Local Databases</a>",2)
   	Do WriteLog("<a href=""#Taskschedule"" title=""Information on background tasks"">Task Schedule</a>",2)
   	Do WriteLog("<a href=""#Journaling"" title=""Information on database journaling for the instance"">Journaling</a>",2)
+  	Do WriteLog("<a href=""#Alerts"" title=""Summary of all alerts found on the system"">Alerts</a>",2)
   	Do WriteLog("</div>")
   	Do WriteLog("<div id=""main"">")
 	Do WriteLog("<a name=""top""></a>")
@@ -851,7 +856,7 @@ isTrak(namespace){
 		return 0						//Method did not work so return 0
 	}
 }
- 
+
 LogTrailer
 	; Records a Trailer record to LogFile
 	Do WriteParagraph("end","End of DeepSeeButtons")	
@@ -1207,7 +1212,6 @@ CPF
 	; Processes Cache configuration file (usually Cache.cpf)
 	New x
 	Do WriteParagraph("cpf","cache.cpf file")
-	//Do WriteLog("<pre>"
 	Use PDev
 	Do WriteLog("")
 	Do WriteLog("<h4 id=""cpftoggle"" onclick=""javascript:toggle('cpfdiv','cpftoggle');"">&rtrif; Expand</h4>",0)
@@ -1224,28 +1228,27 @@ CPF
 	; Read timeout added to prevent the case where neither <ENDOFFILE> error nor $ZEOF terminate the loop
 	Set MapCount=1 		
 	Set NsCount=1
-	For{
-		  Use ConfigFile Read x:FileReadTimeOut
-		  If $p(x,".",1)="[Map"{				//Grab namespace we are mapping from
-			Set NsMap(NsCount)=x 
-			Set NsCount=$I(NsCount) 
-		  }
-		  If x["OBJ.DSTIME"{					//Grab OBJ.DSTIME mapping
-		  	Set DSTimeMap(NsCount)=x  
-		  }
-		  If $p(x,".",1)="Global_DeepSee"{		//Create array of DeepSee.* global mappings within this namespace
-			Set DeepSeeMap(NsCount,MapCount)=x
-			Set MapCount=$I(MapCount)
-		  }		  
-		  Set ZEOF=$ZEof 
-		  Use PDev 
-		  Quit:'$Test!(ZEOF)
-		  Use LogFile 
-		  Write x,CRLF 
-		  Use PDev
+	For {
+		Use ConfigFile Read x:FileReadTimeOut
+		If $p(x,".",1)="[Map"  {				//Grab namespace we are mapping from
+			Set NsMap(NsCount) = x
+			Set NsCount = $I(NsCount)
+		}
+		If x["OBJ.DSTIME" {						//Grab OBJ.DSTIME mapping
+			Set DSTimeMap(NsCount)=x
+		}
+		If $p(x,".",1)="Global_DeepSee" {		//Create array of DeepSee.* global mappings within this namespace
+			Set DeepSeeMap(NsCount,MapCount) = x
+			Set MapCount = $I(MapCount)
+		}
+		Set ZEOF=$ZEof 
+		Use PDev
+		Quit:'$Test!(ZEOF)
+		Use LogFile 
+		Write x,CRLF 
+		Use PDev
 	}
 	Close ConfigFile
-	Write "MAPPING STUFF",!
 	For i=1:1:NsCount{
 		Write NsMap(i),!
 		Set NumMaps=$O(DeepSeeMap(i,""),-1)
@@ -1448,9 +1451,7 @@ LogDeepSeeSetupSection
 	
 	ZN "%SYS"
 	Set status=##Class(Config.Namespaces).Get(namespace,.nsprop)
-	If status=1 {
-		Do WriteLog("<p> Default DBs for globals and routines: "_nsprop("Globals")_", "_nsprop("Routines"),8)
-	}
+	Do:status=1 WriteLog("<p> Default DBs for globals and routines: "_nsprop("Globals")_", "_nsprop("Routines"),8)
 	
 	If '$D(DSTimeMapFrom(namespace)){
 		Do WriteLog("<p>^OBJ.DSTIME: no mappings defined</p>",8)
@@ -1542,53 +1543,6 @@ LogDeepSeeSetupSection
  		Do WriteLog("</table>",0)
 	}
 	Quit
-
-alertDStimeRW(DSTimeMapFrom,alerts) {
-	Try {
-		ZN "%SYS"
-		//Check if DB is Read-Write
-		Set sc = ##class(Config.Databases).Get(DSTimeMapFrom, .prop)
-		Set db=##Class(SYS.Database).%OpenId(prop("Directory"))
-		Set readonly = db.ReadOnly
-		If readonly {
-			Set pre="<p class=""red"" title=""In Caché versions including DevChange DTB422 ^OBJ.DSTIME and ^DeepSee.Update should be mapped to a Read-Write database"">"
-			Set alert = "Alert: ^OBJ.DSTIME and/or ^DeepSee.Update are stored in the "_DSTimeMapFrom_" database, which should be Read-Write"
-			Set alerts($I(alerts)) = alert
-			Do WriteLog(pre_alert_"</p>",8)
-		}
-		Set tSC = 1
-	} Catch (exc) {
-		Set tSC = exc.AsStatus()
-	}
-	Quit tSC
-}
-
-alertCacheMappings(ns,DeepSeeMap,alerts) {
-	Try {
-		Set mapcount=$O(DeepSeeMap(ns,""))
- 		While mapcount'="" {
- 			Set global=$P($P(DeepSeeMap(ns,mapcount),"_",2,*),"=",1)
-			Set DB=$P($P(DeepSeeMap(ns,mapcount),"_",2,*),"=",2,*)
-			If ((global="DeepSee.Cache.*") || (global="DeepSee.Cache*")) {
-				//Check if DB is journaled
-				Set sc = ##class(Config.Databases).Get(DB, .prop)
-				Set db=##Class(SYS.Database).%OpenId(prop("Directory"))
-				Set journaled = (db.GlobalJournalState = 3)
-				If journaled {
-					Set pre="<p class=""red"" title=""Journaling the DeepSee cache leads to problems with disk size and query performance"">"
-					Set alert = "Alert: The DeepSee cache stored in the "_DB_" database is journaled"
-					Set alerts($I(alerts)) = alert
-					Do WriteLog(pre_alert_"</p>",8)
-				}
-			}
-			Set mapcount=$O(DeepSeeMap(ns,mapcount))
-		}
-		Set tSC = $$$OK
-	} Catch (exc) {
-		Set tSC = ex.AsStatus()
-	}
-	Quit tSC
-}
 
 CountNodes(namespace,g){
 	ZN namespace
@@ -1757,10 +1711,10 @@ CubeData
 		 	Set tCube = $O(^DeepSee.BuildErrors(tCube))
 		}
 		If (errs) {
-			Set pre="<p class=""red"" title=""Build errors are logged in the ^DeepSee.BuildErrors global."">"
-			Set alert = "Alert: "_errs_" build error(s) found</p>"
-			Set alerts($I(alerts)) = alert
-			Do WriteLog(pre_alert,0)
+			Set pre="title=""Build errors are logged in the ^DeepSee.BuildErrors global."">"
+			Set alert = "Alert: "_errs_" build error(s) found"
+			Set alerts($I(alerts)) = pre_alert
+			Do WriteLog("<p class=""red"" "_pre_alert_"</p>",0)
 			Set tCube = $O(errs(""))
 			While (tCube'="") {
 				Do WriteLog("<p>"_errs(tCube)_" build error(s) for '"_tCube_"'</p>")
@@ -1842,7 +1796,7 @@ QueryLog
  		Do WriteLog("<table id=""QueryLogTable"" cellpadding=""5"" cellspacing=""5"" class=""tableWithBorders"">")
 		Do WriteLog("<tbody>",2)
 		Do WriteLog("<tr>",4)
-		Do WriteLog("<th onclick=""sortTable('QueryLogTable',0)"">User</th>",6)
+		Do WriteLog("<th onclick=""sortTable('QueryLogTable',0)"">Use &#x25B4;</th>",6)
 		Do WriteLog("<th onclick=""sortTable('QueryLogTable',1)"">Queries run</th>",6)
 		Do WriteLog("</tr>",4)
 		Set u = $O(userqueries(""))
@@ -2129,7 +2083,7 @@ FindOrphanedCubes()
 }
 
 DataBases
-	Set $ZTrap="DataBasesErr"
+	Set $ZTrap="CatchErr"
 	; CKEY^%SYS.LICENSE
 	Do WriteParagraph("LocalDB","Local Databases")
 	Do WriteLog("<br>")
@@ -2163,7 +2117,7 @@ DataBases
 	Quit $$$OK
 
 Tasks
-	Set $ZTrap="TasksErr"
+	Set $ZTrap="CatchErr"
 	Do WriteParagraph("Taskschedule","Task schedule")
 	Use LogFile
 	ZN namespace
@@ -2199,9 +2153,9 @@ Tasks
 	Do WriteLog("</tbody>",2)
 	Do WriteLog("</table>",0)
 	Quit
-	
+
 Journal
-	Set $ZTrap="JournalErr"
+	Set $ZTrap="CatchErr"
 	Do WriteParagraph("Journaling","Journaling")
 	ZN "%SYS"
 	Try{
@@ -2277,22 +2231,27 @@ Journal
 		Do WriteLog("<p>An error occurred</p>")
 	}
 	Quit
-	
-DataBasesErr
-	Set $ZTrap=""
-	Do WriteLog^Buttons("Error: "_$ZError)
-	Quit 
 
-TasksErr
+Alerts
+	Set $ZTrap="CatchErr"
+	Do WriteParagraph("Alerts","Alerts")
+	If $D(alerts)>9 { 	//alerts is an array
+		Do WriteLog("<p>The following alerts were raised on this system. Please find more details above</p>")
+		Set i = $O(alerts(""))
+		While (i'="") {
+			Do WriteLog(" <p "_alerts(i)_"</p>")
+			Set i = $O(alerts(i))
+		}		
+	} Else {
+		Do WriteLog("<p>No alerts"_"</p>")
+	}
+	Quit
+	
+CatchErr
 	Set $ZTrap=""
-	Do WriteLog^Buttons("Error: "_$ZError)
+	Do WriteLog("<p>Error: "_$ZError_"</p>")
 	Quit 
 	
-JournalErr
-	Set $ZTrap=""
-	Do WriteLog^Buttons("Error: "_$ZError)
-	Quit 
-
 CubeSpec(namespace,cube,PDev,LogFile)
 	ZN namespace
 		Do GetCubeInfo
@@ -2472,14 +2431,60 @@ GetCubeInfo
 	ZN "%SYS"
 	Quit
 
+alertDStimeRW(DSTimeMapFrom,alerts) {
+	Try {
+		ZN "%SYS"
+		//Check if DB is Read-Write
+		Set sc = ##class(Config.Databases).Get(DSTimeMapFrom, .prop)
+		Set db=##Class(SYS.Database).%OpenId(prop("Directory"))
+		Set readonly = db.ReadOnly
+		If readonly {
+			Set pre="title=""In Caché versions including DevChange DTB422 ^OBJ.DSTIME and ^DeepSee.Update should be mapped to a Read-Write database"">"
+			Set alert = "Alert: ^OBJ.DSTIME and/or ^DeepSee.Update are stored in the "_DSTimeMapFrom_" database, which should be Read-Write"
+			Set alerts($I(alerts)) = pre_alert
+			Do WriteLog("<p class=""red"" "_pre_alert_"</p>",8)
+		}
+		Set tSC = 1
+	} Catch (exc) {
+		Set tSC = exc.AsStatus()
+	}
+	Quit tSC
+}
+
+alertCacheMappings(ns,DeepSeeMap,alerts) {
+	Try {
+		Set mapcount=$O(DeepSeeMap(ns,""))
+ 		While mapcount'="" {
+ 			Set global=$P($P(DeepSeeMap(ns,mapcount),"_",2,*),"=",1)
+			Set DB=$P($P(DeepSeeMap(ns,mapcount),"_",2,*),"=",2,*)
+			If ((global="DeepSee.Cache.*") || (global="DeepSee.Cache*")) {
+				//Check if DB is journaled
+				Set sc = ##class(Config.Databases).Get(DB, .prop)
+				Set db=##Class(SYS.Database).%OpenId(prop("Directory"))
+				Set journaled = (db.GlobalJournalState = 3)
+				If journaled {
+					Set pre="title=""Journaling the DeepSee cache leads to problems with disk size and query performance"">"
+					Set alert = "Alert: The DeepSee cache stored in the "_DB_" database is journaled"
+					Set alerts($I(alerts)) = pre_alert
+					Do WriteLog("<p class=""red"" "_pre_alert_"</p>",8)
+				}
+			}
+			Set mapcount=$O(DeepSeeMap(ns,mapcount))
+		}
+		Set tSC = $$$OK
+	} Catch (exc) {
+		Set tSC = ex.AsStatus()
+	}
+	Quit tSC
+}
 
 alertInitialBuildCubeManager(cube,msgrepair,msgbuild,alerts) {
 	Try {
 		If ((msgrepair="Not found") && (msgbuild="Not found")) {
-			Set pre="<p class=""red"" title=""Before you synchronize cubes from the Cube Manager, it is necessary to build the cubes at least once from the Cube Manager."">"
+			Set pre="title=""Before you synchronize cubes from the Cube Manager, it is necessary to build the cubes at least once from the Cube Manager."">"
 			Set alert = "Alert: there is no record for the initial build of "_cube_" from Cube Manager. Check if the cube is updating"
-			Set alerts($I(alerts)) = alert
-			Do WriteLog(pre_alert_"</p>",8)
+			Set alerts($I(alerts)) = pre_alert
+			Do WriteLog("<p class=""red"" "_pre_alert_"</p>",8)
 		}
 		Set tSC = 1
 	} Catch(ex) {
