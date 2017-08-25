@@ -239,7 +239,8 @@ StartLogging(cubeList,getLogs,LogFile)
 	Do LogServerSetup
 	
 	/*Set st=$$WIP
-	Return:(st'=$$$OK) 0*/
+	Return:(st'=$$$OK) 0
+	*/
 	
 	Do CubeData
 	Do GetCubeRegistry	
@@ -2820,8 +2821,8 @@ WIP(){
 	s st=$$$OK
 	s tmpfile="osinfo"
 	
-	Do init()
-	Do OSFamily()		
+	Set OSFamily=$$init2()
+ 	Do OSFamily(OSFamily)	
 
 	} Catch(ex) {
 		Set st = ex.AsStatus()
@@ -2832,7 +2833,7 @@ WIP(){
 }
  	
 	
-init(){
+init2(){
 	s OSFamily=$System.Version.GetCompBuildOS()  //UNIX
 	s Majver=$System.Version.GetMajor()  //2017
 	s Minver=$System.Version.GetMinor()  //2
@@ -2841,13 +2842,19 @@ init(){
 	s cpffile=$zu(86),configname=$p(cpffile,"*",2),cpffile=$p(cpffile,"*")
  //	d chkver()
  //	i '$D(^pButtons("profile")) d default()
-	q
+ 
+ 
+ 
+	q OSFamily
 	}
-OSFamily() { //this is called by work(), which is called a few lines after init()
-	
+OSFamily(OSFamily) { //this is called by work(), which is called a few lines after init()
 	//..
 	if (OSFamily="NT")||(OSFamily="Windows") { do Windoze() }  ; windows is 5.1+
-	else { do UNIX() }
+	else { 
+		do UNIX() 
+	}
+	quit
+	
 	//etc
 }
 
@@ -2856,17 +2863,23 @@ Windoze() {
 
 UNIX() {; unix section
  //s $zt="err"
-	if debug set pButtons("family")="unix"
-	if $zu(69,51)||($d(^pButtons("cmds","cstat","useccontrol"))) { s cstatcom="ccontrol stat " } else { s cstatcom=$SYSTEM.Util.BinaryDirectory()_"cstat -s. " }
+ //	if debug set pButtons("family")="unix"
+ 	if $zu(69,51)||($d(^pButtons("cmds","cstat","useccontrol"))) { //0
+ 		s cstatcom="ccontrol stat " 		
+ 	} else { 
+ 		s cstatcom=$SYSTEM.Util.BinaryDirectory()_"cstat -s. " 
+ 	}
 	s cstatout=" >> ",os="unix"
-	q:lite'=0
+	
+	
+ //q:lite'=0
 	s rootid=$$getrootid
 	s eof=$zu(68,40,1)
 	; generate unix worklist
 	; first distinguish between flavours of unix
 	i $zv["Tru64" { s OSspec="Tru64" } else { s OSspec=$tr($p($system.Version.Format(2)," ",4),"()","") }
 	;  do specific pieces for each os...
-	i debug w OSspec,!
+ //	i debug w OSspec,!
 	do $case(OSspec,
 		/*"Oracle"	:UXsol,
 		"Solaris"	:UXsol,
@@ -2889,12 +2902,11 @@ UNIX() {; unix section
 	; now do the cpu/mem/disk stuff which is the same logic no matter the flavour
 	; just pull the actual command from the global
 	; 
-	
 	//ETC ETC!! see code
 	quit
 }	
 	
-UXlin(){	
+UXlin(){
 	s os="linux",linuxbug=1
 	//i debug w os,!
 	i '$D(^pButtons("cmds","cpu"))||$D(^pButtons("cmds","unknown")) {
@@ -2902,8 +2914,12 @@ UXlin(){
 	} else {
  //		d checkawk($g(^pButtons("cmds","check")))
 	}
-	s tmpfile=logdir_"osinfo"
+	//s tmpfile=logdir_"osinfo"
+	s tmpfile="/home/amarin/Desktop/osinfo"
+	
+ S ^Ale($I(^Ale),"tmpfile")=tmpfile
 	i $zf(-1,"echo uname -a: `uname -a` > "_tmpfile)
+	quit
 	i $zf(-1,"echo issue: >> "_tmpfile_"; cat /etc/issue.net >> "_tmpfile)
 	i $zf(-1,"echo >> "_tmpfile)
 	i $zf(-1,"echo lsb_release: >> "_tmpfile_"; lsb_release -a >> "_tmpfile_" 2>&1")
