@@ -237,8 +237,12 @@ StartLogging(cubeList,getLogs,LogFile)
 	Do LogHeader(cubeList,getLogs)
 	Do LogDeepSeeSetupSection
 	Do LogServerSetup
+	
+	/*Set st=$$WIP
+	Return:(st'=$$$OK) 0*/
+	
 	Do CubeData
-	Do GetCubeRegistry
+	Do GetCubeRegistry	
 	If (($D(cubeList)'=0) && (cubeList'="")){   
 		Do WriteParagraph("cubeinfo","Cube Info")
 		Set cubeListLength=$ll(cubeList)
@@ -554,7 +558,7 @@ LogHeader(cubeList,getLogs)
     Do WriteLog("}",8)
     Do WriteLog("delete isStr;",8)
 	Do WriteLog("}",6)
-	Do WriteLog("//Show or remove the arrows",6)
+	Do WriteLog("//Show or remove the triangles",6)
 	Do WriteLog("console.log('Column: ',n,', Sorting: ',dir,isStr?'string':'numeric')",6)
 	Do WriteLog("var ths = table.getElementsByTagName('TH')",8)
 	Do WriteLog("for (i = 0; i < ths.length; i++) {",8)
@@ -1802,7 +1806,7 @@ QueryLog
  		Do WriteLog("<table id=""QueryLogTable"" cellpadding=""5"" cellspacing=""5"" class=""tableWithBorders"">")
 		Do WriteLog("<tbody>",2)
 		Do WriteLog("<tr>",4)
-		Do WriteLog("<th onclick=""sortTable('QueryLogTable',0)"">Use &#x25B4;</th>",6)
+		Do WriteLog("<th onclick=""sortTable('QueryLogTable',0)"">Use</th>",6)
 		Do WriteLog("<th onclick=""sortTable('QueryLogTable',1)"">Queries run</th>",6)
 		Do WriteLog("</tr>",4)
 		Set u = $O(userqueries(""))
@@ -2802,6 +2806,273 @@ FieldNameToSpec(pCubeName) {
 		Set tSC = ex.AsStatus()
 	}
 }
+	
+	
+	
+	
+	
+	
+	
+	/////////////////////////////////////// WORK IN PROGRESS
+
+WIP(){
+	Try {
+	s st=$$$OK
+	s tmpfile="osinfo"
+	
+	Do init()
+	Do OSFamily()		
+
+	} Catch(ex) {
+		Set st = ex.AsStatus()
+		Do WriteLog("<p>WIP error</p>")		
+		Do WriteLog(st)
+		}
+	Quit st
+}
+ 	
+	
+init(){
+	s OSFamily=$System.Version.GetCompBuildOS()  //UNIX
+	s Majver=$System.Version.GetMajor()  //2017
+	s Minver=$System.Version.GetMinor()  //2
+	i Majver<5 w "Sorry this won't work on this version of Caché",! q  // not tested on non-5.0 systems.
+	s Build=$System.Version.Format(5) 	//2017.2 (Build 649)
+	s cpffile=$zu(86),configname=$p(cpffile,"*",2),cpffile=$p(cpffile,"*")
+ //	d chkver()
+ //	i '$D(^pButtons("profile")) d default()
+	q
+	}
+OSFamily() { //this is called by work(), which is called a few lines after init()
+	
+	//..
+	if (OSFamily="NT")||(OSFamily="Windows") { do Windoze() }  ; windows is 5.1+
+	else { do UNIX() }
+	//etc
+}
+
+Windoze() {
+	}
+
+UNIX() {; unix section
+ //s $zt="err"
+	if debug set pButtons("family")="unix"
+	if $zu(69,51)||($d(^pButtons("cmds","cstat","useccontrol"))) { s cstatcom="ccontrol stat " } else { s cstatcom=$SYSTEM.Util.BinaryDirectory()_"cstat -s. " }
+	s cstatout=" >> ",os="unix"
+	q:lite'=0
+	s rootid=$$getrootid
+	s eof=$zu(68,40,1)
+	; generate unix worklist
+	; first distinguish between flavours of unix
+	i $zv["Tru64" { s OSspec="Tru64" } else { s OSspec=$tr($p($system.Version.Format(2)," ",4),"()","") }
+	;  do specific pieces for each os...
+	i debug w OSspec,!
+	do $case(OSspec,
+		/*"Oracle"	:UXsol,
+		"Solaris"	:UXsol,
+		"Sun"		:UXsol,
+		"IBM"		:UXaix,
+		"Alpha/64-bit":UXtru,
+		"Tru64"		:UXtru,
+		"Clusters"	:UXtru,*/
+		"Linux"		:UXlin,
+		"SUSE"		:UXlin,
+		"Red"		:UXlin)
+		/*"HP"		:UXhp,
+		"HP-UX"		:UXhp,
+		"HP-UX/Itanium":UXhp,
+		"Mac"		:UXmac,
+		"Apple"		:UXmac,
+		"Ubuntu"	:UXubu,
+					:UXunk)*/
+	;
+	; now do the cpu/mem/disk stuff which is the same logic no matter the flavour
+	; just pull the actual command from the global
+	; 
+	
+	//ETC ETC!! see code
+	quit
+}	
+	
+UXlin(){	
+	s os="linux",linuxbug=1
+	//i debug w os,!
+	i '$D(^pButtons("cmds","cpu"))||$D(^pButtons("cmds","unknown")) {
+ //		k ^pButtons("cmds") d deflinux()
+	} else {
+ //		d checkawk($g(^pButtons("cmds","check")))
+	}
+	s tmpfile=logdir_"osinfo"
+	i $zf(-1,"echo uname -a: `uname -a` > "_tmpfile)
+	i $zf(-1,"echo issue: >> "_tmpfile_"; cat /etc/issue.net >> "_tmpfile)
+	i $zf(-1,"echo >> "_tmpfile)
+	i $zf(-1,"echo lsb_release: >> "_tmpfile_"; lsb_release -a >> "_tmpfile_" 2>&1")
+	i $zf(-1,"echo >> "_tmpfile)
+	i $zf(-1,"echo id: `id` >> "_tmpfile)
+	i $zf(-1,"echo >> "_tmpfile)
+	i $zf(-1,"echo ulimit -a: >> "_tmpfile_"; ulimit -a >> "_tmpfile)
+	; JEH002+ Add /proc/partitions and device mapper data to output file. Force blank lines for readability
+	if $zf(-1,"echo -ne '\n' >> "_tmpfile_"; echo /proc/partitions: >> "_tmpfile_"; cat /proc/partitions >> "_tmpfile)
+	if $zf(-1,"echo -ne '\n' >> "_tmpfile_"; echo /dev/mapper: >> "_tmpfile_"; ls -l /dev/mapper >> "_tmpfile)
+	; JEH002-
+  //do chk4vx(tmpfile)
+	s oscmd($i(cmdcnt))=$lb("Linux info","mv "_tmpfile_" ",,0)
+	s oscmd($i(cmdcnt))=$lb("cpu","cp /proc/cpuinfo ",,0)
+	s oscmd($i(cmdcnt))=$lb("ipcs","ipcs -a > ",,0)
+	i rootid s oscmd($i(cmdcnt))=$lb("fdisk -l","/sbin/fdisk -l > ",,0)
+	s oscmd($i(cmdcnt))=$lb("mount","mount > ")
+	s oscmd($i(cmdcnt))=$lb("df -m","df -m > ")
+	s oscmd($i(cmdcnt))=$lb("ifconfig","/sbin/ifconfig > ",,0)
+	s oscmd($i(cmdcnt))=$lb("sysctl -a","/sbin/sysctl -a > ",,0)
+	q
+}
+
+getrootid() {; find if root or not
+	n
+	s id=0
+	s eof=$zu(68,40,1)  //0
+ 	s io="id" o io:"RQ":2 i $T u io r line:2 c io i +$p(line,"=",2)=0 s id=1 
+	i $zu(68,40,eof)
+	q id
+}
+	/*
+#; The UXubu subroutine will be called from the UNIX() subroutine on an Ubuntu system.
+#; Its purpose is to set up ^pButtons("cmds"), collect general OS info, and begin to populate the oscmd array.
+#; The following variables are required for proper functioning.
+#; Inputs:
+#;   logdir   - string containing the log file directory
+#;   rootid   - 1 or 0, signifying whether or not to run commands which require root privileges
+#;   debug    - 1 or 0, signifying whether or not we should print debug messages
+#; Outputs:
+#;   oscmd    - array of OS commands to run
+#;   cmdcnt	  - integer counter of the number of OS commands
+#;   os       - string representing this OS, which is referenced later on in the work() subroutine
+#;   linuxbug - 1 or 0, used later on in the work() subroutine when we run the sar command
+UXubu() [logdir,rootid,debug,oscmd,cmdcnt,os,linuxbug] {	; currently we only support the 64-bit platform
+	set os="ubuntu",linuxbug=1
+	if debug write os,!
+	if '$data(^pButtons("cmds","cpu"))||$data(^pButtons("cmds","unknown")) {
+		kill ^pButtons("cmds")
+ //do defubuntu()
+	} else {
+		; call checkawk with os=ubuntu to ensure that we call "free" with -c before -s
+		do checkawk($get(^pButtons("cmds","check")),"ubuntu")
+	}
+	set tmpfile=logdir_"osinfo"
+	if $zf(-1,"echo uname -a: `uname -a` > "_tmpfile)
+	if $zf(-1,"echo issue: >> "_tmpfile_"; cat /etc/issue.net >> "_tmpfile)
+	if $zf(-1,"echo >> "_tmpfile)
+	if $zf(-1,"echo lsb_release: >> "_tmpfile_"; lsb_release -a >> "_tmpfile_" 2>&1")
+	if $zf(-1,"echo >> "_tmpfile)
+	if $zf(-1,"echo id: `id` >> "_tmpfile)
+	if $zf(-1,"echo >> "_tmpfile)
+	if $zf(-1,"echo ulimit -a: >> "_tmpfile_"; ulimit -a >> "_tmpfile)
+	; JEH002+ Add /proc/partitions and device mapper data to output file.
+	; AAR018+ modify JEH002 to use "echo >>" instead of "echo -ne '\n' >> " which doesn't work well on Ubuntu
+	if $zf(-1,"echo >> "_tmpfile)
+	if $zf(-1,"echo /proc/partitions: >> "_tmpfile_"; cat /proc/partitions >> "_tmpfile)
+	if $zf(-1,"echo >> "_tmpfile)
+	if $zf(-1,"echo /dev/mapper: >> "_tmpfile_"; ls -l /dev/mapper >> "_tmpfile)
+	; AAR018-
+	; JEH002-
+	do chk4vx(tmpfile)
+	set oscmd($increment(cmdcnt))=$listbuild("Ubuntu info","mv "_tmpfile_" ",,0)
+	set oscmd($increment(cmdcnt))=$listbuild("cpu","cp /proc/cpuinfo ",,0)
+	set oscmd($increment(cmdcnt))=$listbuild("ipcs","ipcs -a > ",,0)
+	if rootid set oscmd($increment(cmdcnt))=$listbuild("fdisk -l","/sbin/fdisk -l > ",,0)
+	set oscmd($increment(cmdcnt))=$listbuild("mount","mount > ")
+	set oscmd($increment(cmdcnt))=$listbuild("df -m","df -m > ")
+	set oscmd($increment(cmdcnt))=$listbuild("ifconfig","/sbin/ifconfig > ",,0)
+	set oscmd($increment(cmdcnt))=$listbuild("sysctl -a","/sbin/sysctl -a > ",,0)
+	quit
+}
+UXunk	; whoops error but should be some common cmds...
+	s os="unknown"
+	i debug w "Unable to identify Unix platform",os,!
+	i '$D(^pButtons("cmds","cpu")) d defunk()
+	s tmpfile=logdir_"osinfo"
+	i $zf(-1,"echo Failed to identify platform! > "_tmpfile)
+	i $zf(-1,"echo Debug info follows... >> "_tmpfile)
+	i $zf(-1,"echo OSspec: "_OSspec_" >> "_tmpfile)
+	i $zf(-1,"echo ""Product platform string: "_$system.Version.Format(2)_""" >> "_tmpfile)
+	i $zf(-1,"echo >> "_tmpfile)
+	i $zf(-1,"echo uname -a: `uname -a` >> "_tmpfile)
+	i $zf(-1,"echo >> "_tmpfile)
+	i $zf(-1,"echo id: `id` >> "_tmpfile)
+	i $zf(-1,"echo >> "_tmpfile)
+	i $zf(-1,"echo ulimit -a: >> "_tmpfile_"; ulimit -a >> "_tmpfile)
+	do chk4vx(tmpfile)
+	s oscmd($i(cmdcnt))=$lb("OS info","mv "_tmpfile_" ",,0)
+	s oscmd($i(cmdcnt))=$lb("ipcs","ipcs -a > ",,0)
+	s oscmd($i(cmdcnt))=$lb("mount","mount > ",,0)
+	s oscmd($i(cmdcnt))=$lb("df -k","df -k > ")
+	q
+chk4vx(tmpfile) {
+	; detection of veritas
+	s $zt="cvxerr",novx=1
+	if $zu(140,4,"/usr/sbin/vxstat")>=0 s novx=0
+	q:novx
+	i $zf(-1,"echo >> "_tmpfile)
+	i $zf(-1,"echo Detected Veritas! >> "_tmpfile)
+	i rootid {
+		i $zf(-1,"echo >> "_tmpfile)
+		i $zf(-1,"echo Veritas version: `/opt/VRTSob/bin/vxsvcctrl version` >> "_tmpfile)
+		i $zf(-1,"echo Veritas status: `/opt/VRTSob/bin/vxsvcctrl status` >> "_tmpfile)
+		i $zf(-1,"echo >> "_tmpfile)
+		i $zf(-1,"echo Veritas diskgroup list:>> "_tmpfile_"; /usr/sbin/vxdg list 2>/dev/null >> "_tmpfile)
+		i $zf(-1,"echo >> "_tmpfile)
+		i $zf(-1,"echo Veritas diskgroup freespace:>> "_tmpfile_"; /usr/sbin/vxdg free 2>/dev/null >> "_tmpfile)
+		i $zf(-1,"echo >> "_tmpfile)
+	} else { // not root
+		i $zf(-1,"echo Not root so unable to run privileged vx commands. >> "_tmpfile)
+	}
+	i $zf(-1,"echo Veritas vxprint list:>> "_tmpfile_"; /usr/sbin/vxprint -v 2>/dev/null >> "_tmpfile)
+	i $zf(-1,"echo >> "_tmpfile)
+	quit
+}
+
+checkawk(oldawk,os="") {	; linux family supplement to handle old/no awk program
+	n (oldawk,os)
+	set pipe="awk -W version",newawk="old"
+	o pipe:"RQ":$$$OPENTIMEOUT
+	i $T {
+		u pipe r line:$$$READTIMEOUT
+		c pipe
+		i $e(line,1,3)="GNU" s newawk="GNU"
+	}
+	q:oldawk=newawk
+	; different so handle it.
+	set ^pButtons("cmds","check")=newawk
+	i newawk="GNU" { ; add awk stuff
+		set ^pButtons("cmds","cpu",1)=$lb("vmstat","vmstat -n ","interval"," ","count"," |awk '{now=strftime(""%m/%d/%y %T""); print now "" "" $0}'"," > ")
+		if (os="ubuntu") { ; ubuntu needs -c before -s
+			set ^pButtons("cmds","memory",1)=$lb("free","free -m -c ","count"," -s ","interval"," |awk '{now=strftime(""%m/%d/%y %T""); print now "" "" $0}'"," > ")
+		} else { ; default linux
+			set ^pButtons("cmds","memory",1)=$lb("free","free -m -s ","interval"," -c ","count"," |awk '{now=strftime(""%m/%d/%y %T""); print now "" "" $0}'"," > ")
+		}
+	} else { ; take out awk stuff
+		set ^pButtons("cmds","cpu",1)=$lb("vmstat","vmstat -n ","interval"," ","count"," > ")
+		if (os="ubuntu") { ; ubuntu needs -c before -s
+			set ^pButtons("cmds","memory",1)=$lb("free","free -m -c ","count"," -s ","interval"," > ")
+		} else { ; default linux
+			set ^pButtons("cmds","memory",1)=$lb("free","free -m -s ","interval"," -c ","count"," > ")
+		}
+	}
+	q
+}
+
+	
+cvxerr
+	d BACK^%ETN
+	q
+
+err ; main err handling
+	d BACK^%ETN
+	q  ;
+	;
+	
+	*/
+	
 
 ]]></Routine>
 </Export>
