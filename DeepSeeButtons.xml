@@ -29,44 +29,54 @@ DeepSeeButtons(namespace="",cubeString="", getLogs="", LogFile="", proceed="") ;
 	;		-Agent Count and cores
 	;		-DeepSee.AuditCode, DeepSee.AuditQueryCode
 	;		-Most recent activity in  Cube manager
+	;		-Config section of cpf file
 	;		-Important mappings
-	;		-ECP Servers
 	;		-Server Initialization Code
 	;	2) Server Details
+	;		-Configuration
 	;		-Customer name
 	;		-License
+	;		-Fully Qualified Host Name
+	;		-User and date
 	;		-Cache startup 
 	;		-$ZV
+	;		-Locale
 	;		-Operating system
+	;		-Disk space
+	;		-RAM
 	;	3) Cube List
 	;		-Name
+	;		-Display name
+	;		-Build Time
 	;		-Fact Count
-	;		-Last Modified
+	;		-Build Rate
+	;		-Last Compile
 	;		-Source Class
+	;		-Cube Class
 	;		-Last update
-	;		-Duration of last cube build
 	;		-Related Cubes
 	;	4) Cube Registry Map
 	;	5) Cube Info: Optional Extra data on a particular cube
 	;		5A) Cube Info- cube class, fact class, caption, fact count, last modified, compound?, abstract?
 	;		5B) Dimensions- dimension list, %Analyze, FieldNameToSpec, %AnalyzeMissing
 	;		5C) Other Elements- Pivot variables, listing fields, listings
-	;	6) Query Log 
+	;	6) Query Log
+	;		-Number of users runnign queries
+	;		-User and Queries run
 	;		-^DeepSee.LastQuery
-	;		-Last 5 queries run by each user 
-	;	8) cconsole.log
-	;	9) CPF file (includes mappings)
+	;		-Last 5 queries run by each user
+	;	7) DeepSee Logs
+	;	8) CPF file (includes mappings)
+	;	9) cconsole.log
 	;	10) Local Databases
-
+	;	11) Task schedule
+	;	12) Journaling
+	;	13) Alerts
 
 Start
 	New (namespace,cubeString,getLogs,LogFile,proceed)
 	Set PDev=$Principal
 	Use PDev
-	Do PromptUser
-	Quit
- 	
-PromptUser
 	Write !,"DeepSee Diagnostic Report Evidence Logging Tool"
 	Write !,"This reporting tool provides the information required for"
 	Write !,"InterSystems Technical Support to analyze DeepSee issues. "
@@ -123,42 +133,43 @@ ReadLogTypeConfirm
 		If (LogType'="")&(LogType'="Y")&(LogType'="YES") Write !,"Please enter Y or N" Goto ReadLogTypeConfirm	
 	}
  	Set Dir="", CacheDir="",Body=0,Big=0
-	Do LaunchLogs(Dir,0,,Big,CacheDir,Body,namespace,cubeList,getLogs)
+	Do LaunchLogs(Dir,,Big,CacheDir,Body,namespace,cubeList,getLogs)
 	Quit
 
-LaunchLogs(LogDirectory,Quiet,Debug,Big,CacheDir,Body,namespace,cubeList,getLogs)
+LaunchLogs(LogDirectory,Debug,Big,CacheDir,Body,namespace,cubeList,getLogs)
 	Set Body=$Get(Body,0)
-	Set CacheVerNumber=$$CacheVerNumber()
+	Set CacheVerNumber=$System.Version.GetNumber()
 	If +CacheVerNumber<5 Do  Quit Return
 	.	Set Message="*** Wrong version of Diagnostic Report utility ! ***"_$Char(13,10)_$Char(13,10)_"You are running on Cache "_CacheVerNumber_" and this is the code for Cache 5.0 and later"
-	.	If 'Quiet Use PDev Write:$X ! Write !,Message
+	.	Use PDev Write:$X ! Write !,Message
 	.	Set Return="0|"_Message
 	.	Quit	
-	If 'Quiet Use PDev Write:$X ! 
+	Use PDev Write:$X ! 
 	Write "Collecting information, please do not interrupt this process.",!,"Do not close terminal until the process has completed"
  	Break 0
-	Set $ZTrap="MainErr"
+	Set $ZTrap="LaunchLogsErr"
 	Set EOF=$ZUtil(68,40)	
-	///Start logging with the DeepSee Setup section
+	//Start logging with the DeepSee Setup section
 	Set LogFile=$$LogSections(cubeList,getLogs,LogFile)
 	Set rc=$$$OK
-	If $ZUtil(68,40,EOF) ; Reset $ZEOF to the original setting
+	If $ZUtil(68,40,EOF) //Reset $ZEOF to the original setting
 	Break 1 
 	If LogFile="" Do  Quit Return
 	.	Set Message="*** Log file could not be created in "_LogDirectory_". Check directory permissions. ***"
-	.	If 'Quiet Use PDev Write:$X ! Write !,Message
+	.	Use PDev Write:$X ! Write !,Message
 	.	Set Return="0|"_Message
 	.	Quit
-	If 'Quiet {
-		Use PDev
-		Write:$X ! Write !,"DeepSeeButtons report saved to: ",!,LogFile
-		Write !,"Please send the html file above to InterSystems Support."
-		Quit
-	}
-	Quit Return
- 
+	Use PDev
+	Write:$X ! Write !,"DeepSeeButtons report saved to: ",!,LogFile
+	Write !,"Please send the html file above to InterSystems Support."
+	Quit
+
+LaunchLogsErr
+	Do ^%ET //Process will Halt
+	Quit "0|"_$ZError
+
 LogSections(cubeList,getLogs,LogFile)
-	New (Debug,LogDirectory,Quiet,namespace,cubeList,getLogs,LogFile,MgrDir)
+	New (Debug,LogDirectory,namespace,cubeList,getLogs,LogFile,MgrDir)
 	Do InitVars
 	If OS?1"***".e Quit ""
 	If LogFile="" Quit ""
@@ -168,11 +179,12 @@ LogSections(cubeList,getLogs,LogFile)
 	Do LogServerSetup
 	Do LogCubeSection
 	Do LogCubeRegistry
-	Do:(($D(cubeList)'=0) && (cubeList'="")) LogCubeInfo
+	Do:(($D(cubeList)'=0) && (cubeList'="")) LogDetailedCubeInfo
 	Do:getLogs=1 LogQuerylog
 	Do:getLogs=1 LogDeepSeelog
 	Do LogCPF
 	Do:getLogs=1 LogCConsole
+	Do LogMappings
 	Do LogDataBases
 	Do LogTasks
 	Do LogJournal
@@ -185,245 +197,10 @@ LogSections(cubeList,getLogs,LogFile)
 	Quit LogFile
 
 
-///Helper functions for the functions above 
-ValidateNamespace(namespace) [namespace]{
-	Try {
-		ZN namespace
-		return namespace
-	}
-	Catch ex {
-		Write !,namespace," is invalid.  Please enter a valid namespace.",!
-		Set namespace=""
-		return namespace
-	}
-}
-
-GetCubesToLog(namespace) {
-	Set cubeString=""
-	ZN namespace
-	Do ##class(%DeepSee.Utils).%GetCubeList(.cubeList,,1)
-	If '$d(cubeList){
-		Write !,"There are no cubes in this namespace!"
-		Set cubeList=""
-		Quit cubeList
-	}
-	For i=1:1 {
-		Write !,"Give cube name for detailed cube info or press enter to continue: "
-		Read cube
-		If cube="?" {
-			Set cube=$$ListCubes()
-		} ElseIf cube="ALL" { //Secreat ALL keyword
-			Set cubeString=$$GetAllCubes(namespace)
-			Set cube="QUIT"
-		}
-		Quit:(cube="")||(cube="QUIT")||(cube="Q")
-		If ##class(%DeepSee.Utils).%CubeExists(cube,.status)'=1 {
-			Write !,cube," is an invalid cube selection: "
-			Do $system.OBJ.DisplayError(status)
-			Write !,"Enter '?' to see list of cubes in the "_namespace_" namespace",!
-			Set cube=""
-		}
-		If cube'="" {
-			Set cube=$ZCONVERT(cube,"t")		//Make cube name uppercase to normalize names
-			Set cubeString=cubeString_","_cube
-		}
-	}
-	Set cubeString=$p(cubeString,",",2,*)		//Eliminate leading comma
-	Set cubeSelection=$LFS(cubeString,",")		//Create list
-	ZN "%SYS"
-	Quit cubeSelection
-}
-
-GetAllCubes(namespace)
-	Set cubeString=""
-	ZN namespace
-	Do ##class(%DeepSee.Utils).%GetCubeList(.cubeList,,1)
-	Set cubetmp=""
-	Set cubeString=""			
-	For i=1:1 {
-		Set cubetmp=$order(cubeList(cubetmp))
-		Quit:cubetmp=""
-		Set cubeString=cubeString_","_cubetmp
-	}
-	Set cubeString=$P(cubeString,",",2,*)
-	ZN "%SYS"
-	Quit cubeString
-
-VerifyInputCubes(cubeList,namespace){
-	Set len=$LISTLENGTH(cubeList)
-	For i=1:1:len{
-		Set cube=$LG(cubeList,i)
-		Set cube=$ZCONVERT(cube, "U")
-		ZN namespace
-		If ##class(%DeepSee.Utils).%CubeExists(cube,.status)'=1 {
-			Write !!, cube, " is an invalid cube selection.  It will not be included in report.",!
-			Do $system.OBJ.DisplayError(status)
-			Set cube=""
-		}
-		Set $LIST(cubeList,i)=cube			//Change element in list to uppercase version (or null if it didn't exist)
-	}
-	ZN "%SYS"
-	Quit cubeList
-}
-
-InitVars()
-	; Sets routine-wide variables
-	New i,LogFilePrefix,v,x
-	Set PDev=$Principal
-	Set CRLF=$Char(13,10)
-	Set CmdOpenTimeOut=60
-	Set CmdReadTimeOut=30
-	Set FileOpenTimeOut=5
-	Set FileReadTimeOut=30
-	Set CacheVerStr=$ZVersion
-	Set CacheVerNumber=$$CacheVerNumber()
-	Set HostName=$ZUtil(54,0)
-	#;SML994
-	#define USEIPV6 $zbitget($zversion(0)_$c(0,0,0,0),42)
-	#define HostNameToIPText(%h,%f)  $s($$$USEIPV6:$SYSTEM.INetInfo.HostNameToAddr(%h,%f),1:$p($ZU(54,13,%h),",",1))
-	#define IPTextToBinary(%ip)      $s($$$USEIPV6:$SYSTEM.INetInfo.TextAddrToBinary(%ip),1:$ZU(54,1,%ip))
-	#define IPBinaryToHostName(%ip)  $s($$$USEIPV6:$SYSTEM.INetInfo.AddrToHostName(%ip),1:$p($ZU(54,14,%ip),",",2))
-	#define IPTextToHostName(%ip)    $$$IPBinaryToHostName($$$IPTextToBinary(%ip))
-	Set IPAddr=$$$HostNameToIPText(HostName,0),FullHostName=$$$IPTextToHostName(IPAddr)	Set MgrDir=$ZUtil(12)
-	Set MgrNsp=$$ST()
-	Set CurDir=$ZUtil(12,"")
-	Set CurNsp=$ZUtil(5)
-	Set x=$ZUtil(86),ConfigFile=$Piece(x,"*",1),ConfigName=$Piece(x,"*",2)
-	Set CurUser=$ZUtil(67,11,$Job)
-	Set CustomerName=$System.License.KeyCustomerName()
-	Set OrderNumber=$System.License.KeyOrderNumber()
-	; Equivalent to $System.Version.GetCompBuildOS()
-	//Get if Trak or HealthInsight
-	Set isInsight=$$isHealthInsight(namespace) 	//Determine if this is a Health Insight namespace (1 if yes)
-	Set isTrak=$$isTrak(namespace) 	//Determine if this is a Health Insight namespace (1 if yes)
-	Set v=$ZVersion,v=$ZConvert(v,"l")
-	If v["windows" Set OS="WinNT" ; Windows NT, 2000, XP or 2003 Server
-	Else  If v["unix" Set OS="UNIX"
-	Else  If v["openvms" Set OS="VMS"
-	Else  Set OS="*** Unrecognized OS ***"
-	If OS?1"***".e Quit
-	If OS?1"Win".e Do
-	.	Set DirDelim="\"
-	.	Set NullDev="//./nul"
-	.	Do SetDirs
-	.	Set KeyFile=MgrDir_DirDelim_"Cache.key"
-	.	Set BinDir=CacheDir_DirDelim_"Bin"
-	.	Quit
-	If OS="UNIX" Do
-	.	Set DirDelim="/"
-	.	Set NullDev="/dev/null/"
-	.	Do SetDirs
-	.	Set KeyFile=MgrDir_DirDelim_"cache.key"
-	.	Set BinDir=CacheDir_DirDelim_"bin"
-	.	Quit
-	If OS="VMS" Do
-	.	Set DirDelim="."
-	.	Set NullDev="NL:"
-	.	Do SetDirs
-	.	Set KeyFile=MgrDir_"CACHE.KEY"
-	.	Set i=$Find(MgrDir,".MGR")
-	.	Set BinDir=$Extract(MgrDir,1,i-$Length(".MGR")-1)_".BIN"_$Extract(MgrDir,i,*)
-	.	Quit
-	Set LogFilePrefix=""
-	If CustomerName'="" Set LogFilePrefix="DeepSeeButtons_"_$Piece(CustomerName," ",1)_"_" //e.g. CustomerName = ISC Development
-	If LogFilePrefix'="",LogFilePrefix?1a.an,$Length(LogFilePrefix)<20
-#;RFA025+
-	If LogFile="" Do
-	.	Set LogFile=$$NewFile(LogFilePrefix,"html")
-#;RFA025-
-	Open LogFile:"RWNSK\UTF8\":FileOpenTimeOut
-	If '$Test Quit ""
-	Quit 
-
-SetDirs
-	; Sets Cache Installation Directory
-	New i,Dev,Dir
-	If OS?1"Win".e!(OS="UNIX") Do
-	.	If $Extract(MgrDir,$Length(MgrDir))=DirDelim Set MgrDir=$Extract(MgrDir,1,$Length(MgrDir)-1) ; Remove trailing \ or /
-	.	If $Extract(CurDir,$Length(CurDir))=DirDelim Set CurDir=$Extract(CurDir,1,$Length(CurDir)-1) ; Remove trailing \ or /
-	.	Quit
-	Else  If OS="VMS" Do
-	.	Set MgrDir=$$VMSCanonize(MgrDir)
-	.	Set CurDir=$$VMSCanonize(CurDir)
-	.	Quit
-	If OS?1"Win".e!(OS="UNIX") Set i=$Length(MgrDir,DirDelim)-1,CacheDir=$Piece(MgrDir,DirDelim,1,i)
-	Else  If OS="VMS" Do
-	.	Set Dev=$Piece(MgrDir,":",1),Dir=$Piece(MgrDir,":",2,$$$MaxPieceNum)
-	.	If $Extract(Dir,1)="[" Set Dir=$Extract(Dir,2,*)
-	.	If $Extract(Dir,$Length(Dir))="]" Set Dir=$Extract(Dir,1,$Length(Dir)-1)
-	.	Set Dir=$Piece(Dir,".",1,$Length(Dir,".")-1)
-	.	Set Dir="["_Dir_"]"
-	.	Set CacheDir=Dev_":"_Dir
-	.	Quit
-	Quit
-	
-ListCubes(){
-	Do ##class(%DeepSee.Utils).%GetCubeList(.cubeList,,1)
-	Write !, "Cubes in this namespace: ",!!
-	Set cubetmp=""
-	For i=1:1{
-		Set cubetmp=$order(cubeList(cubetmp))
-		Quit:cubetmp=""
-		Write i_") "_cubetmp,!	
-	}
-	Write !, "Select a cube name or press enter to continue: "
-	Read cube
-	If cube'=""{
-		Write !,"Getting detailed information on "_cube
-		Hang 1
-	}
-	Quit cube		//returns "" if no cube number entered
-}
-
-MainErr
-	Do ^%ET ; Process will Halt
-	Quit "0|"_$ZError
-
-Trim(x)
-	New (x)
-	Set x=$Get(x,"")
-	For Char=$Char(32),$Char(9) Set x=$Translate(x,Char,"")
-	Quit x
- 
-LongName(x)
-	New (OS,x)
-	Set x=$Get(x,"")
-	If OS="VMS" Quit x
-	Set Space=$Char(32),Quote=$Char(34)
-	If x[Space Set x=Quote_x_Quote
-	; If x[Space Set x=$ZUtil(147,x)
-	Quit x
- 
-CacheVerNumber()
-	; Equivalent to $System.Version.GetNumber()
-	Quit $System.Version.GetNumber()
- 
-ST()
-	; Sets the Manager's Namespace (also hardcoded in %ST)
-	ZN "%SYS"
-	New
-	Do ^ST
-	Set MgrNsp=%ST("MGRNSP")
-	Quit MgrNsp
- 
-VMSCanonize(Dir)
-	New (Dir)
-	Set Dev=$Piece(Dir,":",1),Dir=$Piece(Dir,":",2,$$$MaxPieceNum)
-	Set Dir=$Translate(Dir,"<","[") ; Replace < by [
-	Set Dir=$Translate(Dir,">","]") ; Replace > by ]
-	Set i=$Length(Dir,"[")-1
-	If i>1 Do  ; Directory format is [DIR.][SUBDIR]...
-	.	If $Extract(Dir,1)="[" Set Dir=$Extract(Dir,2,*)
-	.	If $Extract(Dir,$Length(Dir))="]" Set Dir=$Extract(Dir,1,$Length(Dir)-1)
-	.	For  Quit:$Piece(Dir,"[",2)=""  Set Dir=$Piece(Dir,"[",1)_$Piece(Dir,"[",2,$$$MaxPieceNum)
-	.	For  Quit:$Piece(Dir,"]",2)=""  Set Dir=$Piece(Dir,"]",1)_$Piece(Dir,"]",2,$$$MaxPieceNum)
-	.	Set Dir="["_Dir_"]"
-	.	Quit
-	Set Dir=Dev_":"_Dir
-	Quit Dir
-
+///Log* Helper functions that log the section of a DeepSeeButtons report
 LogHead(cubeList,getLogs)
-	; Writes the Header record
+	//Writes the Header record
+	Try {
 	New %DAT,%TIM,x //,Build
 	//Set x=$Text(+1),Build=$Piece(x,";",5),Build=$Piece(Build," ",2)
 	Set colspan=12 If OS="UNIX" Set colspan=13
@@ -442,7 +219,7 @@ LogHead(cubeList,getLogs)
 	Do WriteLog("var ele = document.getElementById(showHideDiv);",6)
 	Do WriteLog("var text = document.getElementById(switchTextDiv);",6)
 	Do WriteLog("if(ele.style.display == ""block"") {",6)
-    Do WriteLog("ele.style.display = ""none"";",8)
+    Do WriteLog("ele.style.display = ""none"";",8) 
     Do WriteLog("text.innerHTML = ""&rtrif; Expand"";",8)
     Do WriteLog("}",6)
 	Do WriteLog("else {",6)
@@ -597,7 +374,6 @@ LogHead(cubeList,getLogs)
 	Do WriteLog("color: rgb(104,30,30);",6)
 	Do WriteLog("opacity: 1.0;",6)
 	Do WriteLog("}",4)
-	
     Do WriteLog(".zebraStriped tbody tr:nth-child(odd) {",4)
     Do WriteLog("background-color: #ccc;",6)
     Do WriteLog("border-right: 2px solid #D0D0D0;",6)
@@ -605,12 +381,10 @@ LogHead(cubeList,getLogs)
     Do WriteLog("border-bottom: 2px solid #D0D0D0;",6)
     Do WriteLog("border-top: 2px solid #D0D0D0;",6)
 	Do WriteLog("}",4)
-    
     Do WriteLog(".scrollable {",4)
     Do WriteLog("overflow:auto;",6)
     Do WriteLog("resize:both;",6)
 	Do WriteLog("}",4)
-	
     Do WriteLog(".wrapped {",4)
     Do WriteLog("white-space: -moz-pre-wrap; /* Mozilla, supported since 1999 */",6)
     Do WriteLog("white-space: -pre-wrap; /* Opera */",6)
@@ -671,644 +445,21 @@ LogHead(cubeList,getLogs)
 	Do WriteLog("}",4)
 	Do WriteLog("</style>",2)
 	Do WriteLog("</head>")
-	Quit //End LogHead(cubeList,getLogs)
+	} Catch(ex) {
+		Set tSC = ex.AsStatus()
+		Do WriteLog(tSC)
+	}
+	Quit
 	
 LogOpenMainDiv()
 	Do WriteLog("<div id=""main"">")
 	Do WriteLog("<a name=""top""></a>")
 	Do WriteLog("<h1>DeepSeeButtons: DeepSee Diagnostic for the "_namespace_" Namespace</h1>")
 	Quit
-	
-LogServerSetup()
-	///Server Details section
-	Do WriteParagraph("serverdetails","Server Details",1)
-	///The old "Configuration" section
-	Do WriteLog("<table id=""ServerDetailsTable"" cellpadding=""7"" cellspacing=""3"" class=""tableWithBorders tableTabbed"">",0)
-  	Do WriteLog("<tbody>",2)
-	Do WriteLog("<tr>",4)
-	Do WriteLog("<td>",6)
-	Do WriteHeader4("Configuration",8)
-	Do WriteLog("<p>"_ConfigName_" on Machine """_HostName_""""_"</p>",8)
-	Do WriteLog("</td>",6)
-	Do WriteLog("</tr>",4)	
-	Do WriteLog("<tr>",4)
-	Do WriteLog("<td>",6)
-	If CustomerName'?1a.e Set CustomerName="Unknown"
-	Do WriteHeader4("Customer Name",8)
-	Do WriteLog("<p>"_CustomerName_"</p>",8)
-	Do WriteLog("</td>",6)
-	Do WriteLog("</tr>",4)	
-	Do WriteLog("<tr>",4)
-	Do WriteLog("<td>",6)
-	Do WriteHeader4("License Order Number",8)
-	Do WriteLog("<p>"_OrderNumber_"</p>",8)
-	Do WriteLog("</td>",6)
-	Do WriteLog("</tr>",4)	
-	Do WriteLog("<tr>",4)
-	Do WriteLog("<td>",6)
-	Do WriteHeader4("Fully Qualified Host Name",8)
-	Do WriteLog("<p>"_FullHostName_" with IP Address: "_IPAddr_"</p>",8)
-	Do INT^%D,INT^%T
-	Do WriteLog("</td>",6)
-	Do WriteLog("</tr>",4)	
-	Do WriteLog("<tr>",4)
-	Do WriteLog("<td>",6)
-	Do WriteHeader4("Log created by User",8)
-	Do WriteLog("<p>"_CurUser_" on "_$ZD($ZDH(%DAT,7),3)_" at "_%TIM_"</p>",8)
-	Do WriteLog("</td>",6)
-	Do WriteLog("</tr>",4)	
-	Do WriteLog("<tr>",4)
-	Do WriteLog("<td>",6)
-	Do Timeup
-	Do WriteLog("</td>",6)
-	Do WriteLog("</tr>",4)	
-	Do WriteLog("<tr>",4)
-	Do WriteLog("<td>",6)
-	Do WriteHeader4("Caché Version String",8)
-	Do WriteLog("<p>"_CacheVerStr_"</p>",8)
-	//Set isInsight=$$isHealthInsight(namespace) 	//Determine if this is a Health Insight namespace (1 if yes)
-	If isInsight {
-		Do WriteLog("<p>"_##class(%ZHSLIB.HealthShareMgr).VersionInfo()_"</p>",8)
-	}
-	Do WriteAdhocPatch //write information on Adhoc patch
-	//Current Locale subsection
-	Do WriteLog("</td>",6)
-	Do WriteLog("</tr>",4)	
-	Do WriteLog("<tr>",4)
-	Do WriteLog("<td>",6)
-	Do NLS
-	Do WriteLog("</td>",6)
-	Do WriteLog("</tr>",4)	
-	//Operating System Version section
-	Do WriteLog("<tr>",4)
-	Do WriteLog("<td>",6)	
-	Do OSVer
-	Do WriteLog("</td>",6)
-	Do WriteLog("</tr>",4)
-	//RAM physical memory space
-	Do WriteLog("<tr>",4)
-	Do WriteLog("<td>",6)	
-	Do RAM
-	Do WriteLog("</td>",6)
-	Do WriteLog("</tr>",4)
-	//
-	Use PDev
-	If OS?1"Win".e!(OS="VMS"),OS'="Win9x" 
-	Use LogFile	
-	Do WriteLog("</tbody>",2)
-	Do WriteLog("</table>",0)
-	Use PDev
-	Quit
 
-LogSidePanel(cubeList,getLogs,numalerts)
-	Do WriteLog("<div id=""mySidenav"" class=""sidenav"">")
-	Do WriteLog("<a href=""javascript:void(0)"" class=""closebtn"" onclick=""closeNav()"">&times;</a>",2)
-	Do WriteLog("<a href=""#deepseesetup"" title=""General setting relevant for DeepSee"">DeepSee Setup</a>",2)
-	If (isInsight || isTrak) {
-		Set nOverrides=$$CountNodes(namespace,"^DeepSee.Overrides")
-		Do:(nOverrides>=10) WriteLog("<a href=""#overrides"">DeepSee Overrides</a>",2)
-	}	
-	Do WriteLog("<a href=""#serverdetails"" title=""Information on the hosting machine"">Server Details</a>",2)
-	Do WriteLog("<a href=""#cubelist"" title=""Information on all cubes in the namespace"">Cubes</a>",2)
-	Do WriteLog("<a href=""#cuberegistry"">Cube Registry</a>",2)
-	If (($D(cubeList)'=0) && (cubeList'="")) {
-		Do WriteLog("<a href=""#cubeinfo"" title=""Detailed information on cubes"">Cube Info</a>",2)
-		Set cubeListLength=$ll(cubeList)
- 		For i=1:1:cubeListLength{
-			Set cube=$lg(cubeList,i)
-			Do:cube'="" WriteLog("<a class=""cubelinks"" href=""#cubeinfo"_cube_""">"_cube_"</a>",2)
-		}		
-	}
-	If getLogs{
-		Do WriteLog("<a href=""#querylog"" title=""Last 5 MDX queries run by each users in the system"">Query Log</a>",2)
-		Do WriteLog("<a href=""#dslog"" title=""A log file with cube builds and errors occurred in the system"">DeepSee Logs</a>",2)
-	}
-	//Do WriteLog("<a href=""#system"" title=""Information about OS, cpu in the system"">System Info</a>",2)
-	Do WriteLog("<a href=""#cpf"" title=""The Caché Parameter File containing recording the Caché configuration"">cache.cpf</a>",2)
-	Do:getLogs WriteLog("<a href=""#cconsole"" title=""cconsole.log file containing general messages and errors"">cconsole.log</a>",2)
-  	Do WriteLog("<a href=""#LocalDB"">Local Databases</a>",2)
-  	Do WriteLog("<a href=""#Taskschedule"" title=""Information on background tasks"">Task Schedule</a>",2)
-  	Do WriteLog("<a href=""#Journaling"" title=""Information on database journaling for the instance"">Journaling</a>",2)
-  	Set colorclass=$S(numalerts: "red",1:"")
-  	Do WriteLog("<a class="""_colorclass_""" href=""#Alerts"" title=""Summary of all alerts found on the system"">Alerts ("_numalerts_")</a>",2)
-  	Do WriteLog("</div>")
-  	Quit
-
-LogCloseBody
-	Do WriteLog("</body>")
-	Do WriteLog("</html>")
-	Do WriteUpdate("")	
-	Quit
-	
-Timeup
-	Set $ZTrap="TimeupErr"
-	Set timein=$ZHorolog\1, now=$Horolog
-	Set timeup=timein
-	Set days=timeup\86400
-	Set timeup=timeup-(days*86400)
-	Set hours=timeup\3600
-	Set timeup=timeup-(hours*3600)
-	Set minutes=timeup\60
-	Set timeup=timeup-(minutes*60)
-	Set seconds=timeup
-	Set today=+now
-	Set secs=$Piece(now,",",2)
-	Set now=(today*86400)+secs
-	Set then=now-timein
-	Set odays=then\86400
-	Set osecs=then-(odays*86400)
-	Set oh=odays_","_osecs
-	//Do WriteLog("Started on "_$ZDATETIME(oh))
-	//W !,"<p>Caché Started on "_$ZDATETIME(oh)_". As of this report Caché has been up for "_days_" days "_hours_" hours "_minutes_" minutes "_seconds_" seconds"_"</p>"
-	Do WriteHeader4("Last Caché Startup",8)
-	Do WriteLog("<p>"_$ZDATETIME(oh,3)_". As of this report Caché has been up for "_days_" days "_hours_" hours "_minutes_" minutes "_seconds_" seconds"_"</p>",8)
-	Quit
-	
-TimeupErr
-	Set $ZTrap=""
-	Do WriteLog("Error: "_$ZError)
-	Quit 
-
-WriteAdhocPatch
-	Set $ZTrap="PatchErr"
-	Set patchvar=$Order(^%qPatch(""))
-	While (patchvar'=""){
-		Set data=^%qPatch(patchvar)
-		Set patchvar2=$Order(^%qPatch(patchvar))			
-		Do WriteLog("<p style=""margin-left:3em;"">Adhoc: "_$list(data)_"</p>",8)
-		Do WriteLog("<p style=""margin-left:6em;"">Description: "_$list(data,2)_"</p>",8)
-		Do WriteLog("<p style=""margin-left:6em;"">Created at: "_$list(data,5)_"</p>",8)
-		Do WriteLog("<p style=""margin-left:6em;"">Created on $zv: "_$piece($list(data,6),")",1,2)_")"_"</p>",8)
-		Do WriteLog("<p style=""margin-left:6em;"">Applied on: "_$list(data,7)_"</p>",8)
-		Do WriteLog("<p style=""margin-left:6em;"">Applied by: "_$list(data,8)_"</p>",8)
-		Do WriteLog("")
-		Set patchvar=$Order(^%qPatch(patchvar))
-	}
-	Quit
-	
-PatchErr
-	Set $ZTrap=""
-	Do WriteLog("<p>Error: "_$ZError_"</p>",8)
-	Quit 
-
-isHealthInsight(namespace){
-	Try{
-		ZN namespace
-		//Set x=##class(HSAA.Utils).GetLogDirectory()				//Just testing to see if this method works
-		Set HealthShare=##class(%SYSTEM.License).GetFeature(12) 	//Look in license for HealthShare Foundation
-		ZN "%SYS"
-		return HealthShare
-	} Catch {
-		ZN "%SYS"
-		return 0						//Method did not work so return 0
-	}
-}
-
-isTrak(namespace){
-	Try{
-		ZN namespace
-		Set BitTrakCare = ##class(%SYSTEM.License).GetFeature(6) 	//BitTrakCare
-		ZN "%SYS"
-		return BitTrakCare
-	} Catch {
-		ZN "%SYS"
-		return 0						//Method did not work so return 0
-	}
-}
-
-CDSrv
-	New
-	Set $ZTrap="CDSrvErr"
-	Do ^%CDSrv
-	Quit
- 
-CDSrvErr
-	Set $ZTrap=""
-	Quit
- 
-MGW
-	New
-	Set $ZTrap="MGWUpper"
-	Do ^%mgw
-	Quit
- 
-MGWUpper
-	Set $ZTrap="MGWErr"
-	Do ^%MGW
-	Quit
- 
-MGWErr
-	Set $ZTrap=""
-	Quit
- 
-NLS
-	Set $ZTrap="NLSErr"
-	New LocCur,LocDesc,LocSrc,oLoc
-	Set oLoc=##class(Config.NLS.Locales).OpenCurrent()
-	If oLoc="" Set LocCur="Unknown",LocDesc="Unknown"
-	Else  Set LocCur=oLoc.Name,LocDesc=oLoc.Description
-	Do WriteHeader4("Current Locale",8)
-	Set LocSrc=$$$LOCALEPATH
-	Do WriteLog("<p>"_LocCur_" ("_LocDesc_")<p>",8)
-	Quit
- 
-NLSErr
-	Set $ZTrap=""
-	Do WriteLog("Error: "_$ZError)
-	Quit 
- 
-Dir
-	Set $ZTrap="DirError",$ZError=""
-	Set DirInfo=$ZUtil(49,Dir)
- 
-DirError
-	Set $ZTrap=""
-	Set MountStatus=$Get(DirInfo,"")
-	If $ZError'=""!(MountStatus<0) Do  Quit
-	.	Write !,Dir," *** ",$Select(MountStatus<-1:"Doesn't Exist",+MountStatus=-1:"Dismounted",1:$ZError)," ***"
-	Quit
-	If +MountStatus=256 Write !,Dir," *** Not Mounted ***" Quit
-	Set BlockSize=$Piece(DirInfo,",",$$$blksizpiece)
-	Write !,Dir,?49,$Justify(BlockSize,4),?60,$Piece(DirInfo,",",$$$resourcepiece)
-	Write ?80,$Case($$$encrypteddbformat(DirInfo),0:0,:$Piece(DirInfo,",",$$$enckeyidpiece))
-	Quit
- 
-OSVer
-	Try {
-		; Adds the OS version to LogFile
-		New Cmd,uname
-		Do WriteHeader4("Operating System Version",8)
-		Do WriteLog("<p>",8)
-		If OS?1"Win".e Set Cmd="Ver"
-		If OS="UNIX" Set Cmd="uname -a"
-		If OS="VMS" Set Cmd="WRITE SYS$OUTPUT ""OpenVMS "",F$GETSYI(""VERSION"")"		
-		Do ExternalCmd(Cmd)
-		If OS="UNIX" Set uname=$$uname()
-		If ($D(uname) && (uname?1"AIX".e)) {
-			Do WriteLog(" -- ",8)
-			Do ExternalCmd("lsattr -El proc0")
-		}
-	} Catch(ex) {
-		Set tSC = ex.AsStatus()
-		Do WriteLog(tSC,8)
-	}
-	Do WriteLog("</p>",8)
-	Quit
-
-RAM
-	Do WriteHeader4("RAM",8)
-	Set temp = $ZU(190,18)
-	Set totalPhys = $P(temp,",",1)	//  total KB of physical memory.
-    Set availPhys = $P(temp,",",2)	//  free KB of physical memory.
-	Set totalPage = $P(temp,",",3)  //  total KB of paging/swap space.
-	Set availPage = $P(temp,",",4)  //  free  KB of paging/swap space.
-	Do WriteLog("<p>Total physical memory: "_$FNUMBER(totalPhys/1024,",",0)_" MB</p>",8)
-	Do WriteLog("<p>Free physical memory: "_$FNUMBER(availPhys/1024,",",0)_" MB</p>",8)
-	Do WriteLog("<p>Total paging/swap space: "_$FNUMBER(totalPage/1024,",",0)_" MB</p>",8)
-	Do WriteLog("<p>Free paging/swap space: "_$FNUMBER(availPage/1024,",",0)_" MB</p>",8)
-	Do WriteLog("",8)
-	Do WriteHeader4("Disk space",8)
-	Do ##class(%File).DriveListExecute(.drivelist)
-	For {
-		Set st=##class(%File).DriveListFetch(.drivelist,.drive,.AtEnd)  //zw drive  zw AtEnd  zw drivelist
-		Set drive = $LG(drive)
-		Do ##class(%Library.File).GetDirectorySpace(drive,.free,.total,1) //w total,!,free
-		Do WriteLog("<p>Total space in """_drive_""" drive: "_$FNUMBER(total,",",0)_" MB</p>",8)
-		Do WriteLog("<p>Free space in """_drive_""" drive:  "_$FNUMBER(free,",",0)_" MB</p>",8)
-		/*Do WriteLog("<p>$ZU(140,13,"_drive_")</p>")
-		Set temp=$ZU(140,13,drive) 	//See HYY789
-		Do WriteLog("<p>Total disk space: "_$FNUMBER($P(temp,",",3)*$P(temp,",",4)/1024/1024,",",0)_"MB</p>")
-		Do WriteLog("<p>Free disk space: "_$FNUMBER($P(temp,",",2)*$P(temp,",",4)/1024/1000,",",0)_"MB</p>")
-		*/
-		Quit:AtEnd
-	}
-	
-	Quit
- 
-uname()
-	New (CmdOpenTimeOut,CmdReadTimeOut,PDev)
-	Set Cmd="uname -s"
-	Open Cmd:"RQ":CmdOpenTimeOut
-	If '$Test Quit ""
-	Set $ZTrap="unameErr"
-	Use Cmd Read uname:CmdReadTimeOut Use PDev
-	Set $ZTrap=""
-	Set $ZError=""
-	Close Cmd
-	Quit uname
- 
-unameErr
-	Set $ZTrap=""
-	Set $ZError=""
-	Close Cmd
-	Quit ""
- 
-CopyToLog(InputFile,Caption,SkipSize=0)
-	; Appends a file to LogFile
-	; InputFile can be cconsole.log, the generated cstat output file, inuse.dmp or dumpkeys.txt
-	; SkipSize - Skip the first x number of bytes in the file to reduce size. Used by cconsole.log
-	; to keep it a reasonable size
-	New %DAT,%TIM,x
-	Do INT^%D,INT^%T
-	Do WriteLog(Caption_" on "_%DAT_" at "_%TIM_":"),WriteLog("")
-	Set $ZTrap="CopyToLogErr"
-	Open InputFile:"R":FileOpenTimeOut
-	If '$Test Do WriteLog("File "_InputFile_" does not exist") Do WriteLog("</pre>") Use PDev Quit
-	; Read timeout added to prevent the case where neither <ENDOFFILE> error nor $ZEOF terminate the loop
-	If SkipSize>0 Do WriteLog("File "_InputFile_" is too large, skipping first "_SkipSize_" bytes"),WriteLog("")
-	Set Size=0
-	For { 
-		Use InputFile 
-		Read x:FileReadTimeOut 
-		Set ZEOF=$ZEof 
-		Use PDev 
-		Quit:'$Test!(ZEOF)  
-		s Size=Size+$l(x) 
-		continue:SkipSize>Size  
-		Use LogFile 
-		Write $zconvert(x,"O","HTML"),CRLF 
-		Use PDev
-	}
-	Close InputFile
-	Quit
- 
-CopyToLogErr
-	Set $ZTrap=""
-	Close InputFile
-	Do WriteLog("</pre>") Use PDev
-	Set $ZError=""
-	Quit
- 
-#;RFA025+
-NewFile(LogFilePrefix,LogFileSuffix)
-	; Creates a new file with Date and Time added to the filename and opens it for Reading and Writing
-	; File Name can be either "Cache" or "cstat"
-	New Date,Dir,NewFile,Time
-	If LogFileSuffix="" Set LogFileSuffix="html"
-	Set Date=$$CurDate,Time=$$CurTime
-	If OS?1"Win".e Set LogFileSuffix=$ZConvert(LogFileSuffix,"l")
-	Else  If OS="UNIX" Set LogFileSuffix=$ZConvert(LogFileSuffix,"l")
-	Else  If OS="VMS" Set LogFileSuffix=$ZConvert(LogFileSuffix,"U")
-	Set Dir=MgrDir
-	Set LogDirectory=$Get(LogDirectory,"")
-	If LogDirectory'="" Set Dir=LogDirectory
-	If OS?1"Win".e Set NewFile=Dir_DirDelim_LogFilePrefix_Date_"_"_Time_"."_LogFileSuffix
-	//Else  If OS="UNIX" Set NewFile=Dir_DirDelim_$ZConvert(LogFilePrefix,"l")_Date_"-"_Time_"."_LogFileSuffix	
-	Else  If OS="UNIX" Set NewFile=Dir_DirDelim_LogFilePrefix_Date_"_"_Time_"."_LogFileSuffix	
-	Else  If OS="VMS" Set NewFile=Dir_$ZConvert(LogFilePrefix,"U")_Date_Time_"."_LogFileSuffix_";"
-#;RFA025-
-	Set $ZTrap="NewFileErr"
-#; CFL1524
- //	Open NewFile:"RWNSK\UTF8\":FileOpenTimeOut
- //	If '$Test Quit ""
-	Quit NewFile
- 
-NewFileErr
-	Set $ZTrap="",$ZError=""
-	Quit ""
- 
-WriteLog(Record,spaces)
-	; Adds a record to LogFile
-	If Record?1"***".e Quit
-	Use LogFile
-	If '$D(spaces) Set spaces=0
-	Write !,?spaces,Record
-	Quit
- 
-WriteParagraph(name,title,flag)
-	If '$D(flag) Set flag = 1
-	If flag Do WriteLog("<hr noshade size=""4"" width=""auto"">")
-	Do WriteLog("<a name="""_name_"""></a>")
-	Do WriteLog("<h2>"_title_"</h2>")
-	
-WriteHeader4(header,spaces)
-	Use LogFile
-	If '$D(spaces) Set spaces=0
-	Do WriteLog("<h4>"_header_"</h4>",spaces)
-	//Note: do not add !
-	
-WriteUpdate(msg)
-	Use PDev
-	Write $C(13,27)_"[0J"_msg
-	Use LogFile
-	
-ExternalCmd(Command)
-	; Executes an external program and adds its output to LogFile
-	; Requires the full specification of the Exe file
-	New PDev,x
-	Set PDev=$Principal
-	If OS="UNIX" Do ExtCmdPipe
-	If OS?1"Win".e!(OS="VMS") Do ExtCmdFile
-	Use PDev
-	Quit
-
-ExtCmdPipe
-	; Executing an OS command through a pipe works on UNIX
-	; It should also work on 32-bit Windows (NT, 2000 and XP), but I found inconsistent behavior on these platforms
-	Open Command:"RQ":CmdOpenTimeOut
-	If '$Test Quit
-	Set $ZTrap="ExtCmdPipeEOF"
-	; Read timeout added to prevent the case where neither <ENDOFFILE> error nor $ZEOF terminate the loop
-	For  Use Command Read x:CmdReadTimeOut Set ZEOF=$ZEof Use PDev Quit:'$Test!(ZEOF)  If x'="" Do WriteLog($ZConvert(x,"O","HTML"))
-	Set $ZTrap=""
-	Set $ZError=""
-	Close Command
-	Quit
-
-ExtCmdPipeEOF
-	Set $ZTrap=""
-	Set $ZError=""
-	Close Command
-	Quit
-
-ExtCmdFile
-	; Only to be executed when OS is Windows or VMS, when either pipes don't work or behave inconsistently
-	New Date,File,Time
-	Set Date=$$CurDate,Time=$$CurTime
-	If OS?1"Win".e Do
-	.	Set File=MgrDir_DirDelim_Date_Time_".$$$"
-	.	Set Command=$Char(34)_Command_" > "_$$LongName(File)_$Char(34) ; Cache will call "Cmd /c", which requires quotes surrounding the command
-	.	Quit
-	Else  If OS="VMS" Set File=MgrDir_Date_Time_".$$$"
-	If OS?1"Win".e Set x=$ZF(-1,Command)
-	Else  If OS="VMS" Set x=$ZF(-1,Command,File)
-	Set $ZTrap="ExtCmdNoFile"
-	Open File:"R":FileOpenTimeOut
-	If '$Test Do WriteLog("Error: could not open file "_File) Quit
-	Set $ZTrap="ExtCmdFileEOF"
-	; Read timeout added to prevent the case where neither <ENDOFFILE> error nor $ZEOF terminate the loop
-	For { 
-		Use File
-		Read x:FileReadTimeOut
-		Set ZEOF=$ZEof
-		Use PDev
-		Quit:'$Test!(ZEOF)
-		If x'="" Do WriteLog($ZConvert(x,"O","HTML"))
-	}
-	Set $ZTrap=""
-	Set $ZError=""
-	Close File
-	If OS="VMS" Do
-	.	If $Extract(File,$Length(File))'=";" Set File=File_";"
-	.	Set File=File_"*"
-	.	Quit
-	Set x=$ZUtil(140,5,File) ; Delete temporary scratch file
-	Quit
-ExtCmdFileEOF
-	Set $ZTrap=""
-	Set $ZError=""
-	Close File
-	If OS="VMS" Do
-	.	If $Extract(File,$Length(File))'=";" Set File=File_";"
-	.	Set File=File_"*"
-	.	Quit
-	Set x=$ZUtil(140,5,File) ; Delete temporary scratch file
-	Quit
-
-ExtCmdNoFile
-	Set $ZTrap=""
-	Set $ZError=""
-	Quit
-
-CurDate()
-	; Returns Current Date as YYYYMMDD
-	New
-	Do INT^%D
-	Set %DAT=$ZConvert(%DAT,"U")
-	Set MonthName=$Extract(%DAT,1,3)
-	Set Day=+$Piece(%DAT," ",2) If Day?1n Set Day=0_Day
-	Set Year=+$Piece(%DAT," ",3) If Year?2n Set Year=2000+Year
-	Set Month=$Find("JANFEBMARAPRMAYJUNJULAUGSEPOCTNOVDEC",MonthName)\3 If Month?1n Set Month=0_Month
-	Quit Year_Month_Day
-
-CurTime()
-	; Returns Current Time as HHMM
-	New
-	Do INT^%T
-	Set %TIM=$ZConvert(%TIM,"U")    
-	For  Quit:%TIM'?1" ".e  Set %TIM=$Extract(%TIM,2,*)
-	Set Time=$Piece(%TIM," ",1),AMPM=$Piece(%TIM," ",2)
-	Set Hour=+$Piece(Time,":",1),Minutes=+$Piece(Time,":",2)
-	If AMPM="AM",Hour=12 Set Hour=0
-	If AMPM="PM",Hour'=12 Set Hour=Hour+12
-	If Hour?1n Set Hour=0_Hour
-	If Minutes?1n Set Minutes=0_Minutes
-	Quit Hour_Minutes
-
-LogCPF
-	; Processes Cache configuration file (usually Cache.cpf)
-	New x
-	Do WriteParagraph("cpf","cache.cpf file")
-	Use PDev
-	Do WriteLog("")
-	Do WriteLog("<h4 id=""cpftoggle"" onclick=""javascript:toggle('cpfdiv','cpftoggle');"">&rtrif; Expand</h4>",0)
-	//Do WriteLog("<div id=""cpfdiv"" class=""scrollable"" style=""width:100%;height:400px;"">")
-	Do WriteLog("<div id=""cpfdiv"" style=""display:none;"">")
-	Do WriteLog("<p>Caché Configuration File "_ConfigFile_":"_"</p>",2)
-	Do WriteLog("<pre>",2)
-	Set $ZTrap="CPFErr"
-	Open ConfigFile:"R":FileOpenTimeOut
-	If '$Test Do  Quit
-	.	Do WriteLog("Error: could not open Caché Configuration File "_ConfigFile)
-	.	Do WriteLog("</pre>") Use PDev
-	.	Quit
-	; Read timeout added to prevent the case where neither <ENDOFFILE> error nor $ZEOF terminate the loop
-	Set MapCount=1 		
-	Set NsCount=1
-	For {
-		Use ConfigFile Read x:FileReadTimeOut
-		If $p(x,".",1)="[Map"  {				//Grab namespace we are mapping from
-			Set NsMap(NsCount) = x
-			Set NsCount = $I(NsCount)
-		}
-		If x["OBJ.DSTIME" {						//Grab OBJ.DSTIME mapping
-			Set DSTimeMap(NsCount)=x
-		}
-		If $p(x,".",1)="Global_DeepSee" {		//Create array of DeepSee.* global mappings within this namespace
-			Set DeepSeeMap(NsCount,MapCount) = x
-			Set MapCount = $I(MapCount)
-		}
-		Set ZEOF=$ZEof 
-		Use PDev
-		Quit:'$Test!(ZEOF)
-		Use LogFile 
-		Write x,CRLF 
-		Use PDev
-	}
-	Close ConfigFile
-	For i=1:1:NsCount{
-		Write NsMap(i),!
-		Set NumMaps=$O(DeepSeeMap(i,""),-1)
-		For k=1:1:NumMaps{
-			Write DeepSeeMap(i,k),!
-			If k=NumMaps  Write !
-		}	
-	}
-	Use LogFile 
-	Do WriteLog("</pre>",2)
-	Do WriteLog("</div>")
-	Use PDev
-	Quit
-
-CPFErr
-	Set $ZTrap=""
-	Close ConfigFile
-	Use LogFile 
-	Do WriteLog("</pre>",2)
-	Do WriteLog("</div>")
-	Use PDev
-	Set $ZError=""
-	Quit
-
-LogCConsole
-	Set $ZTrap="cconsoleErr"
-	; Processes cconsole.log
-	New cconsoleFile,cconsoleSize,x
-	Do WriteParagraph("cconsole","cconsole.log")
-	Do WriteLog("<h4 id=""cconsoletoggle"" onclick=""javascript:toggle('cconsolediv','cconsoletoggle');"">&rtrif; Expand</h4>",0)	
-	//Do WriteLog("<div id=""cconsolediv"" class=""scrollable"" style=""width:100%;height:400px;"">")
-	Do WriteLog("<div id=""cconsolediv"" style=""display:none;"">")
-	Do WriteLog("<pre>",2)
-	Use PDev
-	If $Data(NoRun("cconsole")) Do  Quit
-	.	Do WriteLog(""),WriteLog("cconsole.log information inhibited by User.")
-	.	Do WriteLog("</pre>",2)
-	.	Do WriteLog("</div>")
-	.	Use PDev
-	.	Quit
-	If OS?1"Win".e!(OS="UNIX"){
-		Set cconsoleFile=MgrDir_DirDelim_"cconsole.log"
-	} Else {
-		If OS="VMS" Set cconsoleFile=MgrDir_"CCONSOLE.LOG"
-	}
-	Set cconsoleSize=$ZUtil(140,1,cconsoleFile)
-	If 'cconsoleSize Do  Quit
-	.	Do WriteLog("File "_cconsoleFile_" is zero bytes long.")
-	.	Do WriteLog("</pre>",2)
-	.	Do WriteLog("</div>")
-	.	Use PDev
-	.	Quit
-#;Only put the last 8mb in the file
-	If cconsoleSize>(8388608 /* 8mb */) {
-		s SkipSize=cconsoleSize-8388608
-		Do WriteLog("File "_cconsoleFile_" is too large, skipping first "_SkipSize_" bytes")
-	} Else {
-		s SkipSize=0
-	}
-	Do CopyToLog(cconsoleFile,"Caché cconsole.log",SkipSize)
-	Do WriteLog("</div>")
-	Use PDev
-	Quit
-
-cconsoleErr
-	Set $ZTrap=""
-	Do WriteLog("Error: "_$ZError)
-	Quit 
-
-
- //////////DeepSee Setup section///////////
 LogDeepSeeSetupSection
 	//Begin body tag
+	Try {
 	Do WriteLog("<body bgcolor=""#FFFFFF"" text=""#000000"">")
 	Do WriteLog("<div class=""trapezoid"">")
 	Do WriteLog("<span onclick=""openNav()""> &#9776; </span>",2)
@@ -1369,7 +520,7 @@ LogDeepSeeSetupSection
 			Set msgrepair=$$GetLastBuild("Repair",cube)	//Get last repair
 			Do alertInitialBuildCubeManager(cube,msgrepair,msgbuild,.alerts)
 		}
-	} 	
+	}
  	ZN "%SYS"
  	Do WriteLog("</td>",6)
 	Do WriteLog("</tr>",4)
@@ -1534,34 +685,100 @@ LogDeepSeeSetupSection
 		Do WriteLog("</tbody>",2)
  		Do WriteLog("</table>",0)
 	}
+	} Catch(ex) {
+		Set tSC = ex.AsStatus()
+		Do WriteLog("Error in LogDeepSeeSetupSection: "_tSC,0)
+		Do WriteLog("</tbody>",2)
+ 		Do WriteLog("</table>",0)
+	}
 	Quit
 
-CountNodes(namespace,g){
-	ZN namespace
-	Return:'$D(@g) 0
-	For count=$D(@g)#10:1 Set g=$Query(@g) Quit:g=""
-	Return count
-}
-	
-PrintGlobal(namespace,glob,spaces){
-	ZN namespace
-	Quit:'$D(@glob)
-	Quit:glob=""
-	Set:$D(spaces) spaces = 0
-	Set queryary=$QUERY(@glob@(""))
-	Set res=@queryary
-	Set quote=""
-	Set:'(res=+res) quote=""""
-	Do WriteLog("<p>"_queryary_" = "_quote_res_quote_"</p>",spaces)
-	For   {
-    Set queryary=$QUERY(@queryary) 
-        Quit:queryary=""
-        Set res=@queryary
-		Set quote=""
-		Set:'(res=+res) quote=""""
-        Do WriteLog("<p>"_queryary_" = "_quote_res_quote_"</p>",spaces)
-	}
-}
+LogServerSetup()
+	///Server Details section
+	Do WriteParagraph("serverdetails","Server Details",1)
+	///The old "Configuration" section
+	Do WriteLog("<table id=""ServerDetailsTable"" cellpadding=""7"" cellspacing=""3"" class=""tableWithBorders tableTabbed"">",0)
+  	Do WriteLog("<tbody>",2)
+	Do WriteLog("<tr>",4)
+	Do WriteLog("<td>",6)
+	Do WriteHeader4("Configuration",8)
+	Do WriteLog("<p>"_ConfigName_" on Machine """_HostName_""""_"</p>",8)
+	Do WriteLog("</td>",6)
+	Do WriteLog("</tr>",4)	
+	Do WriteLog("<tr>",4)
+	Do WriteLog("<td>",6)
+	If CustomerName'?1a.e Set CustomerName="Unknown"
+	Do WriteHeader4("Customer Name",8)
+	Do WriteLog("<p>"_CustomerName_"</p>",8)
+	Do WriteLog("</td>",6)
+	Do WriteLog("</tr>",4)	
+	Do WriteLog("<tr>",4)
+	Do WriteLog("<td>",6)
+	Do WriteHeader4("License Order Number",8)
+	Do WriteLog("<p>"_OrderNumber_"</p>",8)
+	Do WriteLog("</td>",6)
+	Do WriteLog("</tr>",4)	
+	Do WriteLog("<tr>",4)
+	Do WriteLog("<td>",6)
+	Do WriteHeader4("Fully Qualified Host Name",8)
+	Do WriteLog("<p>"_FullHostName_" with IP Address: "_IPAddr_"</p>",8)
+	Do INT^%D,INT^%T
+	Do WriteLog("</td>",6)
+	Do WriteLog("</tr>",4)	
+	Do WriteLog("<tr>",4)
+	Do WriteLog("<td>",6)
+	Do WriteHeader4("Log created by User",8)
+	Do WriteLog("<p>"_CurUser_" on "_$ZD($ZDH(%DAT,7),3)_" at "_%TIM_"</p>",8)
+	Do WriteLog("</td>",6)
+	Do WriteLog("</tr>",4)
+	//Last Caché Startup
+	Do WriteLog("<tr>",4)
+	Do WriteLog("<td>",6)
+	Do WriteHeader4("Last Caché Startup",8)
+	Do WriteLastStartup
+	Do WriteLog("</td>",6)
+	Do WriteLog("</tr>",4)	
+	Do WriteLog("<tr>",4)
+	Do WriteLog("<td>",6)
+	Do WriteHeader4("Caché Version String",8)
+	Do WriteLog("<p>"_CacheVerStr_"</p>",8)
+	//Set isInsight=$$isHealthInsight(namespace) 	//Determine if this is a Health Insight namespace (1 if yes)
+	Do:isInsight WriteLog("<p>"_##class(%ZHSLIB.HealthShareMgr).VersionInfo()_"</p>",8)
+	Do WriteAdhocPatch //write information on Adhoc patch
+	//Current Locale subsection
+	Do WriteLog("</td>",6)
+	Do WriteLog("</tr>",4)	
+	Do WriteLog("<tr>",4)
+	Do WriteLog("<td>",6)
+	Do NLS
+	Do WriteLog("</td>",6)
+	Do WriteLog("</tr>",4)	
+	//Operating System Version section
+	Do WriteLog("<tr>",4)
+	Do WriteLog("<td>",6)	
+	Do OSVer
+	Do WriteLog("</td>",6)
+	Do WriteLog("</tr>",4)
+	//Disk space
+	Do WriteLog("<tr>",4)
+	Do WriteLog("<td>",6)
+	Do DiskSpace
+	Do WriteLog("</td>",6)
+	Do WriteLog("</tr>",4)
+	//RAM physical memory space
+	Do WriteLog("<tr>",4)
+	Do WriteLog("<td>",6)	
+	Do RAM
+	Do WriteLog("</td>",6)
+	Do WriteLog("</tr>",4)
+	//Close the table
+	Use PDev
+	If OS?1"Win".e!(OS="VMS"),OS'="Win9x" 
+	Use LogFile	
+	Do WriteLog("</tbody>",2)
+	Do WriteLog("</table>",0)
+	Use PDev
+	Quit
 
 LogCubeSection
 	Try {
@@ -1729,230 +946,6 @@ LogCubeSection
 	ZN "%SYS"
  	Quit
 
-
-
-GetLastBuild(CubeEvent,cubename) [cubename,CubeEvent,cubekey,cubeevent,totaltime,cubesize,finishtime,factsupdated,SQLCODE] {
-	new cubekey,totaltime,cubesize,finishtime,factsupdated,SQLCODE
-	If $D(cubename) {
-		&sql(SELECT TOP 1 CubeKey,TotalTime,CubeSize,FinishTime,FactsUpdated
-			INTO :cubekey,:totaltime,:cubesize,:finishtime,:factsupdated
-			FROM %DeepSee_CubeManager.CubeEvent
-			WHERE CubeEvent=:CubeEvent AND CubeKey=:cubename
-			ORDER BY FinishTime DESC)
-	} Else {
-		&sql(SELECT TOP 1 CubeKey,TotalTime,CubeSize,FinishTime,FactsUpdated
-			INTO :cubekey,:totaltime,:cubesize,:finishtime,:factsupdated
-			FROM %DeepSee_CubeManager.CubeEvent
-			WHERE CubeEvent=:CubeEvent 
-			ORDER BY FinishTime DESC)
-	}
-	IF SQLCODE=0 {
-		If CubeEvent="Synch"{
-    		Set string=$FNUMBER(factsupdated,",")_" facts synched on "_finishtime_" in "_totaltime_" seconds"
-		} ElseIf CubeEvent="Build"{
-			Set string=$FNUMBER(cubesize,",")_" facts built on "_finishtime_" in "_totaltime_" seconds"
-		} ElseIf CubeEvent="Update"{
-			Set string="on "_finishtime
-		} ElseIf CubeEvent="Repair"{
-			Set string=$FNUMBER(cubesize,",")_" facts built on "_finishtime_" in "_totaltime_" seconds"
-		} Else {			
-			Set string=CubeEvent_" event on "_finishtime_" in "_totaltime
-		}
-		Set:'$D(cubename) string = string_" for the "_cubekey_" cube"
-   	} ElseIf SQLCODE=100 {
-	   	Set string = "Not found"
-   	} Else {
-	   	Set string = "SQL Error code: "_SQLCODE
-   	}
-   	Quit string
-}
-
-
- //Get last 5 queries run by each user
-LogQuerylog
-	Do WriteUpdate("Getting Query Log, DeepSee logs, and cconsole.log..")
-	Do WriteParagraph("querylog","Query Log")
-	
-	//Do WriteParagraph("cconsole","cconsole.log")
-	Do WriteLog("<h4 id=""querylogtoggle"" onclick=""javascript:toggle('querylogdiv','querylogtoggle');"">&rtrif; Expand</h4>",0)
-	//Do WriteLog("<div id=""cconsolediv"" class=""scrollable"" style=""width:100%;height:400px;"">")
-	Do WriteLog("<div id=""querylogdiv"" style=""display:none;"">")
-	
-	
-	
-	
-	//Get usercount in ^DeepSee.QueryLog
- 	ZN namespace
- 	Set user=$O(^DeepSee.QueryLog(""))
- 	Set usercount=0
- 	While (user'="") {
- 		Set userqueries(user)=$G(^DeepSee.QueryLog(user))
-		Set usercount=$I(usercount)
-		Set user=$O(^DeepSee.QueryLog(user))
- 	}
- 	//Show table with number of queries run by users
- 	Do WriteHeader4("Users running MDX queries")
- 	Do WriteLog("<p>Number of users = "_usercount_"</p>")
- 	If $D(userqueries) {
- 		Do WriteLog("<table id=""QueryLogTable"" cellpadding=""5"" cellspacing=""5"" class=""tableWithBorders"">")
-		Do WriteLog("<tbody>",2)
-		Do WriteLog("<tr>",4)
-		Do WriteLog("<th onclick=""sortTable('QueryLogTable',0,1)"">Use</th>",6)
-		Do WriteLog("<th onclick=""sortTable('QueryLogTable',1,0)"">Queries run</th>",6)
-		Do WriteLog("</tr>",4)
-		Set u = $O(userqueries(""))
-		While (u'="") {
-			Do WriteLog("<tr>",4)
-			Do WriteLog("<td>"_u_"</td>",6)
-			Do WriteLog("<td>"_userqueries(u)_"</td>",6)
-			Do WriteLog("</tr>",4)
-			Set u = $O(userqueries(u))		
-		}	
- 		Do WriteLog("</tbody>",2)
- 		Do WriteLog("</table>")
- 	}
- 	//Last Query subsection
- 	Do WriteHeader4("Last query")
-	Do WriteLog("<pre>")
-	Use PDev
-	Set lastquery=$g(^[namespace]DeepSee.LastQuery)		//Display last query
-	If lastquery'=""{		
-		Do WriteLog(lastquery)
-		Use LogFile  Use PDev
-	}
-	Use LogFile
-	Do WriteLog("</pre>")
-	//Subsection with 5 last queries for each user
- 	Do WriteHeader4("MDX queries by user")
- 	ZN "%SYS"
- 	//If (usercount > 5) Do WriteLog("<div class=""scrollable"" style=""width:100%;height:400px;"">")
-	Do WriteLog("<pre class=""wrapped"">")
-	Use PDev
-	Set username=""
-	For k=1:1{
-		Set username=$O(^[namespace]DeepSee.QueryLog(username),1)
-		If username="" Quit
-		Set totqueries=$O(^[namespace]DeepSee.QueryLog(username,""),-1)
-		Set numqueries = 5
-		Set:totqueries<5 numqueries = totqueries
-		Do WriteLog("Last "_numqueries_" of "_totqueries_" MDX queries by User: "_username)
-		Set counter=""
-		For i=1:1:numqueries{
-			Quit:i>totqueries				//User has fewer than 5 queries
-			Set counter=$O(^[namespace]DeepSee.QueryLog(username,counter),-1)
-			Set query=$Get(^[namespace]DeepSee.QueryLog(username,counter))
-			If query'=""{
-				Use LogFile  Write ?2  Use PDev
-				Do WriteLog( i_") "_query)
-			}
-		}
-		Use LogFile  Write !  Use PDev		
-	}
-	Use LogFile
-	Do WriteLog("</pre>")
- 	//If (usercount > 5) Do WriteLog("</div>") 	
- 	Do WriteLog("</div>") //Close Expand/Collapse div	
-	Use PDev
-	Quit
-	
-	
-GetRelationships(cube){
-	If ##class(%DeepSee.Utils).%IsCubeCompound(cube){		//Can't have a related, compound cube
-		Quit
-	}
-	Set status=##class(%DeepSee.Utils).%GetDimensionList(cube,.dimlist)
-	Set nodenum=$O(dimlist(""),-1)			//Get last node in dimlist
-	Set count=0
-	If status=1{
-		For{
-			If $lg(dimlist(nodenum,0,0),1)="r"{			//If dimension is a relationship...
-				Set count=count+1						//increment count
-				Set dimname=$lg(dimlist(nodenum,0,0),2)	//Get name of relationship
-				Set relationships(count)=##class(%DeepSee.Utils).%GetRelatedCube(cube,dimname)	//Related cube name
-			}
-			Quit:nodenum=0								//If no dimensions defined, first node will be 0
-			Set nodenum=$O(dimlist(nodenum),-1)
-			If $lg(dimlist(nodenum,0,0),1)'="r"{
-				Quit
-			}
-		}
-		If count=0{
-			Write "-"
-		}
-		Else{		
-			For i=1:1:count{
-				If $g(relationships(i),"null")'="null"{
-					Write relationships(i)
-					If i'=count{
-						Write ", "
-					}
-				}
-			}
-		}
-	}
-	Quit
-}
-	
-GetSourceClass(cube,type,isInsight)[storageList, inheritList]{
-	Try {
-		Set sourceClass=""
-		If type="cube" {
-			Set cubeObj=##class(%DeepSee.Utils).%GetModel(cube)
-			If cubeObj=""{
-				Set sourceClass = "Cube class not compiled"
-				Quit
-			}
-			Set sourceClass=cubeObj.sourceClass				//Source Class name
-			If sourceClass=""&&isInsight{
-				Set sourceClass=^DeepSee.Overrides(cube,"SOURCECLASS")	//Source class isn't part of cube object	
-			}
-			Set classObj=##class(%Dictionary.CompiledClass).%OpenId(sourceClass)
-			Set storage=classObj.StorageStrategy
-		
-			Set super=classObj.Super
-
-			If storage["SQLStorage"{
-				Set $LIST(storageList,*+1)=cube
-			}
-			If super["%DeepSee.DataConnector"{
-				Set $LIST(inheritList,*+1)=cube
-			}
-		}
-		Else{
- 			Set basecube=##class(%DeepSee.Utils).%GetBaseCube(cube)
- 			//Set cubeobj=##class(%DeepSee.Utils).%GetModel(basecube)
- 			Set sourceClass="SA-"_basecube
-		}
-	} catch {
-		Set sourceClass = "Not available"
-	}
-	Quit sourceClass
-}
-
-
-
-GetDeepSeeAuditCode
-	Kill auditcode,querycode
-	Do WriteHeader4("Audit",8)
-	Try {
-		If $d(^[namespace]DeepSee.AuditCode){
-			Set auditcode=$g(^[namespace]DeepSee.AuditCode)
-			Do WriteLog("<p>DeepSee.AuditCode: "_auditcode_"</p>",8)
-		} Else{
-			Do WriteLog("<p>^DeepSee.AuditCode is undefined</p>",8)
-		}
-		If $d(^[namespace]DeepSee.AuditQueryCode){
-			Set querycode=$g(^[namespace]DeepSee.AuditQueryCode)
-			Do WriteLog("<p>DeepSee.AuditQueryCode: "_querycode_"</p>",8)
-		} Else{
-			Do WriteLog("<p>^DeepSee.AuditQueryCode is undefined</p>",8)
-		}
-	} Catch {
-		W "Not Available"
-	}	
-	Quit 
- 
- 
 LogCubeRegistry
 	Do WriteParagraph("cuberegistry","Cube Registry")
 	ZN namespace	
@@ -1999,8 +992,8 @@ LogCubeRegistry
 	}
 	ZN "%SYS"
 	Quit
-	
-LogCubeInfo
+
+LogDetailedCubeInfo
 	Do WriteParagraph("cubeinfo","Cube Info")
 	Set cubeListLength=$ll(cubeList)
  	For i=1:1:cubeListLength{
@@ -2010,303 +1003,19 @@ LogCubeInfo
 			Do WriteLog("<br>")
 		}
 	}
-	For i=1:1:cubeListLength {
-		Set cube=$lg(cubeList,i)
-		Do:cube'="" CubeSpec(namespace,cube,PDev,LogFile) //PDev eg "/dev/pts/5"
-	}
-	Quit
-
-LogDeepSeelog 
-	; Processes DeepSee Log file
-	New x
-	Set DSFile=$zu(12)_"DeepSeeTasks_"_namespace_".log"
-	Do WriteParagraph("dslog","DeepSee Logs")
-	Do WriteLog("<h4 id=""dslogtoggle"" onclick=""javascript:toggle('dslogdiv','dslogtoggle');"">&rtrif; Expand</h4>",0)	
-	//Do WriteLog("<div id=""dslogdiv"" class=""scrollable"" style=""width:100%;height:400px;"">")
-	Do WriteLog("<div id=""dslogdiv"" style=""display:none;"">")
-	Do WriteLog("<pre>",2)
-	Use PDev	
-	Do WriteLog("DeepSee Logs File "_DSFile_":"),WriteLog("")
-	Set $ZTrap="DSLogErr"
-	Open DSFile:"R":FileOpenTimeOut
-	If '$Test Do  Quit
-	.	Do WriteLog("Error: could not open DeepSee Logs File "_DSFile)
-	.	Use LogFile 
-	.	Do WriteLog("</pre>")
-	.	Do WriteLog("</div>")
-	.	Use PDev
-	.	Quit
-	; Read timeout added to prevent the case where neither <ENDOFFILE> error nor $ZEOF terminate the loop
-	For  Use DSFile Read x:FileReadTimeOut Set ZEOF=$ZEof Use PDev Quit:'$Test!(ZEOF)  Use LogFile Write x,CRLF Use PDev
-	Close DSFile
-	Use LogFile
-	Do WriteLog("</pre>",2)
-	Do WriteLog("</div>")
-	Use PDev
-	Quit
- 
- 
- 
-DSLogErr
-	Set $ZTrap=""
-	Close DSFile
-	Use LogFile
-	Do WriteLog("</pre>",2)
-	Do WriteLog("</div>")
-	Use PDev
-	Set $ZError=""
-	Quit
-	
-	
-	
-GetBuildTime(cube)
-	[time,cube] PUBLIC{
-	new time
-	Set cube=$zconvert(cube,"u")
-	&sql(SELECT TotalTime into :time 
-	FROM %DeepSee_CubeManager.CubeEvent 
-	where cubekey=:cube and cubeevent='Build' 
-	order by finishtime desc)
-	If $d(time){
-		Quit time
-	} Else{
-		Quit "N/A"
-	}
-}
-
-FindOrphanedCubes()
-{
-	Set cubename=""
-	Set count=0
-   	FOR {
-    	SET cubename=$ORDER(^DeepSee.Cubes("cubes",cubename)) 
-    	QUIT:cubename=""
-     
-    	Set classname=##class(%DeepSee.Utils).%GetCubeClass(cubename)
-		If classname=""{					//Class doesn't exist and this is an orphaned node in ^DeepSee.Cubes
-			Set count=count+1
-			Set missingNode(count)=cubename
+	For cubeind=1:1:cubeListLength {
+		Set cube=$lg(cubeList,cubeind)
+ 		//Do:cube'="" LogCubeDetails(namespace,cube,PDev,LogFile) //PDev eg "/dev/pts/5"
+ 		If cube'="" {
+ 			ZN namespace
+			Do LogCubeInfo
+			Do LogCubeDimensions
+			Do LogOtherCubeElements
 		}
-	}
-	If count'=0{
-		Do WriteHeader4("Important Mappings")
-		Do WriteLog("<p>Warning: Orphaned cube node(s) exist in ^DeepSee.Cubes!</p>")
-		Do WriteLog("")
-		For i=1:1:count{
-			Write "<p>==",$d(missingNode(i)),"==</p>",!
-		}
-	}
-}
-
-LogDataBases
-	Set $ZTrap="CatchErr"
-	Do WriteUpdate("Getting local databases information..")
-	; CKEY^%SYS.LICENSE
-	Do WriteParagraph("LocalDB","Local Databases")
-	Do WriteLog("<br>")
-	Do WriteLog("<table id=""databaseTable"" border=""0"" cellpadding=""7"" cellspacing=""3"" class=""zebraStriped"">")
-	Do WriteLog("<tbody>",2)
-	Do WriteLog("<tr>",4)
-	//Do WriteLog("<th>Database</th><th>Directory</th><th>Size in MB</th><th>Status</th><th>Resource</th><th>Encrypted</th><th>Journal</th>",6)
-	Do WriteLog("<th onclick=""sortTable('databaseTable',0,1)"">Database</th>",6)
-	Do WriteLog("<th onclick=""sortTable('databaseTable',1,1)"">Directory</th>",6)
-	Do WriteLog("<th onclick=""sortTable('databaseTable',2,0)"">Size in MB</th>",6)
-	Do WriteLog("<th onclick=""sortTable('databaseTable',3,1)"">Status</th>",6)
-	Do WriteLog("<th onclick=""sortTable('databaseTable',4,1)"">Resource</th>",6)
-	Do WriteLog("<th onclick=""sortTable('databaseTable',5,1)"">Encrypted</th>",6)
-	Do WriteLog("<th onclick=""sortTable('databaseTable',6,1)"">Journal</th>",6)	
-	Do WriteLog("</tr>",4)
-	Set Maj=##class(%SYSTEM.Version).GetMajor()
-	If Maj<2009 {
-		Set result=##class(%Library.ResultSet).%New("Config.DataStorage:LocalDatabaseList")
-	} Else {
-		Set result=##class(%Library.ResultSet).%New("Config.Databases:LocalDatabaseList")
-	}
-	Set sc=result.Execute() If ('sc) Do DisplayError^%apiOBJ(sc) Quit
-	While result.Next(.sc) {
-		If ('sc) Quit
-		Do WriteLog("<tr>",6)
-		Do WriteLog("<td>"_result.Data("Name")_"</td>",8)
-		Do WriteLog("<td>"_result.Data("Directory")_"</td>",8)
-		Do WriteLog("<td>"_$FNUMBER(result.Data("Size in MB"),",",0)_"</td>",8)
-		Do WriteLog("<td>"_result.Data("Status")_"</td>",8)
-		Do WriteLog("<td>"_result.Data("Resource")_"</td>",8)
-		Do WriteLog("<td>"_result.Data("Encrypted")_"</td>",8)
-		Do WriteLog("<td>"_result.Data("Journal")_"</td>",8)
-		Do WriteLog("</tr>",6)
-	}
-	If ('sc) Do DisplayError^%apiOBJ(sc)
-	Do WriteLog("</tbody>",2)
-	Do WriteLog("</table>")
-	Quit $$$OK
-
-LogTasks
-	Set $ZTrap="CatchErr"
-	Do WriteUpdate("Getting background tasks information..")
-	Do WriteParagraph("Taskschedule","Task schedule")
-	Use LogFile
-	ZN namespace
-	ZN "%SYS"	
-	Try {
-		Set rs = ##class(%ResultSet).%New("%SYS.Task:TaskListFilter")
-		Do rs.Execute()
-		Do WriteLog("<table id=""tasksTable"" border=""0"" cellpadding=""7"" cellspacing=""3"" class=""zebraStriped"">")
-		Do WriteLog("<tbody>",2)
-		Do WriteLog("<tr>",4)
-		Do WriteLog("<th onclick=""sortTable('tasksTable',0,1)"">Task Name</th>",6)
-		Do WriteLog("<th onclick=""sortTable('tasksTable',1,1)"">Task Type</th>",6)
-		Do WriteLog("<th onclick=""sortTable('tasksTable',2,1)"">Namespace</th>",6)
-		Do WriteLog("<th onclick=""sortTable('tasksTable',3,1)"">Description</th>",6)
-		Do WriteLog("<th onclick=""sortTable('tasksTable',4,0)"">ID</th>",6)
-		Do WriteLog("<th onclick=""sortTable('tasksTable',5,1)"">Suspended</th>",6)
-		Do WriteLog("<th onclick=""sortTable('tasksTable',6,1)"">Last Finished</th>",6)
-		Do WriteLog("<th onclick=""sortTable('tasksTable',7,1)"">NextScheduled</th>",6)
-		Do WriteLog("</tr>",4)
-		While (rs.Next()) {
-			Do WriteLog("<tr>",4)
-			Do WriteLog("<td>"_rs.%Get("Task Name")_"</td>",6)
-			Do WriteLog("<td>"_rs.%Get("Task Type")_"</td>",6)
-			Do WriteLog("<td>"_rs.%Get("Namespace")_"</td>",6)
-			Do WriteLog("<td>"_rs.%Get("Description")_"</td>",6)
-			Do WriteLog("<td>"_rs.%Get("ID")_"</td>",6)
-			Do WriteLog("<td>"_rs.%Get("Suspended")_"</td>",6)
-			Do WriteLog("<td>"_rs.%Get("Last Finished")_"</td>",6)
-			Do WriteLog("<td>"_rs.%Get("Next Scheduled")_"</td>",6)
-			
-			//Get frequency Set task = ##class(%SYS.Task).%OpenId(rs.%Get("ID"),0,.status)
- 
-			Do WriteLog("</tr>",4)
-		}
-	} Catch {
-		//Do WriteLog("</table>")
-		Do WriteLog("<p>An error occurred</p>")
-	}
-	Do WriteLog("</tbody>",2)
-	Do WriteLog("</table>",0)
+ 	}
 	Quit
 
-LogJournal
-	Set $ZTrap="CatchErr"
-	Do WriteUpdate("Getting journaling information..")
-	Do WriteParagraph("Journaling","Journaling")
-	ZN "%SYS"
-	Try{
-		Set pdir = ##class(%SYS.Journal.System).GetPrimaryDirectory(.st)
-		Set altdir = ##class(%SYS.Journal.System).GetAlternateDirectory(.st)
-		Set freesp = ##class(%SYS.Journal.System).GetFreeSpace()
-		Set stateString = ##class(%SYS.Journal.System).GetStateString()
-		Set filen=1
-		Set FileName = ##class(%SYS.Journal.System).GetCurrentFileName()
-		While FileName'="" {
-			Set FileSize=$zu(140,1,FileName) 
-			i (FileSize<0)||($ZU(78,22,FileName)'=1) s Row="Filename" Quit
-			Set $li(Row(filen),1)=FileName
-			Set $li(Row(filen),2)=FileSize
-			Set $li(Row(filen),3)=$zdt($zdth($p($zu(78,22,FileName,4),",",2),-2),3)
-			Set $li(Row(filen),4)=4 //..TranslateReason($P($zu(78,22,FileName,1),",",3))
-			Do ##class(%SYS.Journal.File).GetPrev(FileName,.FileName)			
-			Set filen=filen+1
-		}
-		ZN namespace
-		Use LogFile
-		Do WriteLog("<table id=""journalinfoTable"" cellpadding=""7"" cellspacing=""3"" class=""tableWithBorders tableTabbed"">")
-  		Do WriteLog("<tbody>",2)
-    	Do WriteLog("<tr>",4)
-    	Do WriteLog("<td>",6)
-		Do WriteHeader4("Primary Directory",8)
-		Do WriteLog("<p>"_pdir_"</p>",8)
-		Do WriteLog("</td>",6)
- 		Do WriteLog("</tr>",4)
- 		Do WriteLog("<tr>",4)
-    	Do WriteLog("<td>",6)
-		Do WriteHeader4("Alternative Directory",8)
-		Do WriteLog("<p>"_altdir_"</p>",8)
-		Do WriteLog("</td>",6)
- 		Do WriteLog("</tr>",4)
- 		Do WriteLog("<tr>",4)
-    	Do WriteLog("<td>",6)
-		Do WriteHeader4("Free Space",8)
-		Do WriteLog("<p>"_$FN(freesp/1024/1024,",",0)_" MB </p>",8)
-		Do WriteLog("</td>",6)
- 		Do WriteLog("</tr>",4)
- 		Do WriteLog("<tr>",4)
-    	Do WriteLog("<td>",6)
-		Do WriteHeader4("State",8)
-		Do WriteLog("<p>"_stateString_"</p>",8)
-		Do WriteLog("</td>",6)
- 		Do WriteLog("</tr>",4)
- 		Do WriteLog("</tbody>",2)
-    	Do WriteLog("</table>")
-		If $D(Row(1)) {
-			Do WriteHeader4("Journal Files")
-			Do WriteLog("<table id=""journalTable"" border=""0"" cellpadding=""7"" cellspacing=""3"" class=""zebraStriped"">")
-			Do WriteLog("<tbody>",2)
-			Do WriteLog("<tr>",4)
-			Do WriteLog("<th onclick=""sortTable('journalTable',0,1)"">Name</th>",6)
-			Do WriteLog("<th onclick=""sortTable('journalTable',1,0)"">Size in KB</th>",6)
-			Do WriteLog("<th onclick=""sortTable('journalTable',2,1)"">Creation Time</th>",6)
-			Do WriteLog("<th onclick=""sortTable('journalTable',3,1)"">Reason</th>",6)
-			Do WriteLog("</tr>",4)
-			Set filen=1
-			While $D(Row(filen)) {			
-				Do WriteLog("<tr>",4)
-				Do WriteLog("<td>"_$LG(Row(filen),1)_"</td>",6)
-				Do WriteLog("<td style=""text-align:right"">"_$FN($LG(Row(filen),2)/1024,",",0)_"</td>",6)
-				Do WriteLog("<td>"_$LG(Row(filen),3)_"</td>",6)
-				Set a=$LG(Row(filen),4)
-				Set reas=$S(a=-1:"<STARTUP>",a=0:"unspecified",a=1:"by user",a=2:"file size limit reached",a=3:"to retry failed I/O",a=4:"by backup",a=5:"by restore",a=6:"by task manager",a=7:"to activate journal changes",a=8:"to reenable journaling",a=9:"by mirror startup",a=10:"by mirror shutdown",a=11:"mirror database removed",1:"Unknown")
-				Do WriteLog("<td>"_reas_"</td>",6)
-				Do WriteLog("</tr>",4)
-				Set filen=filen+1
-			}
-			Do WriteLog("</tbody>",2)
-			Do WriteLog("</table>")
-		}
-	} Catch {
-		Do WriteLog("<p>An error occurred</p>")
-	}
-	Quit
-
-LogAlerts
-	Set $ZTrap="CatchErr"
-	Do WriteParagraph("Alerts","Alerts")
-	If $D(alerts)>9 { 	//alerts is an array
-		
-		 //class=""red""
-		Do WriteLog("<p>The following alerts were raised on this system. Please find more details above</p>")
-		Set i = $O(alerts(""))
-		While (i'="") {
-			Do WriteLog("<p class=""red"""_alerts(i)_"</p>")
-			Set i = $O(alerts(i))
-		}		
-	} Else {
-		Do WriteLog("<p>No alerts"_"</p>")
-	}
-	Quit
-
-LogTrailer
-	; Records a Trailer record to LogFile
-	Do WriteParagraph("end","End of DeepSeeButtons")	
-	Do WriteLog("<p>"_ConfigName_" on Machine """_HostName_"""</p>")
-	Do WriteLog("</div>")	
-	Use PDev
-	Quit
-		
-CatchErr
-	Set $ZTrap=""
-	Do WriteLog("<p>Error: "_$ZError_"</p>")
-	Quit 
-	
-CubeSpec(namespace,cube,PDev,LogFile)
-	ZN namespace
-		Do GetCubeInfo
-		Do Dimensions
-		Do OtherElements
-		Kill cube
-	Quit
-
-
-GetCubeInfo
+LogCubeInfo
 	Do WriteUpdate("Getting detailed cube information for "_cube)
 	Use LogFile
 	ZN namespace
@@ -2370,12 +1079,14 @@ GetCubeInfo
     Do WriteLog("<td>",6)
 	Do WriteLog("<h4>Source Class</h4>",8)
 	//Get the source class. All code is repeated here from DeepSeeButtons
-	Try{
+	
+ /*	Try{
 		Set x=##class(HSAA.Utils).GetLogDirectory()	//Just testing to see if this method works
 		Set isInsight = 1
 	} Catch {
-		Set isInsight = 0						//Method did not work so return 0
+		Set isInsight = 0							//Method did not work so return 0
 	}
+	*/
 	Do ##class(%DeepSee.Utils).%GetCubeList(.plist)
 	Set type = $lg(plist(cube),4)
 	Set sourceclass = $$GetSourceClass(cube,type,isInsight)
@@ -2410,6 +1121,7 @@ GetCubeInfo
     //Cube Registry
     Do WriteLog("<tr>",4)
     Do WriteLog("<td>",6)
+   	Do WriteUpdate("Getting detailed cube information for "_cube_": cube registry")
     Do WriteLog("<h4>Cube Registry</h4>",8)
     S rs = ##class(%ResultSet).%New("%DeepSee.CubeManager.RegistryMap:RegistryMapTableView")
 	Set registered = ""
@@ -2476,73 +1188,8 @@ GetCubeInfo
 	ZN "%SYS"
 	Quit
 
-alertDStimeRW(DSTimeMapFrom,alerts) {
-	Try {
-		ZN "%SYS"
-		//Check if DB is Read-Write
-		Set sc = ##class(Config.Databases).Get(DSTimeMapFrom, .prop)
-		Set db=##Class(SYS.Database).%OpenId(prop("Directory"))
-		Set readonly = db.ReadOnly
-		If readonly {
-			Set pre="title=""In Caché versions including DevChange DTB422 ^OBJ.DSTIME and ^DeepSee.Update should be mapped to a Read-Write database"">"
-			Set alert = "Alert: ^OBJ.DSTIME and/or ^DeepSee.Update are stored in the "_DSTimeMapFrom_" database, which should be Read-Write"
-			Set alerts($I(alerts)) = pre_alert
-			Do WriteLog("<p class=""red"" "_pre_alert_"</p>",8)
-		}
-		Set tSC = 1
-	} Catch (exc) {
-		Set tSC = exc.AsStatus()
-	}
-	Quit tSC
-}
-
-alertCacheMappings(ns,DeepSeeMap,alerts) {
-	Try {
-		Set mapcount=$O(DeepSeeMap(ns,""))
- 		While mapcount'="" {
- 			Set global=$P($P(DeepSeeMap(ns,mapcount),"_",2,*),"=",1)
-			Set DB=$P($P(DeepSeeMap(ns,mapcount),"_",2,*),"=",2,*)
-			If ((global="DeepSee.Cache.*") || (global="DeepSee.Cache*")) {
-				//Check if DB is journaled
-				Set sc = ##class(Config.Databases).Get(DB, .prop)
-				Set db=##Class(SYS.Database).%OpenId(prop("Directory"))
-				Set journaled = (db.GlobalJournalState = 3)
-				If journaled {
-					Set pre="title=""Journaling the DeepSee cache leads to problems with disk size and query performance"">"
-					Set alert = "Alert: The DeepSee cache stored in the "_DB_" database is journaled"
-					Set alerts($I(alerts)) = pre_alert
-					Do WriteLog("<p class=""red"" "_pre_alert_"</p>",8)
-				}
-			}
-			Set mapcount=$O(DeepSeeMap(ns,mapcount))
-		}
-		Set tSC = $$$OK
-	} Catch (exc) {
-		Set tSC = ex.AsStatus()
-	}
-	Quit tSC
-}
-
-alertInitialBuildCubeManager(cube,msgrepair,msgbuild,alerts) {
-	Try {
-		If ((msgrepair="Not found") && (msgbuild="Not found")) {
-			Set pre="title=""Before you synchronize cubes from the Cube Manager, it is necessary to build the cubes at least once from the Cube Manager."">"
-			Set alert = "Alert: there is no record for the initial build of "_cube_" from Cube Manager. Check if the cube is updating"
-			Set alerts($I(alerts)) = pre_alert
-			Do WriteLog("<p class=""red"" "_pre_alert_"</p>",8)
-		}
-		Set tSC = 1
-	} Catch(ex) {
-		Set pre="<p class=""red"" title=""Before you synchronize cubes from the Cube Manager, it is necessary to build the cubes at least once from the Cube Manager."">"
-			Set alert = Ext
-			Set alerts($I(alerts)) = alert
-			Do WriteLog(pre_alert_"</p>",8)
-		Set tSC = ex.AsStatus()
-	}
-}
-
-Dimensions
-	Use LogFile
+LogCubeDimensions
+	Do WriteUpdate("Getting detailed cube information for "_cube_": get dimension list")
 	ZN namespace
 	Do WriteLog("<hr size=""4"" noshade>")
 	Do WriteLog("<a name=""dimensions"_cube_"""></a>")
@@ -2631,6 +1278,7 @@ Dimensions
 		}
 	Do WriteLog("</tbody>",2)
 	Do WriteLog("</table>")
+	Do WriteUpdate("Getting detailed cube information for "_cube_": %Analyze")
 	Do WriteLog("<h4>Analyze</h4>")
 	Do WriteLog("<table border=""0"" cellpadding=""5"" cellspacing=""5"">")
 	Do WriteLog("<tbody>",2)
@@ -2643,11 +1291,13 @@ Dimensions
 	Do WriteLog("")
 	Do WriteLog("")
 	// Translate the filed names in %Analyze to actual specs
+	Do WriteUpdate("Getting detailed cube information for "_cube_": FieldNameToSpec")
 	Write "FieldNameToSpec("""_cube_""")",!
 	Do FieldNameToSpec(cube)  //worked
 	Do WriteLog("")
 	Do WriteLog("")
 	Do WriteLog("")
+	Do WriteUpdate("Getting detailed cube information for "_cube_": %AnalyzeMissing")
 	Write "Do ##class(%DeepSee.Utils).%AnalyzeMissing(""",cube,""")",!
 	Do ##class(%DeepSee.Utils).%AnalyzeMissing(cube)
 	Do WriteLog("</pre>",8)
@@ -2660,8 +1310,8 @@ Dimensions
 	Quit
 	
 
-OtherElements
-	Use LogFile
+LogOtherCubeElements
+	Do WriteUpdate("Getting detailed cube information for "_cube_": other cube elements")
 	ZN namespace
 	Do WriteLog("<hr noshade size=""4"" width=""auto"">"	)
 	Do WriteLog("<a name=""otherelements""></a>")
@@ -2784,7 +1434,1068 @@ OtherElements
 	}
 	Write !	
 	ZN "%SYS"
+	Quit
+	
+LogQuerylog
+	//Get last 5 queries run by each user
+	Do WriteUpdate("Getting Query Log, DeepSee logs, and cconsole.log..")
+	Do WriteParagraph("querylog","Query Log")
+	Do WriteLog("<h4 id=""querylogtoggle"" onclick=""javascript:toggle('querylogdiv','querylogtoggle');"">&rtrif; Expand</h4>",0)
+	Do WriteLog("<div id=""querylogdiv"" style=""display:none;"">")
+	//Get usercount in ^DeepSee.QueryLog
+ 	ZN namespace
+ 	Set user=$O(^DeepSee.QueryLog(""))
+ 	Set usercount=0
+ 	While (user'="") {
+ 		Set userqueries(user)=$G(^DeepSee.QueryLog(user))
+		Set usercount=$I(usercount)
+		Set user=$O(^DeepSee.QueryLog(user))
+ 	}
+ 	//Show table with number of queries run by users
+ 	Do WriteHeader4("Users running MDX queries")
+ 	Do WriteLog("<p>Number of users = "_usercount_"</p>")
+ 	If $D(userqueries) {
+ 		Do WriteLog("<table id=""QueryLogTable"" cellpadding=""5"" cellspacing=""5"" class=""tableWithBorders"">")
+		Do WriteLog("<tbody>",2)
+		Do WriteLog("<tr>",4)
+		Do WriteLog("<th onclick=""sortTable('QueryLogTable',0,1)"">User</th>",6)
+		Do WriteLog("<th onclick=""sortTable('QueryLogTable',1,0)"">Queries run</th>",6)
+		Do WriteLog("</tr>",4)
+		Set u = $O(userqueries(""))
+		While (u'="") {
+			Do WriteLog("<tr>",4)
+			Do WriteLog("<td>"_u_"</td>",6)
+			Do WriteLog("<td>"_userqueries(u)_"</td>",6)
+			Do WriteLog("</tr>",4)
+			Set u = $O(userqueries(u))		
+		}	
+ 		Do WriteLog("</tbody>",2)
+ 		Do WriteLog("</table>")
+ 	}
+ 	//Last Query subsection
+ 	Do WriteHeader4("Last query")
+	Do WriteLog("<pre>")
+	Use PDev
+	Set lastquery=$g(^[namespace]DeepSee.LastQuery)		//Display last query
+	If lastquery'=""{		
+		Do WriteLog(lastquery)
+		Use LogFile  Use PDev
+	}
+	Use LogFile
+	Do WriteLog("</pre>")
+	//Subsection with 5 last queries for each user
+ 	Do WriteHeader4("MDX queries by user")
+ 	ZN "%SYS"
+ 	//If (usercount > 5) Do WriteLog("<div class=""scrollable"" style=""width:100%;height:400px;"">")
+	Do WriteLog("<pre class=""wrapped"">")
+	Use PDev
+	Set username=""
+	For k=1:1{
+		Set username=$O(^[namespace]DeepSee.QueryLog(username),1)
+		If username="" Quit
+		Set totqueries=$O(^[namespace]DeepSee.QueryLog(username,""),-1)
+		Set numqueries = 5
+		Set:totqueries<5 numqueries = totqueries
+		Do WriteLog("Last "_numqueries_" of "_totqueries_" MDX queries by User: "_username)
+		Set counter=""
+		For i=1:1:numqueries{
+			Quit:i>totqueries				//User has fewer than 5 queries
+			Set counter=$O(^[namespace]DeepSee.QueryLog(username,counter),-1)
+			Set query=$Get(^[namespace]DeepSee.QueryLog(username,counter))
+			If query'=""{
+				Use LogFile  Write ?2  Use PDev
+				Do WriteLog( i_") "_query)
+			}
+		}
+		Use LogFile  Write !  Use PDev		
+	}
+	Use LogFile
+	Do WriteLog("</pre>")
+ 	//If (usercount > 5) Do WriteLog("</div>") 	
+ 	Do WriteLog("</div>") //Close Expand/Collapse div	
+	Use PDev
+	Quit
+
+LogDeepSeelog 
+	//Processes DeepSee Log file
+	Try {
+		New x
+		Set DSFile=$zu(12)_"DeepSeeTasks_"_namespace_".log"
+		Do WriteParagraph("dslog","DeepSee Logs")
+		Do WriteLog("<h4 id=""dslogtoggle"" onclick=""javascript:toggle('dslogdiv','dslogtoggle');"">&rtrif; Expand</h4>",0)	
+		//Do WriteLog("<div id=""dslogdiv"" class=""scrollable"" style=""width:100%;height:400px;"">")
+		Do WriteLog("<div id=""dslogdiv"" style=""display:none;"">")
+		Do WriteLog("<pre>",2)
+		Use PDev	
+		Do WriteLog("DeepSee Logs File "_DSFile_":"),WriteLog("")
+		Open DSFile:"R":FileOpenTimeOut
+		If '$Test Do  Quit
+		.	Do WriteLog("Error: could not open DeepSee Logs File "_DSFile)
+		.	Use LogFile 
+		.	Do WriteLog("</pre>")
+		.	Do WriteLog("</div>")
+		.	Use PDev
+		.	Quit
+		//Read timeout added to prevent the case where neither <ENDOFFILE> error nor $ZEOF terminate the loop
+		For  Use DSFile Read x:FileReadTimeOut Set ZEOF=$ZEof Use PDev Quit:'$Test!(ZEOF)  Use LogFile Write x,CRLF Use PDev
+		Close DSFile
+		Use LogFile
+		Do WriteLog("</pre>",2)
+		Do WriteLog("</div>")
+		Use PDev
+	} Catch(ex) {
+		Set tSC = ex.AsStatus()
+		Close DSFile
+		Use LogFile
+		Do WriteLog("</pre>",2)
+		Do WriteLog("</div>")
+		Use PDev
+	}
 	Quit	
+
+LogCPF
+	Try {
+		//Processes Cache configuration file (usually Cache.cpf)
+		New x
+		Do WriteParagraph("cpf","cache.cpf file")
+		Use PDev
+		Do WriteLog("")
+		Do WriteLog("<h4 id=""cpftoggle"" onclick=""javascript:toggle('cpfdiv','cpftoggle');"">&rtrif; Expand</h4>",0)
+		//Do WriteLog("<div id=""cpfdiv"" class=""scrollable"" style=""width:100%;height:400px;"">")
+		Do WriteLog("<div id=""cpfdiv"" style=""display:none;"">")
+		Do WriteLog("<p>Caché Configuration File "_ConfigFile_":"_"</p>",2)
+		Do WriteLog("<pre>",2)
+		Open ConfigFile:"R":FileOpenTimeOut
+		If '$Test Do  Quit
+		.	Do WriteLog("Error: could not open Caché Configuration File "_ConfigFile)
+		.	Do WriteLog("</pre>") Use PDev
+		.	Quit
+		//Read timeout added to prevent the case where neither <ENDOFFILE> error nor $ZEOF terminate the loop
+		Set MapCount=1 		
+		Set NsCount=1
+		For {
+			Use ConfigFile Read x:FileReadTimeOut
+			If $p(x,".",1)="[Map"  {				//Grab namespace we are mapping from
+				Set NsMap(NsCount) = x
+				Set NsCount = $I(NsCount)
+			}
+			If x["OBJ.DSTIME" {						//Grab OBJ.DSTIME mapping
+				Set DSTimeMap(NsCount)=x
+			}
+			If $p(x,".",1)="Global_DeepSee" {		//Create array of DeepSee.* global mappings within this namespace
+				Set DeepSeeMap(NsCount,MapCount) = x
+				Set MapCount = $I(MapCount)
+			}
+			Set ZEOF=$ZEof 
+			Use PDev
+			Quit:'$Test!(ZEOF)
+			Use LogFile 
+			Write x,CRLF 
+			Use PDev
+		}
+		Close ConfigFile
+		For i=1:1:NsCount{
+			Write NsMap(i),!
+			Set NumMaps=$O(DeepSeeMap(i,""),-1)
+			For k=1:1:NumMaps{
+				Write DeepSeeMap(i,k),!
+				If k=NumMaps  Write !
+			}	
+		}
+		Use LogFile 
+		Do WriteLog("</pre>",2)
+		Do WriteLog("</div>")
+		Use PDev
+	} Catch(ex) {
+		Set tSC = ex.AsStatus()
+		Close ConfigFile
+		Use LogFile 
+		Do WriteLog("</pre>",2)
+		Do WriteLog("</div>")
+		Use PDev
+	}
+	Quit
+
+LogCConsole
+	Try {
+		//Processes cconsole.log
+		New cconsoleFile,cconsoleSize,x
+		Do WriteParagraph("cconsole","cconsole.log")
+		Do WriteLog("<h4 id=""cconsoletoggle"" onclick=""javascript:toggle('cconsolediv','cconsoletoggle');"">&rtrif; Expand</h4>",0)	
+		//Do WriteLog("<div id=""cconsolediv"" class=""scrollable"" style=""width:100%;height:400px;"">")
+		Do WriteLog("<div id=""cconsolediv"" style=""display:none;"">")
+		Do WriteLog("<pre>",2)
+		Use PDev
+		If $Data(NoRun("cconsole")) Do  Quit
+		.	Do WriteLog(""),WriteLog("cconsole.log information inhibited by User.")
+		.	Do WriteLog("</pre>",2)
+		.	Do WriteLog("</div>")
+		.	Use PDev
+		.	Quit
+		If OS?1"Win".e!(OS="UNIX"){
+			Set cconsoleFile=MgrDir_DirDelim_"cconsole.log"
+		} Else {
+			If OS="VMS" Set cconsoleFile=MgrDir_"CCONSOLE.LOG"
+		}
+		Set cconsoleSize=$ZUtil(140,1,cconsoleFile)
+		If 'cconsoleSize Do  Quit
+		.	Do WriteLog("File "_cconsoleFile_" is zero bytes long.")
+		.	Do WriteLog("</pre>",2)
+		.	Do WriteLog("</div>")
+		.	Use PDev
+		.	Quit
+		//Only put the last 8mb in the file
+		If cconsoleSize>(8388608 /* 8mb */) {
+			Set SkipSize=cconsoleSize-8388608
+			Do WriteLog("File "_cconsoleFile_" is too large, skipping first "_SkipSize_" bytes")
+		} Else {
+			s SkipSize=0
+		}
+		Do CopyToLog(cconsoleFile,"Caché cconsole.log",SkipSize)
+		Do WriteLog("</div>")
+		Use PDev
+	} Catch(ex) {
+		Set tSC = ex.AsStatus()
+		Do WriteLog("Error in logging the cconsole.log file")
+	}
+	Quit
+
+LogMappings
+	Do WriteParagraph("mappings","Mappings")
+	ZN "%SYS"
+	Try {
+		Set rs=##class(%ResultSet).%New("Config.MapGlobals:List")
+		Do rs.Execute(namespace)	
+		Set next=rs.Next()
+		If ('next) {
+			Do WriteLog("<p>No mappings for the "_namespace_" namespace</p>",2)
+			Return
+		}
+		Do rs.Execute(namespace)
+		Do WriteLog("<table id=""mappingsTable"" border=""0"" cellpadding=""7"" cellspacing=""3"" class=""zebraStriped"">")
+		Do WriteLog("<tbody>",2)
+		Do WriteLog("<tr>",4)
+		Do WriteLog("<th>Global</th>",6)
+		Do WriteLog("<th>Database</th>",6)
+		Do WriteLog("</tr>",4)	
+		For {
+			Quit:'rs.Next()
+			Do WriteLog("<tr>",4)
+			Do WriteLog("<td>"_rs.Get("Name")_"</td>",6)
+			Do WriteLog("<td>"_rs.Get("Database")_"</td>",6)
+			Do WriteLog("</tr>",4)
+		}
+		Do WriteLog("</tbody>",2)
+		Do WriteLog("</table>",0)
+		Do WriteLog("<br>")	
+		ZN "%SYS"
+		
+	} Catch(ex) {
+		Set tSC = ex.AsStatus()
+	}
+	Quit
+
+LogDataBases
+	Try {
+		Do WriteUpdate("Getting local databases information..")
+		//CKEY^%SYS.LICENSE
+		Do WriteParagraph("LocalDB","Local Databases")
+		Do WriteLog("<br>")
+		Do WriteLog("<table id=""databaseTable"" border=""0"" cellpadding=""7"" cellspacing=""3"" class=""zebraStriped"">")
+		Do WriteLog("<tbody>",2)
+		Do WriteLog("<tr>",4)
+		//Do WriteLog("<th>Database</th><th>Directory</th><th>Size in MB</th><th>Status</th><th>Resource</th><th>Encrypted</th><th>Journal</th>",6)
+		Do WriteLog("<th onclick=""sortTable('databaseTable',0,1)"">Database</th>",6)
+		Do WriteLog("<th onclick=""sortTable('databaseTable',1,1)"">Directory</th>",6)
+		Do WriteLog("<th onclick=""sortTable('databaseTable',2,0)"">Size in MB</th>",6)
+		Do WriteLog("<th onclick=""sortTable('databaseTable',3,1)"">Status</th>",6)
+		Do WriteLog("<th onclick=""sortTable('databaseTable',4,1)"">Resource</th>",6)
+		Do WriteLog("<th onclick=""sortTable('databaseTable',5,1)"">Encrypted</th>",6)
+		Do WriteLog("<th onclick=""sortTable('databaseTable',6,1)"">Journal</th>",6)	
+		Do WriteLog("</tr>",4)
+		Set Maj=##class(%SYSTEM.Version).GetMajor()
+		If Maj<2009 {
+			Set result=##class(%Library.ResultSet).%New("Config.DataStorage:LocalDatabaseList")
+		} Else {
+			Set result=##class(%Library.ResultSet).%New("Config.Databases:LocalDatabaseList")
+		}
+		Set sc=result.Execute() If ('sc) Do DisplayError^%apiOBJ(sc) Quit
+		While result.Next(.sc) {
+			If ('sc) Quit
+			Do WriteLog("<tr>",6)
+			Do WriteLog("<td>"_result.Data("Name")_"</td>",8)
+			Do WriteLog("<td>"_result.Data("Directory")_"</td>",8)
+			Do WriteLog("<td>"_$FNUMBER(result.Data("Size in MB"),",",0)_"</td>",8)
+			Do WriteLog("<td>"_result.Data("Status")_"</td>",8)
+			Do WriteLog("<td>"_result.Data("Resource")_"</td>",8)
+			Do WriteLog("<td>"_result.Data("Encrypted")_"</td>",8)
+			Do WriteLog("<td>"_result.Data("Journal")_"</td>",8)
+			Do WriteLog("</tr>",6)
+		}
+		If ('sc) Do DisplayError^%apiOBJ(sc)
+		Do WriteLog("</tbody>",2)
+		Do WriteLog("</table>")
+	} Catch(ex) {
+		Set tSC = ex.AsStatus()
+		Do WriteLog("<p>An error occurred</p>")
+	}
+	Quit $$$OK
+
+LogTasks
+	Try {
+		Do WriteUpdate("Getting background tasks information..")
+		Do WriteParagraph("Taskschedule","Task schedule")
+		Use LogFile
+		ZN namespace
+		ZN "%SYS"
+		Set rs = ##class(%ResultSet).%New("%SYS.Task:TaskListFilter")
+		Do rs.Execute()
+		Do WriteLog("<table id=""tasksTable"" border=""0"" cellpadding=""7"" cellspacing=""3"" class=""zebraStriped"">")
+		Do WriteLog("<tbody>",2)
+		Do WriteLog("<tr>",4)
+		Do WriteLog("<th onclick=""sortTable('tasksTable',0,1)"">Task Name</th>",6)
+		Do WriteLog("<th onclick=""sortTable('tasksTable',1,1)"">Task Type</th>",6)
+		Do WriteLog("<th onclick=""sortTable('tasksTable',2,1)"">Namespace</th>",6)
+		Do WriteLog("<th onclick=""sortTable('tasksTable',3,1)"">Description</th>",6)
+		Do WriteLog("<th onclick=""sortTable('tasksTable',4,0)"">ID</th>",6)
+		Do WriteLog("<th onclick=""sortTable('tasksTable',5,1)"">Suspended</th>",6)
+		Do WriteLog("<th onclick=""sortTable('tasksTable',6,1)"">Last Finished</th>",6)
+		Do WriteLog("<th onclick=""sortTable('tasksTable',7,1)"">NextScheduled</th>",6)
+		Do WriteLog("</tr>",4)
+		While (rs.Next()) {
+			Do WriteLog("<tr>",4)
+			Do WriteLog("<td>"_rs.%Get("Task Name")_"</td>",6)
+			Do WriteLog("<td>"_rs.%Get("Task Type")_"</td>",6)
+			Do WriteLog("<td>"_rs.%Get("Namespace")_"</td>",6)
+			Do WriteLog("<td>"_rs.%Get("Description")_"</td>",6)
+			Do WriteLog("<td>"_rs.%Get("ID")_"</td>",6)
+			Do WriteLog("<td>"_rs.%Get("Suspended")_"</td>",6)
+			Do WriteLog("<td>"_rs.%Get("Last Finished")_"</td>",6)
+			Do WriteLog("<td>"_rs.%Get("Next Scheduled")_"</td>",6)
+			
+			//Get frequency Set task = ##class(%SYS.Task).%OpenId(rs.%Get("ID"),0,.status)
+ 
+			Do WriteLog("</tr>",4)
+		}
+	} Catch {
+		//Do WriteLog("</table>")
+		Do WriteLog("<p>An error occurred</p>")
+	}
+	Do WriteLog("</tbody>",2)
+	Do WriteLog("</table>",0)
+	Quit
+
+LogJournal
+	Do WriteUpdate("Getting journaling information..")
+	Do WriteParagraph("Journaling","Journaling")
+	ZN "%SYS"
+	Try{
+		Set pdir = ##class(%SYS.Journal.System).GetPrimaryDirectory(.st)
+		Set altdir = ##class(%SYS.Journal.System).GetAlternateDirectory(.st)
+		Set freesp = ##class(%SYS.Journal.System).GetFreeSpace()
+		Set stateString = ##class(%SYS.Journal.System).GetStateString()
+		Set filen=1
+		Set FileName = ##class(%SYS.Journal.System).GetCurrentFileName()
+		While FileName'="" {
+			Set FileSize=$zu(140,1,FileName) 
+			i (FileSize<0)||($ZU(78,22,FileName)'=1) s Row="Filename" Quit
+			Set $li(Row(filen),1)=FileName
+			Set $li(Row(filen),2)=FileSize
+			Set $li(Row(filen),3)=$zdt($zdth($p($zu(78,22,FileName,4),",",2),-2),3)
+			Set $li(Row(filen),4)=4 //..TranslateReason($P($zu(78,22,FileName,1),",",3))
+			Do ##class(%SYS.Journal.File).GetPrev(FileName,.FileName)			
+			Set filen=filen+1
+		}
+		ZN namespace
+		Use LogFile
+		Do WriteLog("<table id=""journalinfoTable"" cellpadding=""7"" cellspacing=""3"" class=""tableWithBorders tableTabbed"">")
+  		Do WriteLog("<tbody>",2)
+    	Do WriteLog("<tr>",4)
+    	Do WriteLog("<td>",6)
+		Do WriteHeader4("Primary Directory",8)
+		Do WriteLog("<p>"_pdir_"</p>",8)
+		Do WriteLog("</td>",6)
+ 		Do WriteLog("</tr>",4)
+ 		Do WriteLog("<tr>",4)
+    	Do WriteLog("<td>",6)
+		Do WriteHeader4("Alternative Directory",8)
+		Do WriteLog("<p>"_altdir_"</p>",8)
+		Do WriteLog("</td>",6)
+ 		Do WriteLog("</tr>",4)
+ 		Do WriteLog("<tr>",4)
+    	Do WriteLog("<td>",6)
+		Do WriteHeader4("Free Space",8)
+		Do WriteLog("<p>"_$FN(freesp/1024/1024,",",0)_" MB </p>",8)
+		Do WriteLog("</td>",6)
+ 		Do WriteLog("</tr>",4)
+ 		Do WriteLog("<tr>",4)
+    	Do WriteLog("<td>",6)
+		Do WriteHeader4("State",8)
+		Do WriteLog("<p>"_stateString_"</p>",8)
+		Do WriteLog("</td>",6)
+ 		Do WriteLog("</tr>",4)
+ 		Do WriteLog("</tbody>",2)
+    	Do WriteLog("</table>")
+		If $D(Row(1)) {
+			Do WriteHeader4("Journal Files")
+			Do WriteLog("<table id=""journalTable"" border=""0"" cellpadding=""7"" cellspacing=""3"" class=""zebraStriped"">")
+			Do WriteLog("<tbody>",2)
+			Do WriteLog("<tr>",4)
+			Do WriteLog("<th onclick=""sortTable('journalTable',0,1)"">Name</th>",6)
+			Do WriteLog("<th onclick=""sortTable('journalTable',1,0)"">Size in KB</th>",6)
+			Do WriteLog("<th onclick=""sortTable('journalTable',2,1)"">Creation Time</th>",6)
+			Do WriteLog("<th onclick=""sortTable('journalTable',3,1)"">Reason</th>",6)
+			Do WriteLog("</tr>",4)
+			Set filen=1
+			While $D(Row(filen)) {			
+				Do WriteLog("<tr>",4)
+				Do WriteLog("<td>"_$LG(Row(filen),1)_"</td>",6)
+				Do WriteLog("<td style=""text-align:right"">"_$FN($LG(Row(filen),2)/1024,",",0)_"</td>",6)
+				Do WriteLog("<td>"_$LG(Row(filen),3)_"</td>",6)
+				Set a=$LG(Row(filen),4)
+				Set reas=$S(a=-1:"<STARTUP>",a=0:"unspecified",a=1:"by user",a=2:"file size limit reached",a=3:"to retry failed I/O",a=4:"by backup",a=5:"by restore",a=6:"by task manager",a=7:"to activate journal changes",a=8:"to reenable journaling",a=9:"by mirror startup",a=10:"by mirror shutdown",a=11:"mirror database removed",1:"Unknown")
+				Do WriteLog("<td>"_reas_"</td>",6)
+				Do WriteLog("</tr>",4)
+				Set filen=filen+1
+			}
+			Do WriteLog("</tbody>",2)
+			Do WriteLog("</table>")
+		}
+	} Catch {
+		Do WriteLog("<p>An error occurred</p>")
+	}
+	Quit
+
+LogAlerts
+	Try {
+		Do WriteParagraph("Alerts","Alerts")
+		If $D(alerts)>9 { 	//alerts is an array
+			Do WriteLog("<p>The following alerts were raised on this system. Please find more details above</p>")
+			Set i = $O(alerts(""))
+			While (i'="") {
+				Do WriteLog("<p class=""red"""_alerts(i)_"</p>")
+				Set i = $O(alerts(i))
+			}		
+		} Else {
+			Do WriteLog("<p>No alerts"_"</p>")
+		}
+	} Catch(ex) {
+		Set tSC = ex.AsStatus()
+		Do WriteLog("<p>Error: "_tSC_"</p>")
+	}
+	Quit
+
+LogTrailer
+	//Records a Trailer record to LogFile
+	Do WriteParagraph("end","End of DeepSeeButtons")	
+	Do WriteLog("<p>"_ConfigName_" on Machine """_HostName_"""</p>")
+	Do WriteLog("</div>")	
+	Use PDev
+	Quit
+
+LogSidePanel(cubeList,getLogs,numalerts)
+	Do WriteLog("<div id=""mySidenav"" class=""sidenav"">")
+	Do WriteLog("<a href=""javascript:void(0)"" class=""closebtn"" onclick=""closeNav()"">&times;</a>",2)
+	Do WriteLog("<a href=""#deepseesetup"" title=""General setting relevant for DeepSee"">DeepSee Setup</a>",2)
+	If (isInsight || isTrak) {
+		//Set nOverrides=$$CountNodes(namespace,"^DeepSee.Overrides")
+		Do:(nOverrides>=10) WriteLog("<a href=""#overrides"">DeepSee Overrides</a>",2)
+	}	
+	Do WriteLog("<a href=""#serverdetails"" title=""Information on the hosting machine"">Server Details</a>",2)
+	Do WriteLog("<a href=""#cubelist"" title=""Information on all cubes in the namespace"">Cubes</a>",2)
+	Do WriteLog("<a href=""#cuberegistry"">Cube Registry</a>",2)
+	If (($D(cubeList)'=0) && (cubeList'="")) {
+		Do WriteLog("<a href=""#cubeinfo"" title=""Detailed information on cubes"">Cube Info</a>",2)
+		Set cubeListLength=$ll(cubeList)
+ 		For i=1:1:cubeListLength{
+			Set cube=$lg(cubeList,i)
+			Do:cube'="" WriteLog("<a class=""cubelinks"" href=""#cubeinfo"_cube_""">"_cube_"</a>",2)
+		}		
+	}
+	If getLogs{
+		Do WriteLog("<a href=""#querylog"" title=""Last 5 MDX queries run by each users in the system"">Query Log</a>",2)
+		Do WriteLog("<a href=""#dslog"" title=""A log file with cube builds and errors occurred in the system"">DeepSee Logs</a>",2)
+	}
+	Do WriteLog("<a href=""#cpf"" title=""The Caché Parameter File containing recording the Caché configuration"">cache.cpf</a>",2)
+	Do:getLogs WriteLog("<a href=""#cconsole"" title=""cconsole.log file containing general messages and errors"">cconsole.log</a>",2)
+  	Do WriteLog("<a href=""#Mappings"" title=""Global mapppings defined for the "_namespace_" namespace"">Mappings</a>",2)
+  	Do WriteLog("<a href=""#LocalDB"" title=""Local databases defined in the instance"">Local Databases</a>",2)  	
+  	Do WriteLog("<a href=""#Taskschedule"" title=""Information on background tasks"">Task Schedule</a>",2)
+  	Do WriteLog("<a href=""#Journaling"" title=""Information on database journaling for the instance"">Journaling</a>",2)
+  	Set colorclass=$S(numalerts: "red",1:"")
+  	Do WriteLog("<a class="""_colorclass_""" href=""#Alerts"" title=""Summary of all alerts found on the system"">Alerts ("_numalerts_")</a>",2)
+  	Do WriteLog("</div>")
+  	Quit
+
+LogCloseBody
+	Do WriteLog("</body>")
+	Do WriteLog("</html>")
+	Do WriteUpdate("")	
+	Quit
+
+
+
+/// More helper functions for the Log* functions above
+ValidateNamespace(namespace) [namespace]{
+	Try {
+		ZN namespace
+		return namespace
+	}
+	Catch ex {
+		Write !,namespace," is invalid.  Please enter a valid namespace.",!
+		Set namespace=""
+		return namespace
+	}
+}
+
+InitVars()
+	//Sets routine-wide variables
+	New i,LogFilePrefix,v,x
+	Set PDev=$Principal
+	Set CRLF=$Char(13,10)
+	Set CmdOpenTimeOut=60
+	Set CmdReadTimeOut=30
+	Set FileOpenTimeOut=5
+	Set FileReadTimeOut=30
+	Set CacheVerStr=$ZVersion
+	Set CacheVerNumber=$System.Version.GetNumber()
+	Set HostName=$ZUtil(54,0)
+	#define USEIPV6 $zbitget($zversion(0)_$c(0,0,0,0),42)
+	#define HostNameToIPText(%h,%f)  $s($$$USEIPV6:$SYSTEM.INetInfo.HostNameToAddr(%h,%f),1:$p($ZU(54,13,%h),",",1))
+	#define IPTextToBinary(%ip)      $s($$$USEIPV6:$SYSTEM.INetInfo.TextAddrToBinary(%ip),1:$ZU(54,1,%ip))
+	#define IPBinaryToHostName(%ip)  $s($$$USEIPV6:$SYSTEM.INetInfo.AddrToHostName(%ip),1:$p($ZU(54,14,%ip),",",2))
+	#define IPTextToHostName(%ip)    $$$IPBinaryToHostName($$$IPTextToBinary(%ip))
+	Set IPAddr=$$$HostNameToIPText(HostName,0),FullHostName=$$$IPTextToHostName(IPAddr)	Set MgrDir=$ZUtil(12)
+	Set MgrNsp=$$ST()
+	Set CurDir=$ZUtil(12,"")
+	Set CurNsp=$ZUtil(5)
+	Set x=$ZUtil(86),ConfigFile=$Piece(x,"*",1),ConfigName=$Piece(x,"*",2)
+	Set CurUser=$ZUtil(67,11,$Job)
+	Set CustomerName=$System.License.KeyCustomerName()
+	Set OrderNumber=$System.License.KeyOrderNumber()
+	//Equivalent to $System.Version.GetCompBuildOS()
+	//Get if Trak or HealthInsight
+	Set isInsight=$$isHealthInsight(namespace) 	//Determine if this is a Health Insight namespace (1 if yes)
+	Set isTrak=$$isTrak(namespace) 	//Determine if this is a Health Insight namespace (1 if yes)	
+	Set nOverrides = "" 
+ 	Set:(isInsight || isTrak) nOverrides=$$CountNodes(namespace,"^DeepSee.Overrides") 
+	Set v=$ZVersion,v=$ZConvert(v,"l")
+	If v["windows" Set OS="WinNT" //Windows NT, 2000, XP or 2003 Server
+	Else  If v["unix" Set OS="UNIX"
+	Else  If v["openvms" Set OS="VMS"
+	Else  Set OS="*** Unrecognized OS ***"
+	If OS?1"***".e Quit
+	If OS?1"Win".e Do
+	.	Set DirDelim="\"
+	.	Set NullDev="//./nul"
+	.	Do SetDirs
+	.	Set KeyFile=MgrDir_DirDelim_"Cache.key"
+	.	Set BinDir=CacheDir_DirDelim_"Bin"
+	.	Quit
+	If OS="UNIX" Do
+	.	Set DirDelim="/"
+	.	Set NullDev="/dev/null/"
+	.	Do SetDirs
+	.	Set KeyFile=MgrDir_DirDelim_"cache.key"
+	.	Set BinDir=CacheDir_DirDelim_"bin"
+	.	Quit
+	If OS="VMS" Do
+	.	Set DirDelim="."
+	.	Set NullDev="NL:"
+	.	Do SetDirs
+	.	Set KeyFile=MgrDir_"CACHE.KEY"
+	.	Set i=$Find(MgrDir,".MGR")
+	.	Set BinDir=$Extract(MgrDir,1,i-$Length(".MGR")-1)_".BIN"_$Extract(MgrDir,i,*)
+	.	Quit
+	Set LogFilePrefix=""
+	If CustomerName'="" Set LogFilePrefix="DeepSeeButtons_"_$Piece(CustomerName," ",1)_"_" //e.g. CustomerName = ISC Development
+	If LogFilePrefix'="",LogFilePrefix?1a.an,$Length(LogFilePrefix)<20
+	Set:LogFile="" LogFile=$$NewFile(LogFilePrefix,"html")
+	Open LogFile:"RWNSK\UTF8\":FileOpenTimeOut
+	If '$Test Quit ""
+	Quit
+
+ST()
+	//Sets the Manager's Namespace (also hardcoded in %ST)
+	ZN "%SYS"
+	New
+	Do ^ST
+	Set MgrNsp=%ST("MGRNSP")
+	Quit MgrNsp
+	
+GetCubesToLog(namespace) {
+	Set cubeString=""
+	ZN namespace
+	Do ##class(%DeepSee.Utils).%GetCubeList(.cubeList,,1)
+	If '$d(cubeList){
+		Write !,"There are no cubes in this namespace!"
+		Set cubeList=""
+		Quit cubeList
+	}
+	For i=1:1 {
+		Write !,"Give cube name for detailed cube info or press enter to continue: "
+		Read cube
+		If cube="?" {
+			Set cube=$$ListCubes()
+		} ElseIf cube="ALL" { //Secreat ALL keyword
+			Set cubeString=$$GetAllCubes(namespace)
+			Set cube="QUIT"
+		}
+		Quit:(cube="")||(cube="QUIT")||(cube="Q")
+		If ##class(%DeepSee.Utils).%CubeExists(cube,.status)'=1 {
+			Write !,cube," is an invalid cube selection: "
+			Do $system.OBJ.DisplayError(status)
+			Write !,"Enter '?' to see list of cubes in the "_namespace_" namespace",!
+			Set cube=""
+		}
+		If cube'="" {
+			Set cube=$ZCONVERT(cube,"t")		//Make cube name uppercase to normalize names
+			Set cubeString=cubeString_","_cube
+		}
+	}
+	Set cubeString=$p(cubeString,",",2,*)		//Eliminate leading comma
+	Set cubeSelection=$LFS(cubeString,",")		//Create list
+	ZN "%SYS"
+	Quit cubeSelection
+}
+
+GetAllCubes(namespace)
+	Set cubeString=""
+	ZN namespace
+	Do ##class(%DeepSee.Utils).%GetCubeList(.cubeList,,1)
+	Set cubetmp=""
+	Set cubeString=""			
+	For i=1:1 {
+		Set cubetmp=$order(cubeList(cubetmp))
+		Quit:cubetmp=""
+		Set cubeString=cubeString_","_cubetmp
+	}
+	Set cubeString=$P(cubeString,",",2,*)
+	ZN "%SYS"
+	Quit cubeString
+
+VerifyInputCubes(cubeList,namespace){
+	Set len=$LISTLENGTH(cubeList)
+	For i=1:1:len{
+		Set cube=$LG(cubeList,i)
+		Set cube=$ZCONVERT(cube, "U")
+		ZN namespace
+		If ##class(%DeepSee.Utils).%CubeExists(cube,.status)'=1 {
+			Write !!, cube, " is an invalid cube selection.  It will not be included in report.",!
+			Do $system.OBJ.DisplayError(status)
+			Set cube=""
+		}
+		Set $LIST(cubeList,i)=cube			//Change element in list to uppercase version (or null if it didn't exist)
+	}
+	ZN "%SYS"
+	Quit cubeList
+}
+
+SetDirs
+	//Sets Cache Installation Directory
+	New i,Dev,Dir
+	If OS?1"Win".e!(OS="UNIX") Do
+	.	If $Extract(MgrDir,$Length(MgrDir))=DirDelim Set MgrDir=$Extract(MgrDir,1,$Length(MgrDir)-1) //Remove trailing \ or /
+	.	If $Extract(CurDir,$Length(CurDir))=DirDelim Set CurDir=$Extract(CurDir,1,$Length(CurDir)-1) //Remove trailing \ or /
+	.	Quit
+	Else  If OS="VMS" Do
+	.	Set MgrDir=$$VMSCanonize(MgrDir)
+	.	Set CurDir=$$VMSCanonize(CurDir)
+	.	Quit
+	If OS?1"Win".e!(OS="UNIX") Set i=$Length(MgrDir,DirDelim)-1,CacheDir=$Piece(MgrDir,DirDelim,1,i)
+	Else  If OS="VMS" Do
+	.	Set Dev=$Piece(MgrDir,":",1),Dir=$Piece(MgrDir,":",2,$$$MaxPieceNum)
+	.	If $Extract(Dir,1)="[" Set Dir=$Extract(Dir,2,*)
+	.	If $Extract(Dir,$Length(Dir))="]" Set Dir=$Extract(Dir,1,$Length(Dir)-1)
+	.	Set Dir=$Piece(Dir,".",1,$Length(Dir,".")-1)
+	.	Set Dir="["_Dir_"]"
+	.	Set CacheDir=Dev_":"_Dir
+	.	Quit
+	Quit
+	
+ListCubes(){
+	Do ##class(%DeepSee.Utils).%GetCubeList(.cubeList,,1)
+	Write !, "Cubes in this namespace: ",!!
+	Set cubetmp=""
+	For i=1:1{
+		Set cubetmp=$order(cubeList(cubetmp))
+		Quit:cubetmp=""
+		Write i_") "_cubetmp,!	
+	}
+	Write !, "Select a cube name or press enter to continue: "
+	Read cube
+	If cube'=""{
+		Write !,"Getting detailed information on "_cube
+		Hang 1
+	}
+	Quit cube		//returns "" if no cube number entered
+}
+ 
+LongName(x)
+	New (OS,x)
+	Set x=$Get(x,"")
+	If OS="VMS" Quit x
+	Set Space=$Char(32),Quote=$Char(34)
+	If x[Space Set x=Quote_x_Quote
+	//If x[Space Set x=$ZUtil(147,x)
+	Quit x
+ 
+VMSCanonize(Dir)
+	New (Dir)
+	Set Dev=$Piece(Dir,":",1),Dir=$Piece(Dir,":",2,$$$MaxPieceNum)
+	Set Dir=$Translate(Dir,"<","[") //Replace < by [
+	Set Dir=$Translate(Dir,">","]") //Replace > by ]
+	Set i=$Length(Dir,"[")-1
+	If i>1 Do  //Directory format is [DIR.][SUBDIR]...
+	.	If $Extract(Dir,1)="[" Set Dir=$Extract(Dir,2,*)
+	.	If $Extract(Dir,$Length(Dir))="]" Set Dir=$Extract(Dir,1,$Length(Dir)-1)
+	.	For  Quit:$Piece(Dir,"[",2)=""  Set Dir=$Piece(Dir,"[",1)_$Piece(Dir,"[",2,$$$MaxPieceNum)
+	.	For  Quit:$Piece(Dir,"]",2)=""  Set Dir=$Piece(Dir,"]",1)_$Piece(Dir,"]",2,$$$MaxPieceNum)
+	.	Set Dir="["_Dir_"]"
+	.	Quit
+	Set Dir=Dev_":"_Dir
+	Quit Dir
+
+WriteLastStartup
+	Try {
+		Set timein=$ZHorolog\1, now=$Horolog
+		Set timeup=timein
+		Set days=timeup\86400
+		Set timeup=timeup-(days*86400)
+		Set hours=timeup\3600
+		Set timeup=timeup-(hours*3600)
+		Set minutes=timeup\60
+		Set timeup=timeup-(minutes*60)
+		Set seconds=timeup
+		Set today=+now
+		Set secs=$Piece(now,",",2)
+		Set now=(today*86400)+secs
+		Set then=now-timein
+		Set odays=then\86400
+		Set osecs=then-(odays*86400)
+		Set oh=odays_","_osecs
+		//Do WriteLog("Started on "_$ZDATETIME(oh))
+		//W !,"<p>Caché Started on "_$ZDATETIME(oh)_". As of this report Caché has been up for "_days_" days "_hours_" hours "_minutes_" minutes "_seconds_" seconds"_"</p>"
+		Do WriteLog("<p>"_$ZDATETIME(oh,3)_". As of this report Caché has been up for "_days_" days "_hours_" hours "_minutes_" minutes "_seconds_" seconds"_"</p>",8)
+	} Catch(ex) {
+		Set tSC = ex.AsStatus()
+		Do WriteLog("<p>An error occurred</p>")
+	}
+	Quit
+
+isHealthInsight(namespace){
+	Try{
+		ZN namespace
+		//Set x=##class(HSAA.Utils).GetLogDirectory()				//Just testing to see if this method works
+		Set HealthShare=##class(%SYSTEM.License).GetFeature(12) 	//Look in license for HealthShare Foundation
+		ZN "%SYS"
+		return HealthShare
+	} Catch {
+		ZN "%SYS"
+		return 0						//Method did not work so return 0
+	}
+}
+
+isTrak(namespace){
+	Try{
+		ZN namespace
+		Set BitTrakCare = ##class(%SYSTEM.License).GetFeature(6) 	//BitTrakCare
+		ZN "%SYS"
+		return BitTrakCare
+	} Catch {
+		ZN "%SYS"
+		return 0						//Method did not work so return 0
+	}
+}
+ 
+NLS
+	Try {
+		New LocCur,LocDesc,LocSrc,oLoc
+		Set oLoc=##class(Config.NLS.Locales).OpenCurrent()
+		If oLoc="" Set LocCur="Unknown",LocDesc="Unknown"
+		Else  Set LocCur=oLoc.Name,LocDesc=oLoc.Description
+		Do WriteHeader4("Current Locale",8)
+		Set LocSrc=$$$LOCALEPATH
+		Do WriteLog("<p>"_LocCur_" ("_LocDesc_")<p>",8)
+	} Catch(ex) {
+		Do WriteLog("<p>An error occurred</p>")
+	}
+	Quit
+
+OSVer
+	Try {
+		//Add the OS version to LogFile
+		New Cmd,uname
+		Do WriteHeader4("Operating System Version",8)
+		Do WriteLog("<p>",8)
+		If OS?1"Win".e Set Cmd="Ver"
+		If OS="UNIX" Set Cmd="uname -a"
+		If OS="VMS" Set Cmd="WRITE SYS$OUTPUT ""OpenVMS "",F$GETSYI(""VERSION"")"		
+		Do ExternalCmd(Cmd)
+		If OS="UNIX" Set uname=$$uname()
+		If ($D(uname) && (uname?1"AIX".e)) {
+			Do WriteLog(" -- ",8)
+			Do ExternalCmd("lsattr -El proc0")
+		}
+	} Catch(ex) {
+		Set tSC = ex.AsStatus()
+		Do WriteLog(tSC,8)
+	}
+	Do WriteLog("</p>",8)
+	Quit
+
+uname()
+	New (CmdOpenTimeOut,CmdReadTimeOut,PDev)
+	Set Cmd="uname -s"
+	Open Cmd:"RQ":CmdOpenTimeOut
+	If '$Test Quit ""
+	Try {
+		Use Cmd Read uname:CmdReadTimeOut Use PDev
+	} Catch(ex) {
+		Set tSC = ex.AsStatus()
+	}
+	Close Cmd
+	Quit uname
+	
+RAM
+	Do WriteHeader4("RAM",8)
+	//First refresh CPU info
+	Do $ZU(204,0)
+	Do WriteLog("<p>Model: "_$ZU(204,2)_"</p>",8)
+	Do WriteLog("<p>Chips: "_$ZU(204,6)_"</p>",8)
+	Do WriteLog("<p>Cores: "_$ZU(204,5)_"</p>",8)
+	Do WriteLog("<p>Threads: "_$ZU(204,4)_"</p>",8)	
+	Do WriteLog("<p>Frequency: "_$ZU(204,11)_" MHz</p>",8)	
+	Set temp = $ZU(190,18)
+	Do WriteLog("<p>Total physical memory: "_$FNUMBER($P(temp,",",1)/1024,",",0)_" MB</p>",8)
+	Do WriteLog("<p>Free physical memory: "_$FNUMBER($P(temp,",",2)/1024,",",0)_" MB</p>",8)
+	Do WriteLog("<p>Total paging/swap space: "_$FNUMBER($P(temp,",",3)/1024,",",0)_" MB</p>",8)
+	Do WriteLog("<p>Free paging/swap space: "_$FNUMBER($P(temp,",",4)/1024,",",0)_" MB</p>",8)
+	Do WriteLog("",8)
+	Quit
+	
+DiskSpace
+	Do WriteHeader4("Disk space",8)
+	Do ##class(%File).DriveListExecute(.drivelist)
+	For {
+		Set st=##class(%File).DriveListFetch(.drivelist,.drive,.AtEnd)  //zw drive  zw AtEnd  zw drivelist
+		Set drive = $LG(drive)
+		Do ##class(%Library.File).GetDirectorySpace(drive,.free,.total,1) //w total,!,free
+		Do WriteLog("<p>Total space in """_drive_""" drive: "_$FNUMBER(total,",",0)_" MB</p>",8)
+		Do WriteLog("<p>Free space in """_drive_""" drive:  "_$FNUMBER(free,",",0)_" MB</p>",8)
+		Quit:AtEnd
+	}	
+	Quit
+
+CopyToLog(InputFile,Caption,SkipSize=0)
+	//Appends a file to LogFile. Used for cconsole.log
+	//InputFile can be cconsole.log, the generated cstat output file, inuse.dmp or dumpkeys.txt
+	//SkipSize - Skip the first x number of bytes in the file to reduce size. Used by cconsole.log
+	//to keep it a reasonable size
+	New %DAT,%TIM,x
+	Do INT^%D,INT^%T
+	Do WriteLog(Caption_" on "_%DAT_" at "_%TIM_":"),WriteLog("")
+	Try {
+		Open InputFile:"R":FileOpenTimeOut
+		If '$Test Do WriteLog("File "_InputFile_" does not exist") Do WriteLog("</pre>") Use PDev Quit
+		//Read timeout added to prevent the case where neither <ENDOFFILE> error nor $ZEOF terminate the loop
+		If SkipSize>0 Do WriteLog("File "_InputFile_" is too large, skipping first "_SkipSize_" bytes"),WriteLog("")
+		Set Size=0
+		For { 
+			Use InputFile 
+			Read x:FileReadTimeOut 
+			Set ZEOF=$ZEof 
+			Use PDev 
+			Quit:'$Test!(ZEOF)  
+			Set Size=Size+$l(x) 
+			Continue:SkipSize>Size  
+			Use LogFile 
+			Write $zconvert(x,"O","HTML"),CRLF 
+			Use PDev
+		}
+	} Catch(ex) {
+		Set tSC = ex.AsStatus()
+		Do WriteLog("</pre>") Use PDev
+	}
+	Close InputFile
+	Quit
+ 
+CurDate()
+	//Returns Current Date as YYYYMMDD
+	New
+	Do INT^%D
+	Set %DAT=$ZConvert(%DAT,"U")
+	Set MonthName=$Extract(%DAT,1,3)
+	Set Day=+$Piece(%DAT," ",2) If Day?1n Set Day=0_Day
+	Set Year=+$Piece(%DAT," ",3) If Year?2n Set Year=2000+Year
+	Set Month=$Find("JANFEBMARAPRMAYJUNJULAUGSEPOCTNOVDEC",MonthName)\3 If Month?1n Set Month=0_Month
+	Quit Year_Month_Day
+
+CurTime()
+	//Returns Current Time as HHMM
+	New
+	Do INT^%T
+	Set %TIM=$ZConvert(%TIM,"U")    
+	For  Quit:%TIM'?1" ".e  Set %TIM=$Extract(%TIM,2,*)
+	Set Time=$Piece(%TIM," ",1),AMPM=$Piece(%TIM," ",2)
+	Set Hour=+$Piece(Time,":",1),Minutes=+$Piece(Time,":",2)
+	If AMPM="AM",Hour=12 Set Hour=0
+	If AMPM="PM",Hour'=12 Set Hour=Hour+12
+	If Hour?1n Set Hour=0_Hour
+	If Minutes?1n Set Minutes=0_Minutes
+	Quit Hour_Minutes
+
+CountNodes(namespace,g){
+	ZN namespace
+	Return:'$D(@g) 0
+	For count=$D(@g)#10:1 Set g=$Query(@g) Quit:g=""
+	Return count
+}
+
+GetLastBuild(CubeEvent,cubename) [cubename,CubeEvent,cubekey,cubeevent,totaltime,cubesize,finishtime,factsupdated,SQLCODE] {
+	new cubekey,totaltime,cubesize,finishtime,factsupdated,SQLCODE
+	If $D(cubename) {
+		&sql(SELECT TOP 1 CubeKey,TotalTime,CubeSize,FinishTime,FactsUpdated
+			INTO :cubekey,:totaltime,:cubesize,:finishtime,:factsupdated
+			FROM %DeepSee_CubeManager.CubeEvent
+			WHERE CubeEvent=:CubeEvent AND CubeKey=:cubename
+			ORDER BY FinishTime DESC)
+	} Else {
+		&sql(SELECT TOP 1 CubeKey,TotalTime,CubeSize,FinishTime,FactsUpdated
+			INTO :cubekey,:totaltime,:cubesize,:finishtime,:factsupdated
+			FROM %DeepSee_CubeManager.CubeEvent
+			WHERE CubeEvent=:CubeEvent 
+			ORDER BY FinishTime DESC)
+	}
+	IF SQLCODE=0 {
+		If CubeEvent="Synch"{
+    		Set string=$FNUMBER(factsupdated,",")_" facts synched on "_finishtime_" in "_totaltime_" seconds"
+		} ElseIf CubeEvent="Build"{
+			Set string=$FNUMBER(cubesize,",")_" facts built on "_finishtime_" in "_totaltime_" seconds"
+		} ElseIf CubeEvent="Update"{
+			Set string="on "_finishtime
+		} ElseIf CubeEvent="Repair"{
+			Set string=$FNUMBER(cubesize,",")_" facts built on "_finishtime_" in "_totaltime_" seconds"
+		} Else {			
+			Set string=CubeEvent_" event on "_finishtime_" in "_totaltime
+		}
+		Set:'$D(cubename) string = string_" for the "_cubekey_" cube"
+   	} ElseIf SQLCODE=100 {
+	   	Set string = "Not found"
+   	} Else {
+	   	Set string = "SQL Error code: "_SQLCODE
+   	}
+   	Quit string
+}
+	
+GetRelationships(cube){
+	If ##class(%DeepSee.Utils).%IsCubeCompound(cube){		//Can't have a related, compound cube
+		Quit
+	}
+	Set status=##class(%DeepSee.Utils).%GetDimensionList(cube,.dimlist)
+	Set nodenum=$O(dimlist(""),-1)			//Get last node in dimlist
+	Set count=0
+	If status=1{
+		For{
+			If $lg(dimlist(nodenum,0,0),1)="r"{			//If dimension is a relationship...
+				Set count=count+1						//increment count
+				Set dimname=$lg(dimlist(nodenum,0,0),2)	//Get name of relationship
+				Set relationships(count)=##class(%DeepSee.Utils).%GetRelatedCube(cube,dimname)	//Related cube name
+			}
+			Quit:nodenum=0								//If no dimensions defined, first node will be 0
+			Set nodenum=$O(dimlist(nodenum),-1)
+			If $lg(dimlist(nodenum,0,0),1)'="r"{
+				Quit
+			}
+		}
+		If count=0{
+			Write "-"
+		}
+		Else{		
+			For i=1:1:count{
+				If $g(relationships(i),"null")'="null"{
+					Write relationships(i)
+					If i'=count{
+						Write ", "
+					}
+				}
+			}
+		}
+	}
+	Quit
+}
+	
+GetSourceClass(cube,type,isInsight)[storageList, inheritList]{
+	Try {
+		Set sourceClass=""
+		If type="cube" {
+			Set cubeObj=##class(%DeepSee.Utils).%GetModel(cube)
+			If cubeObj=""{
+				Set sourceClass = "Cube class not compiled"
+				Quit
+			}
+			Set sourceClass=cubeObj.sourceClass				//Source Class name
+			If sourceClass=""&&isInsight{
+				Set sourceClass=^DeepSee.Overrides(cube,"SOURCECLASS")	//Source class isn't part of cube object	
+			}
+			Set classObj=##class(%Dictionary.CompiledClass).%OpenId(sourceClass)
+			Set storage=classObj.StorageStrategy
+		
+			Set super=classObj.Super
+
+			If storage["SQLStorage"{
+				Set $LIST(storageList,*+1)=cube
+			}
+			If super["%DeepSee.DataConnector"{
+				Set $LIST(inheritList,*+1)=cube
+			}
+		}
+		Else{
+ 			Set basecube=##class(%DeepSee.Utils).%GetBaseCube(cube)
+ 			//Set cubeobj=##class(%DeepSee.Utils).%GetModel(basecube)
+ 			Set sourceClass="SA-"_basecube
+		}
+	} catch {
+		Set sourceClass = "Not available"
+	}
+	Quit sourceClass
+}
+
+GetDeepSeeAuditCode
+	Kill auditcode,querycode
+	Do WriteHeader4("Audit",8)
+	Try {
+		If $d(^[namespace]DeepSee.AuditCode){
+			Set auditcode=$g(^[namespace]DeepSee.AuditCode)
+			Do WriteLog("<p>DeepSee.AuditCode: "_auditcode_"</p>",8)
+		} Else{
+			Do WriteLog("<p>^DeepSee.AuditCode is undefined</p>",8)
+		}
+		If $d(^[namespace]DeepSee.AuditQueryCode){
+			Set querycode=$g(^[namespace]DeepSee.AuditQueryCode)
+			Do WriteLog("<p>DeepSee.AuditQueryCode: "_querycode_"</p>",8)
+		} Else{
+			Do WriteLog("<p>^DeepSee.AuditQueryCode is undefined</p>",8)
+		}
+	} Catch {
+		W "Not Available"
+	}	
+	Quit 
+	
+GetBuildTime(cube)
+	[time,cube] PUBLIC{
+	new time
+	Set cube=$zconvert(cube,"u")
+	&sql(SELECT TotalTime into :time 
+	FROM %DeepSee_CubeManager.CubeEvent 
+	where cubekey=:cube and cubeevent='Build' 
+	order by finishtime desc)
+	If $d(time){
+		Quit time
+	} Else{
+		Quit "N/A"
+	}
+}
 
 FieldNameToSpec(pCubeName) {	
 	Set tSC = $$$OK
@@ -2840,215 +2551,303 @@ FieldNameToSpec(pCubeName) {
 	Catch(ex) {
 		Set tSC = ex.AsStatus()
 	}
-}	
-	
-	
-	/*
-/////////////////////////////////////// WORK IN PROGRESS
-WIP
-
-	Quit
-	Try {
-		Set st=$$$OK
-		Set tmpfile="osinfo"
-		Set OSFamily=$System.Version.GetCompBuildOS()  //UNIX
-		Set Majver=$System.Version.GetMajor()  //2017
-		Set Minver=$System.Version.GetMinor()  //2
-		If Majver<5 w "Sorry this won't work on this version of Caché",! q  // not tested on non-5.0 systems.
-		Set Build=$System.Version.Format(5) 	//2017.2 (Build 649)
-		Set cpffile=$zu(86),configname=$p(cpffile,"*",2),cpffile=$p(cpffile,"*")
- //	d chkver()
- 		Do WriteParagraph("system","System Info")
-		If (OSFamily="NT")||(OSFamily="Windows") { 
-			Set tempfile = MgrDir_"\osfile"
-			Do Windows() 	// windows is 5.1+
-		} Else { 
-			Set tmpfile=MgrDir_"/osinfo"
-			Do UNIX(tmpfile)
-		}
-	} Catch(ex) {
-		Set st = ex.AsStatus()
-		Do WriteLog("<p>Error in system section</p>")		
-		Do WriteLog(st)
-	}
-	Quit
-
-
-Windows()
-	s os="win"	
-	//s rc=$$Winsysinf(tmpfile)
-	//If rc<0 {
-		//Set ^pButtons("run",runid,"os",cmdcnt)=$lb("Windows info",,"error",,,,0)
-	//} Else {
-		//Set ^pButtons("run",runid,"os",cmdcnt)=$lb("Windows info",,tmpfile,,,,0)
-	//}
-	////Set ^pButtons("run",runid,"os")=$i(cmdcnt),tmpfile=ofile_"_"_cmdcnt_".log"
-
-	Do WriteLog("<h4>CPU information (wmic OS)</h4>")
-	Do WriteLog("<pre>",0)
-	If $ZF(-1,"wmic OS get TotalVisibleMemorySize /Value > "_tempfile)
-	If $ZF(-1,"wmic OS get FreePhysicalMemory /Value >> "_tempfile)
-	Do copyfile(LogFile,tempfile)
- 	Do WriteLog("</pre>",0)
-	//
-	Do WriteLog("<h4>System disk space (wmic logicaldisk)</h4>")
-	Do WriteLog("<pre>",0)
-	If $ZF(-1,"wmic logicaldisk get size,freespace,caption > "_tempfile)	
-	//If $ZF(-1," KB >> "_tempfile)
-	Do copyfile(LogFile,tempfile)
- 	Do WriteLog("</pre>",0)
-
-	
-	Quit
-
-Winsysinf(tmpfile)
-	New (tmpfile)
-	Set f="sys1.txt",skip=0 //,$zt="Winsierr"
-	If $zf(-1,"systeminfo > "_f)
-	Open f::2
-	Quit:'$T "-1^unable to open tmp file"
-	Open tmpfile:"WNS":2
-	Quit:'$T "-2^unable to open output file"
-	For { ; upto Hotfixes...
-		Use f Read l:1 Set zeof=$zeof Quit:zeof
-		Quit:$E(l,1,6)="Hotfix"
-		Use tmpfile Write l,!
-	}
-	For { ; skip to first char not space
-		Use f Read l:1 Set zeof=$zeof Quit:zeof
-		If $E(l)'=" " Use tmpfile Write l,! Quit
-	}
-	For { 
-		Use f r l:1 s zeof=$zeof q:zeof
-		Use tmpfile w l,!
-	}
-	Close f,tmpfile
-	If $ZU(140,5,f)
-	Quit 0
-	
-UNIX(tmpfile); unix section
-	Set cstatout=" >> ",os="unix"
-	Set rootid=$$getrootid
-	Set eof=$zu(68,40,1)
-	// generate unix worklist
-	// first distinguish between flavours of unix
-	If $zv["Tru64" {
-		Set OSspec="Tru64" 
-	} Else {
-		Set OSspec=$tr($p($system.Version.Format(2)," ",4),"()","")
-	}
-	// do specific pieces for each os...
- Set tempfile = MgrDir_"/osfile"
-	Do $case(OSspec,
-		//"Oracle"	:UXsol,
-		//"Solaris"	:UXsol,
-		//"Sun"		:UXsol,
-		//"IBM"		:UXaix,
-		//"Alpha/64-bit":UXtru,
-		//"Tru64"		:UXtru,
-		//"Clusters"	:UXtru,
-		"Linux"		:UXlin,
-		"SUSE"		:UXlin,
-		"Red"		:UXlin)
-		//"HP"		:UXhp,
-		//"HP-UX"		:UXhp,
-		//"HP-UX/Itanium":UXhp,
-		//"Mac"		:UXmac,
-		//"Apple"		:UXmac,
-		//"Ubuntu"	:UXubu,
-		//			:UXunk)
-	;
-	; now do the cpu/mem/disk stuff which is the same logic no matter the flavour
-	; just pull the actual command from the global
-	; 
-	//ETC ETC!! see code
-	Quit
-
-	
-UXlin()
-	Set os="linux"
-	//Linux information section
- 	Do WriteLog("<h4>Linux information ("_os_")</h4>")
- 	Do WriteLog("<pre>",0)
-	Do $ZF(-1,"echo uname -a: `uname -a` > "_tempfile)
-	Do $ZF(-1,"echo issue: >> "_LogFile_"; cat /etc/issue.net >> "_tempfile)
-	Do $ZF(-1,"echo >> "_tempfile)
-	Do $ZF(-1,"echo lsb_release: >> "_tempfile_"; lsb_release -a >> "_tempfile_" 2>&1")
-	Do $ZF(-1,"echo >> "_tempfile)
-	Do $ZF(-1,"echo id: `id` >> "_tempfile)
-	Do $ZF(-1,"echo >> "_tempfile)
-	Do $ZF(-1,"echo ulimit -a: >> "_tempfile_"; ulimit -a >> "_tempfile)
-	If $ZF(-1,"echo -ne '\n' >> "_tempfile_"; echo /proc/partitions: >> "_tempfile_"; cat /proc/partitions >> "_tempfile)
-	If $ZF(-1,"echo -ne '\n' >> "_tempfile_"; echo /dev/mapper: >> "_tempfile_"; ls -l /dev/mapper >> "_tempfile)
-	Do copyfile(LogFile,tempfile)
-	Do WriteLog("</pre>",0)
-  //do chk4vx(tmpfile)
-  
-	//CPU information section
-	Do WriteLog("<h4>CPU information (/proc/cpuinfo file)</h4>")
-	Do WriteLog("<pre>",0)
-	If $ZF(-1,"cat /proc/cpuinfo > "_tempfile)
-	Do copyfile(LogFile,tempfile)
- 	Do WriteLog("</pre>",0)
- 	//System disk space section
- 	Do WriteLog("<h4>System disk space (df -m command)</h4>")
- 	Do WriteLog("<pre>",0)
-	If $ZF(-1,"df -m > "_tempfile)
-	Do copyfile(LogFile,tempfile)
- 	Do WriteLog("</pre>",0) 		
-	Quit
-
-UXmac	; 
-	s os="mac"
-	//i '$D(^pButtons("cmds","cpu"))||$D(^pButtons("cmds","unknown")) k ^pButtons("cmds") d defmac()
-	
-	Do WriteLog("<h4>Linux information ("_os_")</h4>")
- 	Do WriteLog("<pre>",0)
-	i $zf(-1,"echo sw_vers: > "_tmpfile_"; sw_vers >> "_tmpfile)
-	i $zf(-1,"echo >> "_tmpfile)
-	i $zf(-1,"echo uname -a: `uname -a` >> "_tmpfile)
-	i $zf(-1,"echo >> "_tmpfile)
-	i $zf(-1,"echo id: `id` >> "_tmpfile)
-	i $zf(-1,"echo >> "_tmpfile)
-	i $zf(-1,"echo ulimit -a: >> "_tmpfile_"; ulimit -a >> "_tmpfile)
-	i $zf(-1,"echo >> "_tmpfile)	
-	i $zf(-1,"echo sysctl hw: >> "_tmpfile_"; sysctl hw >> "_tmpfile)
-	i $zf(-1,"echo >> "_tmpfile)
-	i $zf(-1,"echo vm_stat: >> "_tmpfile_"; vm_stat >> "_tmpfile)
-	i $zf(-1,"echo >> "_tmpfile)
-	i $zf(-1,"echo netstat: >> "_tmpfile_"; /usr/sbin/netstat -i >> "_tmpfile)
-	//do chk4vx(tmpfile)
-	Do copyfile(LogFile,tempfile)
-	Do WriteLog("</pre>",0)
-	
-	s oscmd($i(cmdcnt))=$lb("MacOSX info","mv "_tmpfile_" ",,0)
-	s oscmd($i(cmdcnt))=$lb("ipcs","ipcs -a > ",,0)
-	s oscmd($i(cmdcnt))=$lb("mount","/sbin/mount > ",,0)
-	s oscmd($i(cmdcnt))=$lb("df -m","df -m > ")
-	s oscmd($i(cmdcnt))=$lb("sysctl -a","/usr/sbin/sysctl -a > ",,0)
-	q
-
-getrootid() {; find if root or not
-	New
-	Set id=0
-	Set eof=$zu(68,40,1)  //0
- 	Set io="id" o io:"RQ":2 i $T u io r line:2 c io i +$p(line,"=",2)=0 s id=1 
-	I $zu(68,40,eof)
-	Q id
 }
 
-copyfile(Logfile,infile)	; append outfile to logfile,
+/// Alerts
+alertDStimeRW(DSTimeMapFrom,alerts) {
 	Try {
-		Open infile:"r":2
-		If '$T Use Logfile Write !,"Unexpected problem opening data file: "_infile Set x=$zu(140,11,infile,infile_"bad") Quit   ; only cstat files not pre-tested
-		For  Use infile Read line:2 Set zeof=$zeof Quit:'$T!zeof  Use Logfile Write !,line 
-		Close infile
-	} Catch(ex) {
-		Set st = ex.AsStatus()
-		Do WriteLog("Error copying system information from temporary file")
-		Do WriteLog(st)
+		ZN "%SYS"
+		//Check if DB is Read-Write
+		Set sc = ##class(Config.Databases).Get(DSTimeMapFrom, .prop)
+		Set db=##Class(SYS.Database).%OpenId(prop("Directory"))
+		Set readonly = db.ReadOnly
+		If readonly {
+			Set pre="title=""In Caché versions including DevChange DTB422 ^OBJ.DSTIME and ^DeepSee.Update should be mapped to a Read-Write database"">"
+			Set alert = "Alert: ^OBJ.DSTIME and/or ^DeepSee.Update are stored in the "_DSTimeMapFrom_" database, which should be Read-Write"
+			Set alerts($I(alerts)) = pre_alert
+			Do WriteLog("<p class=""red"" "_pre_alert_"</p>",8)
 		}
+		Set tSC = 1
+	} Catch (exc) {
+		Set tSC = exc.AsStatus()
+	}
+	Quit tSC
+}
+
+alertCacheMappings(ns,DeepSeeMap,alerts) {
+	Try {
+		Set mapcount=$O(DeepSeeMap(ns,""))
+ 		While mapcount'="" {
+ 			Set global=$P($P(DeepSeeMap(ns,mapcount),"_",2,*),"=",1)
+			Set DB=$P($P(DeepSeeMap(ns,mapcount),"_",2,*),"=",2,*)
+			If ((global="DeepSee.Cache.*") || (global="DeepSee.Cache*")) {
+				//Check if DB is journaled
+				Set sc = ##class(Config.Databases).Get(DB, .prop)
+				Set db=##Class(SYS.Database).%OpenId(prop("Directory"))
+				Set journaled = (db.GlobalJournalState = 3)
+				If journaled {
+					Set pre="title=""Journaling the DeepSee cache leads to problems with disk size and query performance"">"
+					Set alert = "Alert: The DeepSee cache stored in the "_DB_" database is journaled"
+					Set alerts($I(alerts)) = pre_alert
+					Do WriteLog("<p class=""red"" "_pre_alert_"</p>",8)
+				}
+			}
+			Set mapcount=$O(DeepSeeMap(ns,mapcount))
+		}
+		Set tSC = $$$OK
+	} Catch (exc) {
+		Set tSC = ex.AsStatus()
+	}
+	Quit tSC
+}
+
+alertInitialBuildCubeManager(cube,msgrepair,msgbuild,alerts) {
+	Try {
+		If ((msgrepair="Not found") && (msgbuild="Not found")) {
+			Set pre="title=""Before you synchronize cubes from the Cube Manager, it is necessary to build the cubes at least once from the Cube Manager."">"
+			Set alert = "Alert: there is no record for the initial build of "_cube_" from Cube Manager. Check if the cube is updating"
+			Set alerts($I(alerts)) = pre_alert
+			Do WriteLog("<p class=""red"" "_pre_alert_"</p>",8)
+		}
+		Set tSC = 1
+	} Catch(ex) {
+		Set pre="<p class=""red"" title=""Before you synchronize cubes from the Cube Manager, it is necessary to build the cubes at least once from the Cube Manager."">"
+		Set alert = Ext
+		Set alerts($I(alerts)) = alert
+		Do WriteLog(pre_alert_"</p>",8)
+		Set tSC = ex.AsStatus()
+	}
+}
+
+
+/// Write, I/O, etc helper functions
+WriteLog(string,spaces)
+	//Adds a record to LogFile
+	If string?1"***".e Quit
+	Use LogFile
+	If '$D(spaces) Set spaces=0
+	Write !,?spaces,string
 	Quit
-	*/
+ 
+WriteParagraph(name,title,flag)
+	If '$D(flag) Set flag = 1
+	If flag Do WriteLog("<hr noshade size=""4"" width=""auto"">")
+	Do WriteLog("<a name="""_name_"""></a>")
+	Do WriteLog("<h2>"_title_"</h2>")
+	
+WriteHeader4(header,spaces)
+	Use LogFile
+	If '$D(spaces) Set spaces=0
+	Do WriteLog("<h4>"_header_"</h4>",spaces)
+	//Note: do not add !
+	
+WriteUpdate(msg)
+	Use PDev
+	Write $C(13,27)_"[0J"_msg
+	Use LogFile
+
+WriteAdhocPatch
+	Try {
+		Set patchvar=$Order(^%qPatch(""))
+		While (patchvar'=""){
+			Set data=^%qPatch(patchvar)
+			Set patchvar2=$Order(^%qPatch(patchvar))			
+			Do WriteLog("<p style=""margin-left:3em;"">Adhoc: "_$list(data)_"</p>",8)
+			Do WriteLog("<p style=""margin-left:6em;"">Description: "_$list(data,2)_"</p>",8)
+			Do WriteLog("<p style=""margin-left:6em;"">Created at: "_$list(data,5)_"</p>",8)
+			Do WriteLog("<p style=""margin-left:6em;"">Created on $zv: "_$piece($list(data,6),")",1,2)_")"_"</p>",8)
+			Do WriteLog("<p style=""margin-left:6em;"">Applied on: "_$list(data,7)_"</p>",8)
+			Do WriteLog("<p style=""margin-left:6em;"">Applied by: "_$list(data,8)_"</p>",8)
+			Do WriteLog("")
+			Set patchvar=$Order(^%qPatch(patchvar))
+		}
+	} Catch(ex) {
+		Set tSC = ex.AsStatus()
+		Do WriteLog("<p>An error occurred</p>")
+	}
+	Quit
+
+NewFile(LogFilePrefix,LogFileSuffix)
+	//Creates a new file with Date and Time added to the filename and opens it for Reading and Writing
+	//File Name can be either "Cache" or "cstat"
+	New Date,Dir,NewFile,Time
+	If LogFileSuffix="" Set LogFileSuffix="html"
+	Set Date=$$CurDate,Time=$$CurTime
+	If OS?1"Win".e Set LogFileSuffix=$ZConvert(LogFileSuffix,"l")
+	Else  If OS="UNIX" Set LogFileSuffix=$ZConvert(LogFileSuffix,"l")
+	Else  If OS="VMS" Set LogFileSuffix=$ZConvert(LogFileSuffix,"U")
+	Set Dir=MgrDir
+	Set LogDirectory=$Get(LogDirectory,"")
+	If LogDirectory'="" Set Dir=LogDirectory
+	If OS?1"Win".e Set NewFile=Dir_DirDelim_LogFilePrefix_Date_"_"_Time_"."_LogFileSuffix
+	//Else  If OS="UNIX" Set NewFile=Dir_DirDelim_$ZConvert(LogFilePrefix,"l")_Date_"-"_Time_"."_LogFileSuffix	
+	Else  If OS="UNIX" Set NewFile=Dir_DirDelim_LogFilePrefix_Date_"_"_Time_"."_LogFileSuffix	
+	Else  If OS="VMS" Set NewFile=Dir_$ZConvert(LogFilePrefix,"U")_Date_Time_"."_LogFileSuffix_";"
+ 	//	Open NewFile:"RWNSK\UTF8\":FileOpenTimeOut
+ 	//	If '$Test Quit ""
+	Quit NewFile
+	
+PrintGlobal(namespace,glob,spaces){
+	ZN namespace
+	Quit:'$D(@glob)
+	Quit:glob=""
+	Set:$D(spaces) spaces = 0
+	Set queryary=$QUERY(@glob@(""))
+	Set res=@queryary
+	Set quote=""
+	Set:'(res=+res) quote=""""
+	Do WriteLog("<p>"_queryary_" = "_quote_res_quote_"</p>",spaces)
+	For   {
+    Set queryary=$QUERY(@queryary) 
+        Quit:queryary=""
+        Set res=@queryary
+		Set quote=""
+		Set:'(res=+res) quote=""""
+        Do WriteLog("<p>"_queryary_" = "_quote_res_quote_"</p>",spaces)
+	}
+}
+
+Dir
+	Set $ZTrap="DirError",$ZError=""
+	Set DirInfo=$ZUtil(49,Dir)
+DirError
+	Set $ZTrap=""
+	Set MountStatus=$Get(DirInfo,"")
+	If $ZError'=""!(MountStatus<0) Do  Quit
+	.	Write !,Dir," *** ",$Select(MountStatus<-1:"Doesn't Exist",+MountStatus=-1:"Dismounted",1:$ZError)," ***"
+	Quit
+	If +MountStatus=256 Write !,Dir," *** Not Mounted ***" Quit
+	Set BlockSize=$Piece(DirInfo,",",$$$blksizpiece)
+	Write !,Dir,?49,$Justify(BlockSize,4),?60,$Piece(DirInfo,",",$$$resourcepiece)
+	Write ?80,$Case($$$encrypteddbformat(DirInfo),0:0,:$Piece(DirInfo,",",$$$enckeyidpiece))
+	Quit
+	
+ExternalCmd(Command)
+	//Executes an external program and adds its output to LogFile
+	//Requires the full specification of the Exe file
+	New PDev,x
+	Set PDev=$Principal
+	If OS="UNIX" Do ExtCmdPipe
+	If OS?1"Win".e!(OS="VMS") Do ExtCmdFile
+	Use PDev
+	Quit
+
+ExtCmdPipe
+	//Executing an OS command through a pipe works on UNIX
+	//It should also work on 32-bit Windows (NT, 2000 and XP), but I found inconsistent behavior on these platforms
+	Open Command:"RQ":CmdOpenTimeOut
+	If '$Test Quit
+	Try {
+		//Read timeout added to prevent the case where neither <ENDOFFILE> error nor $ZEOF terminate the loop
+		For  Use Command Read x:CmdReadTimeOut Set ZEOF=$ZEof Use PDev Quit:'$Test!(ZEOF)  If x'="" Do WriteLog($ZConvert(x,"O","HTML"))
+		Close Command
+	} Catch(ex) {
+		Set tSC = ex.AsStatus()
+		Close Command
+	}
+	Quit
+
+ExtCmdFile
+	//Only to be executed when OS is Windows or VMS, when either pipes don't work or behave inconsistently
+	New Date,File,Time
+	Set Date=$$CurDate,Time=$$CurTime
+	If OS?1"Win".e Do
+	.	Set File=MgrDir_DirDelim_Date_Time_".$$$"
+	.	Set Command=$Char(34)_Command_" > "_$$LongName(File)_$Char(34) //Cache will call "Cmd /c", which requires quotes surrounding the command
+	.	Quit
+	Else  If OS="VMS" Set File=MgrDir_Date_Time_".$$$"
+	If OS?1"Win".e Set x=$ZF(-1,Command)
+	Else  If OS="VMS" Set x=$ZF(-1,Command,File)
+	Set $ZTrap="ExitCmdNoFile"
+	Open File:"R":FileOpenTimeOut
+	If '$Test Do WriteLog("Error: could not open file "_File) Quit
+	Set $ZTrap="ExitCmdFileEOF"
+	//Read timeout added to prevent the case where neither <ENDOFFILE> error nor $ZEOF terminate the loop
+	For { 
+		Use File
+		Read x:FileReadTimeOut
+		Set ZEOF=$ZEof
+		Use PDev
+		Quit:'$Test!(ZEOF)
+		If x'="" Do WriteLog($ZConvert(x,"O","HTML"))
+	}
+	Set $ZTrap=""
+	Set $ZError=""
+	Close File
+	If OS="VMS" Do
+	.	If $Extract(File,$Length(File))'=";" Set File=File_";"
+	.	Set File=File_"*"
+	.	Quit
+	Set x=$ZUtil(140,5,File) //Delete temporary scratch file
+	Quit
+ExitCmdFileEOF
+	Set $ZTrap=""
+	Set $ZError=""
+	Close File
+	If OS="VMS" Do
+	.	If $Extract(File,$Length(File))'=";" Set File=File_";"
+	.	Set File=File_"*"
+	.	Quit
+	Set x=$ZUtil(140,5,File) //Delete temporary scratch file
+	Quit
+ExitCmdNoFile
+	Set $ZTrap=""
+	Set $ZError=""
+	Quit
+
+
+/// Is this used at all?
+ /*
+Trim(x)
+	New (x)
+	Set x=$Get(x,"")
+	For Char=$Char(32),$Char(9) Set x=$Translate(x,Char,"")
+	Quit x
+
+FindOrphanedCubes() {
+	Set cubename=""
+	Set count=0
+   	FOR {
+    	SET cubename=$ORDER(^DeepSee.Cubes("cubes",cubename)) 
+    	QUIT:cubename=""
+     
+    	Set classname=##class(%DeepSee.Utils).%GetCubeClass(cubename)
+		If classname=""{					//Class doesn't exist and this is an orphaned node in ^DeepSee.Cubes
+			Set count=count+1
+			Set missingNode(count)=cubename
+		}
+	}
+	If count'=0{
+		Do WriteHeader4("Important Mappings")
+		Do WriteLog("<p>Warning: Orphaned cube node(s) exist in ^DeepSee.Cubes!</p>")
+		Do WriteLog("")
+		For i=1:1:count{
+			Write "<p>==",$d(missingNode(i)),"==</p>",!
+		}
+	}
+}
+
+
+CDSrv
+	New
+	Try {
+		Do ^%CDSrv
+	} Catch(ex) {
+		Set tSC = ex.AsStatus()
+	}
+	Quit
+
+MGW
+	New
+	Try {
+		Do ^%mgw
+	} Catch {
+		Try {
+			Do ^%MGW
+		} Catch {
+		}
+	}
+	Quit
+*/
 ]]></Routine>
 </Export>
