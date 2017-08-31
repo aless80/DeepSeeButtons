@@ -1442,23 +1442,25 @@ LogQuerylog
 	Do WriteParagraph("querylog","Query Log")
 	Do WriteLog("<h4 id=""querylogtoggle"" onclick=""javascript:toggle('querylogdiv','querylogtoggle');"">&rtrif; Expand</h4>",0)
 	Do WriteLog("<div id=""querylogdiv"" style=""display:none;"">")
+	ZN namespace
+	Do:($D(^DeepSee.QueryLog)<10) WriteLog("<p>Query log global not found</p>",0)
+	Quit:($D(^DeepSee.QueryLog)<10)
 	//Get usercount in ^DeepSee.QueryLog
- 	ZN namespace
  	Set user=$O(^DeepSee.QueryLog(""))
  	Set usercount=0
  	While (user'="") {
  		Set userqueries(user)=$G(^DeepSee.QueryLog(user))
 		Set usercount=$I(usercount)
 		Set user=$O(^DeepSee.QueryLog(user))
- 	}
+ 	}	
  	//Show table with number of queries run by users
  	Do WriteHeader4("Users running MDX queries")
- 	Do WriteLog("<p>Number of users = "_usercount_"</p>")
+ 	//Do WriteLog("<p>Number of users = "_usercount_"</p>")
  	If $D(userqueries) {
  		Do WriteLog("<table id=""QueryLogTable"" cellpadding=""5"" cellspacing=""5"" class=""tableWithBorders"">")
 		Do WriteLog("<tbody>",2)
 		Do WriteLog("<tr>",4)
-		Do WriteLog("<th onclick=""sortTable('QueryLogTable',0,1)"">User</th>",6)
+		Do WriteLog("<th onclick=""sortTable('QueryLogTable',0,1)"">User ("_usercount_" total) </th>",6)
 		Do WriteLog("<th onclick=""sortTable('QueryLogTable',1,0)"">Queries run</th>",6)
 		Do WriteLog("</tr>",4)
 		Set u = $O(userqueries(""))
@@ -1472,6 +1474,63 @@ LogQuerylog
  		Do WriteLog("</tbody>",2)
  		Do WriteLog("</table>")
  	}
+ 	
+ 	//Show table with the most run queries
+ 	/*
+ 	//NO, use Set key=$ZCRC(string,7)
+ 	Set u=""
+ 	Set i=""  
+ 	For {
+	 	Set u=$O(^DeepSee.QueryLog(u)) 
+	 	Quit:u=""  
+	 	For {
+		 	Set i=$O(^DeepSee.QueryLog(u,i)) 
+		 	Quit:i="" 
+		 	If $D(queryarr(^DeepSee.QueryLog(u,i))) {
+			 	Set queryarr(^DeepSee.QueryLog(u,i))=$I(queryarr(^DeepSee.QueryLog(u,i)))
+		 	} Else {
+		 		Set queryarr(^DeepSee.QueryLog(u,i))=1
+		 	}
+		 }
+	}
+	//Reverse the array
+	Set q=""
+	For {
+		Set q=$O(queryarr(q))
+		Quit:q=""
+		Set freq=queryarr(q)
+		If $D(qfreqarr(freq)) {
+			Set qfreqarr(freq) = $ListUpdate(qfreqarr(freq),$ListLength(qfreqarr(freq))+1,q)
+		} Else {
+			Set qfreqarr(freq) = $LB(q)
+		}
+	}
+	//Print the most run queries
+	Do WriteHeader4("5 most run queries")	
+	Do WriteLog("<table id=""FrequentQueriesTable"" cellpadding=""5"" cellspacing=""5"" class=""tableWithBorders"">")
+	Do WriteLog("<tbody>",2)
+	Do WriteLog("<tr>",4)
+	Do WriteLog("<th onclick=""sortTable('FrequentQueriesTable',0,0)"">Frequency</th>",6)
+	Do WriteLog("<th onclick=""sortTable('QueryLogTable',1,1)"">Query</th>",6)
+	Do WriteLog("</tr>",4)		
+	Set freq = ""
+	For n = 1:1:5 {
+		Set freq = $O(qfreqarr(freq),-1)
+		Quit:freq=""
+		Do WriteLog("<tr>",4)
+		Set qlist = qfreqarr(freq)
+		Do WriteLog("<td>"_freq_"</td>",6)
+		Do WriteLog("<td>",6)
+		For i=1:1:$ListLength(qlist) {
+			Set query=$lg(qlist,i)			
+			Do WriteLog(query,0)
+		}
+		Do WriteLog("</td>",6)
+		Do WriteLog("</tr>",4)
+	}
+	Do WriteLog("</tbody>",2)
+ 	Do WriteLog("</table>")
+ 	*/
  	//Last Query subsection
  	Do WriteHeader4("Last query")
 	Do WriteLog("<pre>")
