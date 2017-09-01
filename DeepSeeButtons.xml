@@ -1488,29 +1488,7 @@ LogQuerylog
 	Do WriteLog("</pre>")
 	//Subsection with 5 last queries for each user
  	Do WriteHeader4("MDX queries by user")
-	Do WriteLog("<pre class=""wrapped"">")
-	Set username=""
-	For k=1:1 {
-		Set username=$O(^DeepSee.QueryLog(username),1)
-		If username="" Quit
-		Set totqueries=$O(^DeepSee.QueryLog(username,""),-1)
-		Set numqueries = 5
-		Set:totqueries<5 numqueries = totqueries
-		Do WriteLog("Last "_numqueries_" of "_totqueries_" MDX queries by User: "_username)
-		Set counter=""
-		For i=1:1:numqueries {
-			Quit:i>totqueries				//User has fewer than 5 queries
-			Set counter=$O(^DeepSee.QueryLog(username,counter),-1)
-			Set query=$Get(^DeepSee.QueryLog(username,counter))
-			If query'=""{
-				Use LogFile  Write ?2  Use PDev
-				Do WriteLog( i_") "_query)
-			}
-		}
-		Use LogFile  Write !  Use PDev		
-	}
-	Do WriteLog("</pre>")
- 	//If (usercount > 5) Do WriteLog("</div>") 	
+	Do last5Queries
  	Do WriteLog("</div>") //Close Expand/Collapse div
 	Use PDev
 	Quit
@@ -2618,7 +2596,31 @@ MostRunQueries
 	Do WriteLog("</tbody>",2)
  	Do WriteLog("</table>")
  	Quit
- 	
+ 
+last5Queries
+	Do WriteLog("<pre class=""wrapped"">")
+	Set username=""
+	For k=1:1 {
+		Set username=$O(^DeepSee.QueryLog(username),1)
+		If username="" Quit
+		Set totqueries=$O(^DeepSee.QueryLog(username,""),-1)
+		Set numqueries = 5
+		Set:totqueries<5 numqueries = totqueries
+		Do WriteLog("Last "_numqueries_" of "_totqueries_" MDX queries by User: "_username)
+		Set counter=""
+		For i=1:1:numqueries {
+			Quit:i>totqueries				//User has fewer than 5 queries
+			Set counter=$O(^DeepSee.QueryLog(username,counter),-1)
+			Set query=$Get(^DeepSee.QueryLog(username,counter))
+			If query'=""{
+				Use LogFile  Write ?2  Use PDev
+				Do WriteLog( i_") "_query)
+			}
+		}
+		Use LogFile  Write !  Use PDev		
+	}
+	Do WriteLog("</pre>")
+	Quit
  
 /// Alerts
 alertDStimeRW(DSTimeMapFrom,alerts) {
