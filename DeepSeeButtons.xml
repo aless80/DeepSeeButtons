@@ -1420,7 +1420,7 @@ LogOtherCubeElements
 			While field'=""{
 				Do WriteLog("<tr>",6)
 				Do WriteLog("<td></td>",8)
-				Do WriteLog("<td>"_field_"</td>")	//FieldName
+				Do WriteLog("<td>"_field_"</td>",8)	//FieldName
 				Do WriteLog("</tr>",6)
 				Set field=$LG(fieldList,$I(tInd))
 			}
@@ -1474,93 +1474,34 @@ LogQuerylog
  		Do WriteLog("</tbody>",2)
  		Do WriteLog("</table>")
  	}
- 	
  	//Show table with the most run queries
- 	/*
- 	//NO, use Set key=$ZCRC(string,7)
- 	Set u=""
- 	Set i=""  
- 	For {
-	 	Set u=$O(^DeepSee.QueryLog(u)) 
-	 	Quit:u=""  
-	 	For {
-		 	Set i=$O(^DeepSee.QueryLog(u,i)) 
-		 	Quit:i="" 
-		 	If $D(queryarr(^DeepSee.QueryLog(u,i))) {
-			 	Set queryarr(^DeepSee.QueryLog(u,i))=$I(queryarr(^DeepSee.QueryLog(u,i)))
-		 	} Else {
-		 		Set queryarr(^DeepSee.QueryLog(u,i))=1
-		 	}
-		 }
-	}
-	//Reverse the array
-	Set q=""
-	For {
-		Set q=$O(queryarr(q))
-		Quit:q=""
-		Set freq=queryarr(q)
-		If $D(qfreqarr(freq)) {
-			Set qfreqarr(freq) = $ListUpdate(qfreqarr(freq),$ListLength(qfreqarr(freq))+1,q)
-		} Else {
-			Set qfreqarr(freq) = $LB(q)
-		}
-	}
-	//Print the most run queries
-	Do WriteHeader4("5 most run queries")	
-	Do WriteLog("<table id=""FrequentQueriesTable"" cellpadding=""5"" cellspacing=""5"" class=""tableWithBorders"">")
-	Do WriteLog("<tbody>",2)
-	Do WriteLog("<tr>",4)
-	Do WriteLog("<th onclick=""sortTable('FrequentQueriesTable',0,0)"">Frequency</th>",6)
-	Do WriteLog("<th onclick=""sortTable('QueryLogTable',1,1)"">Query</th>",6)
-	Do WriteLog("</tr>",4)		
-	Set freq = ""
-	For n = 1:1:5 {
-		Set freq = $O(qfreqarr(freq),-1)
-		Quit:freq=""
-		Do WriteLog("<tr>",4)
-		Set qlist = qfreqarr(freq)
-		Do WriteLog("<td>"_freq_"</td>",6)
-		Do WriteLog("<td>",6)
-		For i=1:1:$ListLength(qlist) {
-			Set query=$lg(qlist,i)			
-			Do WriteLog(query,0)
-		}
-		Do WriteLog("</td>",6)
-		Do WriteLog("</tr>",4)
-	}
-	Do WriteLog("</tbody>",2)
- 	Do WriteLog("</table>")
- 	*/
+ 	Do WriteHeader4("5 most run queries")
+ 	Do MostRunQueries 	
  	//Last Query subsection
  	Do WriteHeader4("Last query")
 	Do WriteLog("<pre>")
-	Use PDev
 	Set lastquery=$g(^[namespace]DeepSee.LastQuery)		//Display last query
 	If lastquery'=""{		
 		Do WriteLog(lastquery)
 		Use LogFile  Use PDev
 	}
-	Use LogFile
 	Do WriteLog("</pre>")
 	//Subsection with 5 last queries for each user
  	Do WriteHeader4("MDX queries by user")
- 	ZN "%SYS"
- 	//If (usercount > 5) Do WriteLog("<div class=""scrollable"" style=""width:100%;height:400px;"">")
 	Do WriteLog("<pre class=""wrapped"">")
-	Use PDev
 	Set username=""
-	For k=1:1{
-		Set username=$O(^[namespace]DeepSee.QueryLog(username),1)
+	For k=1:1 {
+		Set username=$O(^DeepSee.QueryLog(username),1)
 		If username="" Quit
-		Set totqueries=$O(^[namespace]DeepSee.QueryLog(username,""),-1)
+		Set totqueries=$O(^DeepSee.QueryLog(username,""),-1)
 		Set numqueries = 5
 		Set:totqueries<5 numqueries = totqueries
 		Do WriteLog("Last "_numqueries_" of "_totqueries_" MDX queries by User: "_username)
 		Set counter=""
-		For i=1:1:numqueries{
+		For i=1:1:numqueries {
 			Quit:i>totqueries				//User has fewer than 5 queries
-			Set counter=$O(^[namespace]DeepSee.QueryLog(username,counter),-1)
-			Set query=$Get(^[namespace]DeepSee.QueryLog(username,counter))
+			Set counter=$O(^DeepSee.QueryLog(username,counter),-1)
+			Set query=$Get(^DeepSee.QueryLog(username,counter))
 			If query'=""{
 				Use LogFile  Write ?2  Use PDev
 				Do WriteLog( i_") "_query)
@@ -1568,10 +1509,9 @@ LogQuerylog
 		}
 		Use LogFile  Write !  Use PDev		
 	}
-	Use LogFile
 	Do WriteLog("</pre>")
  	//If (usercount > 5) Do WriteLog("</div>") 	
- 	Do WriteLog("</div>") //Close Expand/Collapse div	
+ 	Do WriteLog("</div>") //Close Expand/Collapse div
 	Use PDev
 	Quit
 
@@ -2612,6 +2552,74 @@ FieldNameToSpec(pCubeName) {
 	}
 }
 
+MostRunQueries
+ 	//Show table with the most run queries
+ 	//Use $ZCRC(,7) to hash an MDX query, then create two arrays: 
+ 	//  queryarr(hashed MDX query) = frequency
+ 	//  crcarr(hashed MDX query) = MDX query
+ 	Set u = ""
+ 	Set i = ""
+ 	For {
+	 	Set u = $O(^DeepSee.QueryLog(u))
+	 	Quit:u=""
+	 	For {
+		 	Set i = $O(^DeepSee.QueryLog(u,i)) 
+		 	Quit:i=""
+		 	//Strip some patterns from MDX queries
+		 	Set strippedquery = $ZSTRIP(^DeepSee.QueryLog(u,i),"*C") 	//strip control characters
+		 	Set strippedquery = $REPLACE(strippedquery,", ",",")		//replace ", "
+		 	Set strippedquery = $ZSTRIP(strippedquery,"<=>W")  			//strip leading, trailing, and repeating white spaces
+		 	Set crc = $ZCRC(strippedquery,7)
+		 	If $D(queryarr(crc)) {
+			 	Set queryarr(crc) = $I(queryarr(crc))
+		 	} Else {
+		 		Set queryarr(crc) = 1
+		 		Set crcarr(crc) = strippedquery
+		 	}
+		 }
+	}
+	//Reverse the queryarr array to get frequencies handy:
+	//  freqarr(frequency, hashed MDX query) = MDX query
+	Set c = ""
+	For {
+		Set c = $O(queryarr(c))
+		Quit:c=""
+		Set f = queryarr(c)
+		Set freqarr(f,c) = crcarr(c)
+	}
+	//Print
+	Do WriteLog("<table id=""FrequentQueriesTable"" cellpadding=""5"" cellspacing=""5"" class=""tableWithBorders"">")
+	Do WriteLog("<tbody>",2)
+	Do WriteLog("<tr>",4)
+	Do WriteLog("<th onclick=""sortTable('FrequentQueriesTable',0,0)"">Frequency</th>",6)
+	Do WriteLog("<th onclick=""sortTable('FrequentQueriesTable',1,1)"">Query</th>",6)
+	Do WriteLog("</tr>",4)		
+	Set freq = ""
+	For n = 1:1:5 {
+		Set freq = $O(freqarr(freq),-1)
+		Quit:freq=""
+		Do WriteLog("<tr>",4)
+		Do WriteLog("<td>"_freq_"</td>",6)
+		Do WriteLog("<td>",6)
+		Set hashed=""
+		Set counter = 0
+		For {
+			Set hashed=$O(freqarr(freq,hashed))
+			Quit:hashed=""
+			Do:counter=7 WriteLog("<p> ... </p>",8) //Show up to 6 queries per frequency
+			Quit:counter=7
+			Set query = freqarr(freq,hashed)
+			Do WriteLog("<p>"_query_"</p>",8)
+			Set counter= $I(counter)
+		}
+		Do WriteLog("</td>",6)
+		Do WriteLog("</tr>",4)
+	}
+	Do WriteLog("</tbody>",2)
+ 	Do WriteLog("</table>")
+ 	Quit
+ 	
+ 
 /// Alerts
 alertDStimeRW(DSTimeMapFrom,alerts) {
 	Try {
@@ -2854,59 +2862,5 @@ ExitCmdNoFile
 	Set $ZError=""
 	Quit
 
-
-/// Is this used at all?
- /*
-Trim(x)
-	New (x)
-	Set x=$Get(x,"")
-	For Char=$Char(32),$Char(9) Set x=$Translate(x,Char,"")
-	Quit x
-
-FindOrphanedCubes() {
-	Set cubename=""
-	Set count=0
-   	FOR {
-    	SET cubename=$ORDER(^DeepSee.Cubes("cubes",cubename)) 
-    	QUIT:cubename=""
-     
-    	Set classname=##class(%DeepSee.Utils).%GetCubeClass(cubename)
-		If classname=""{					//Class doesn't exist and this is an orphaned node in ^DeepSee.Cubes
-			Set count=count+1
-			Set missingNode(count)=cubename
-		}
-	}
-	If count'=0{
-		Do WriteHeader4("Important Mappings")
-		Do WriteLog("<p>Warning: Orphaned cube node(s) exist in ^DeepSee.Cubes!</p>")
-		Do WriteLog("")
-		For i=1:1:count{
-			Write "<p>==",$d(missingNode(i)),"==</p>",!
-		}
-	}
-}
-
-
-CDSrv
-	New
-	Try {
-		Do ^%CDSrv
-	} Catch(ex) {
-		Set tSC = ex.AsStatus()
-	}
-	Quit
-
-MGW
-	New
-	Try {
-		Do ^%mgw
-	} Catch {
-		Try {
-			Do ^%MGW
-		} Catch {
-		}
-	}
-	Quit
-*/
 ]]></Routine>
 </Export>
