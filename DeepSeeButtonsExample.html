@@ -86,7 +86,10 @@
         }
       }
     }
-    window.onload = openNav;
+    window.onload = function () {
+      openNav();
+      if (document.getElementById('QueryLogTable')) sortTable('QueryLogTable',0,1)
+    }
   </script>
   <style>
     .sidenav {
