@@ -300,7 +300,7 @@ LogHead(cubeList,getLogs)
 	/// onload: call openNav to open the side panel, click on header
 	Do WriteLog("window.onload = function () {",4)
     Do WriteLog("openNav();",6)
-    Do WriteLog("if (document.getElementById('QueryLogTableUser')) sortTable('QueryLogTable',0,1)",6)
+    Do WriteLog("if (document.getElementById('QueryLogTable')) sortTable('QueryLogTable',0,1)",6)
     Do WriteLog("}",4)
   	Do WriteLog("</script>",2)
   	/// Style section
@@ -1477,7 +1477,7 @@ LogQuerylog
  		Do WriteLog("<table id=""QueryLogTable"" cellpadding=""5"" cellspacing=""5"" class=""tableWithBorders"">")
 		Do WriteLog("<tbody>",2)
 		Do WriteLog("<tr>",4)
-		Do WriteLog("<th onclick=""sortTable('QueryLogTable',0,1)"" ID=""QueryLogTableUser"">User ("_usercount_" total) </th>",6)
+		Do WriteLog("<th onclick=""sortTable('QueryLogTable',0,1)"">User ("_usercount_" total) </th>",6)
 		Do WriteLog("<th onclick=""sortTable('QueryLogTable',1,0)"">Queries run</th>",6)
 		Do WriteLog("</tr>",4)
 		Set u = $O(userqueries(""))
