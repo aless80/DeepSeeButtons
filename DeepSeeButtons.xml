@@ -297,8 +297,11 @@ LogHead(cubeList,getLogs)
 	Do WriteLog("}",8)
 	Do WriteLog("}",6)
 	Do WriteLog("}",4)
-	/// onload: call openNav to open the side panel
-	Do WriteLog("window.onload = openNav;",4)
+	/// onload: call openNav to open the side panel, click on header
+	Do WriteLog("window.onload = function () {",4)
+    Do WriteLog("openNav();",6)
+    Do WriteLog("if (document.getElementById('QueryLogTableUser')) sortTable('QueryLogTable',0,1)",6)
+    Do WriteLog("}",4)
   	Do WriteLog("</script>",2)
   	/// Style section
 	Do WriteLog("<style>",2)
@@ -821,20 +824,17 @@ LogCubeSection
 			Set inheritList=""			
 			Set abstractcount = 0
 			For {
-				QUIT:cubenode=""				//Do the work to get info and write out the table
+				QUIT:cubenode=""
 				Set cubename=$list(plist(cubenode),1)
-				If (cubename'="" && '##class(%DeepSee.Utils).%IsCubeAbstract(cubenode)) {		//if cube is not abstract
+				If (cubename'="" && '##class(%DeepSee.Utils).%IsCubeAbstract(cubenode)) {	//if cube is not abstract
 					Do WriteLog("<tr>",4)
-					Do WriteLog("<td>"_cubename_"</td>",6)					//cubename					
+					Do WriteLog("<td>"_cubename_"</td>",6)							//cubename					
 					Set cubecaption=##class(%DeepSee.Utils).%GetCubeCaption(cubename)
 					Do WriteLog("<td>"_cubecaption_"</td>",6)
-					Set cubeclass=##class(%DeepSee.Utils).%GetCubeClass(cubename) //cube class
-					Set lastmod=$zdt($lg(plist(cubenode),3),3)				//last cube compile
-					Set type=$lg(plist(cubenode),4)							//subject area or cube?					
+					Set cubeclass=##class(%DeepSee.Utils).%GetCubeClass(cubename) 	//cube class
+					Set lastmod=$ZDT($LG(plist(cubenode),3),3)						//last cube compile
+					Set type=$LG(plist(cubenode),4)									//subject area or cube?					
 					Set facts=##class(%DeepSee.Utils).%GetCubeFactCount(cubename)	//number of facts					
-					//Set moddate=$p(lastmod," ",1)
-					//Set modtime=$p(lastmod," ",2)
-					//Set lastmod=moddate_" "_modtime
   					//DTB422 moved ^DeepSee.Cubes to ^DeepSee.Update
 					If ($d(^DeepSee.Cubes("cubes",cubenode,"lastDataUpdate"))=1) {
 						Set lastDataUpdate = ^DeepSee.Cubes("cubes",cubenode,"lastDataUpdate")
@@ -844,7 +844,7 @@ LogCubeSection
 						Set lastDataUpdate = 0
 					}
 					If (lastDataUpdate'=0){
-						Set lastSync=$zdt(lastDataUpdate,3)	//Last cube sync from cube global
+						Set lastSync=$ZDT(lastDataUpdate,3)							//Last cube sync from cube global
 						If lastSync="1840-12-31"{
 							Set lastSync="-"
 						} Else{
@@ -857,7 +857,8 @@ LogCubeSection
 						Set lastSync="N/A"
 					}					
 					Set buildtime=$$GetBuildTime(cubename)
-					Do WriteLog("<td>"_$FNUMBER(buildtime,",")_"</td>",6)
+					Set:(buildtime=+buildtime) buildtime = $FNUMBER(buildtime,",")
+					Do WriteLog("<td>"_buildtime_"</td>",6)
 					Do WriteLog("<td>"_$FNUMBER(facts,",")_"</td>",6)
 					Try {
 						If ((buildtime="N/A") || (facts=0)) {
@@ -998,14 +999,14 @@ LogDetailedCubeInfo
 	Do WriteParagraph("cubeinfo","Cube Info")
 	Set cubeListLength=$ll(cubeList)
  	For i=1:1:cubeListLength{
-		Set cube=$lg(cubeList,i)
+		Set cube=$LG(cubeList,i)
 		If cube'=""{
 			Do WriteLog("<a href=""#cubeinfo"_cube_""">"_cube_"</a>")
 			Do WriteLog("<br>")
 		}
 	}
 	For cubeind=1:1:cubeListLength {
-		Set cube=$lg(cubeList,cubeind)
+		Set cube=$LG(cubeList,cubeind)
  		//Do:cube'="" LogCubeDetails(namespace,cube,PDev,LogFile) //PDev eg "/dev/pts/5"
  		If cube'="" {
  			ZN namespace
@@ -1027,7 +1028,7 @@ LogCubeInfo
 	Set factclass=##class(%DeepSee.Utils).%GetCubeFactClass(cube)
 	Set cubecaption=##class(%DeepSee.Utils).%GetCubeCaption(cube)
 	Set factcount=##class(%DeepSee.Utils).%GetCubeFactCount(cube)
-	Set moddate=$zdt(##class(%DeepSee.Utils).%GetCubeModifiedDate(cube))
+	Set moddate=$ZDT(##class(%DeepSee.Utils).%GetCubeModifiedDate(cube))
 	Set compound=##class(%DeepSee.Utils).%IsCubeCompound(cube,.joinlist)
 	Set abstract=##class(%DeepSee.Utils).%IsCubeAbstract(cube)
 	Set base=##class(%DeepSee.Utils).%GetBaseCube(cube)	
@@ -1089,7 +1090,7 @@ LogCubeInfo
 	}
 	*/
 	Do ##class(%DeepSee.Utils).%GetCubeList(.plist)
-	Set type = $lg(plist(cube),4)
+	Set type = $LG(plist(cube),4)
 	Set sourceclass = $$GetSourceClass(cube,type,isInsight)
 	Do WriteLog("<p>"_sourceclass_"</p>",8)
     Do WriteLog("</td>",6)
@@ -1125,8 +1126,8 @@ LogCubeInfo
    	Do WriteUpdate("Getting detailed cube information for "_cube_": cube registry")
     Do WriteLog("<h4>Cube Registry</h4>",8)
     S rs = ##class(%ResultSet).%New("%DeepSee.CubeManager.RegistryMap:RegistryMapTableView")
-	Set registered = ""
-	Set state = ""	
+	Set registered = "not registered"
+	Set state = "disabled"	
 	Do rs.Execute(cube)
 	While (rs.Next()) {
 		If (cube=rs.Get("CubeKey")){
@@ -1144,7 +1145,7 @@ LogCubeInfo
 	} Else {
 		If (state="enabled") {
 			Set msgsynch=$$GetLastBuild("Synch",cube)	//Get last synch
-			Set msgbuild=$$GetLastBuild("Build",cube)	//Get last build		
+			Set msgbuild=$$GetLastBuild("Build",cube)	//Get last build
 			Set msgupdate=$$GetLastBuild("Update",cube)	//Get last update
 			Set msgrepair=$$GetLastBuild("Repair",cube)	//Get last repair
 			Do WriteLog("<p>Cube is "_state_" in Cube Manager. Most Recent events:</p>",8)
@@ -1154,7 +1155,7 @@ LogCubeInfo
 			Do WriteLog("<p>Repair event: "_msgrepair_"</p>",8)
 			Do alertInitialBuildCubeManager(cube,msgrepair,msgbuild,.alerts)
 		} Else {
-			Do WriteLog("<p>Cube is "_state_" in Cube Manager</p>",8)
+			Do WriteLog("<p>Cube is "_state_" in Cube Manager</p>",8) 
 		}
 	}
 	Do WriteLog("</td>",6)
@@ -1325,7 +1326,7 @@ LogCubeDimensions
 	Quit
 	
 
-LogOtherCubeElements
+LogOtherCubeElements  
 	Do WriteUpdate("Getting detailed cube information for "_cube_": other cube elements")
 	ZN namespace
 	Do WriteLog("<hr noshade size=""4"" width=""auto"">"	)
@@ -1335,7 +1336,8 @@ LogOtherCubeElements
 		Do WriteLog("<p>Not available because the cube is abstract</p>",6)
 		ZN "%SYS"
 		Quit
-	}	
+	}
+	Kill pivotvars
 	Do ##class(%DeepSee.Utils).%GetPivotVariables(cube,.pivotvars)
 	Do ##class(%DeepSee.Utils).%GetCubeListingFields(cube,.listingfields)
 	Do ##class(%DeepSee.Utils).%GetCubeListings(cube,.listings)
@@ -1347,7 +1349,7 @@ LogOtherCubeElements
 	}
 	/// Pivot Variabled
 	Do WriteLog("<h4>Pivot Variables</h4>")
-	If $d(pivotvars){
+	If $D(pivotvars){
 		Do WriteLog("<table id=""PivotVarTable"" cellpadding=""5"" cellspacing=""5"" class=""tableWithBorders"">")
 		Do WriteLog("<tbody>",2)
 		Do WriteLog("<tr>",4)
@@ -1355,10 +1357,10 @@ LogOtherCubeElements
 		Do WriteLog("</tr>",4)
 		For ii=1:1:pivotvars{
 			Do WriteLog("<tr>",4)
-			Do WriteLog("<td>"_$lg(pivotvars(ii),1)_"</td>",6)
-			Do WriteLog("<td>"_$lg(pivotvars(ii),2)_"</td>",6)	//Description
-			Do WriteLog("<td>"_$lg(pivotvars(ii),3)_"</td>",6)	//Default Value
-			Do WriteLog("<td>"_$lg(pivotvars(ii),4)_"</td>",6)	//Type
+			Do WriteLog("<td>"_$LG(pivotvars(ii),1)_"</td>",6)
+			Do WriteLog("<td>"_$LG(pivotvars(ii),2)_"</td>",6)	//Description
+			Do WriteLog("<td>"_$LG(pivotvars(ii),3)_"</td>",6)	//Default Value
+			Do WriteLog("<td>"_$LG(pivotvars(ii),4)_"</td>",6)	//Type
 			Do WriteLog("</tr>",4)
 		}
 		Do WriteLog("</tbody>",2)
@@ -1377,8 +1379,8 @@ LogOtherCubeElements
 		Set ii = $O(namedsets(""))
 		While ii'="" {
 			Do WriteLog("<tr>",4)
-			Do WriteLog("<td>"_$lg(namedsets(ii),1)_"</td>",6)
-			Do WriteLog("<td>"_$lg(namedsets(ii),2)_"</td>",6)	//Set Expression
+			Do WriteLog("<td>"_$LG(namedsets(ii),1)_"</td>",6)
+			Do WriteLog("<td>"_$LG(namedsets(ii),2)_"</td>",6)	//Set Expression
 			Do WriteLog("</tr>",4)
 			Set ii = $O(namedsets(ii))
 		}
@@ -1475,7 +1477,7 @@ LogQuerylog
  		Do WriteLog("<table id=""QueryLogTable"" cellpadding=""5"" cellspacing=""5"" class=""tableWithBorders"">")
 		Do WriteLog("<tbody>",2)
 		Do WriteLog("<tr>",4)
-		Do WriteLog("<th onclick=""sortTable('QueryLogTable',0,1)"">User ("_usercount_" total) </th>",6)
+		Do WriteLog("<th onclick=""sortTable('QueryLogTable',0,1)"" ID=""QueryLogTableUser"">User ("_usercount_" total) </th>",6)
 		Do WriteLog("<th onclick=""sortTable('QueryLogTable',1,0)"">Queries run</th>",6)
 		Do WriteLog("</tr>",4)
 		Set u = $O(userqueries(""))
@@ -1491,13 +1493,13 @@ LogQuerylog
  	}
  	//Show table with the most run queries
  	Do WriteHeader4("5 most run queries")
- 	Do MostRunQueries 	
+ 	Do MostRunQueries
  	//Last Query subsection
  	Do WriteHeader4("Last query")
 	Do WriteLog("<pre>")
 	Set lastquery=$g(^[namespace]DeepSee.LastQuery)		//Display last query
 	If lastquery'=""{		
-		Do WriteLog(lastquery)
+		Do WriteLog($$encodeMDX(lastquery))
 		Use LogFile  Use PDev
 	}
 	Do WriteLog("</pre>")
@@ -1660,7 +1662,7 @@ LogMappings
 		Do rs.Execute(namespace)	
 		Set next=rs.Next()
 		If ('next) {
-			Do WriteLog("<p>No mappings for the "_namespace_" namespace</p>",2)
+			Do WriteLog("<p>No mappings for the "_namespace_" namespace</p>",0)
 			Return
 		}
 		Do rs.Execute(namespace)
@@ -1793,7 +1795,7 @@ LogJournal
 			i (FileSize<0)||($ZU(78,22,FileName)'=1) s Row="Filename" Quit
 			Set $li(Row(filen),1)=FileName
 			Set $li(Row(filen),2)=FileSize
-			Set $li(Row(filen),3)=$zdt($zdth($p($zu(78,22,FileName,4),",",2),-2),3)
+			Set $li(Row(filen),3)=$ZDT($zdth($p($zu(78,22,FileName,4),",",2),-2),3)
 			Set $li(Row(filen),4)=4 //..TranslateReason($P($zu(78,22,FileName,1),",",3))
 			Do ##class(%SYS.Journal.File).GetPrev(FileName,.FileName)			
 			Set filen=filen+1
@@ -1865,7 +1867,7 @@ LogAlerts
 			Do WriteLog("<p>The following alerts were raised on this system. Please find more details above</p>")
 			Set i = $O(alerts(""))
 			While (i'="") {
-				Do WriteLog("<p class=""red"""_alerts(i)_"</p>")
+				Do WriteLog("<p class=""red"" "_alerts(i)_"</p>")
 				Set i = $O(alerts(i))
 			}		
 		} Else {
@@ -1900,7 +1902,7 @@ LogSidePanel(cubeList,getLogs,numalerts)
 		Do WriteLog("<a href=""#cubeinfo"" title=""Detailed information on cubes"">Cube Info</a>",2)
 		Set cubeListLength=$ll(cubeList)
  		For i=1:1:cubeListLength{
-			Set cube=$lg(cubeList,i)
+			Set cube=$LG(cubeList,i)
 			Do:cube'="" WriteLog("<a class=""cubelinks"" href=""#cubeinfo"_cube_""">"_cube_"</a>",2)
 		}		
 	}
@@ -2389,14 +2391,14 @@ GetRelationships(cube){
 	Set count=0
 	If status=1{
 		For{
-			If $lg(dimlist(nodenum,0,0),1)="r"{			//If dimension is a relationship...
+			If $LG(dimlist(nodenum,0,0),1)="r"{			//If dimension is a relationship...
 				Set count=count+1						//increment count
-				Set dimname=$lg(dimlist(nodenum,0,0),2)	//Get name of relationship
+				Set dimname=$LG(dimlist(nodenum,0,0),2)	//Get name of relationship
 				Set relationships(count)=##class(%DeepSee.Utils).%GetRelatedCube(cube,dimname)	//Related cube name
 			}
 			Quit:nodenum=0								//If no dimensions defined, first node will be 0
 			Set nodenum=$O(dimlist(nodenum),-1)
-			If $lg(dimlist(nodenum,0,0),1)'="r"{
+			If $LG(dimlist(nodenum,0,0),1)'="r"{
 				Quit
 			}
 		}
@@ -2479,12 +2481,12 @@ GetBuildTime(cube)
 	new time
 	Set cube=$zconvert(cube,"u")
 	&sql(SELECT TotalTime into :time 
-	FROM %DeepSee_CubeManager.CubeEvent 
-	where cubekey=:cube and cubeevent='Build' 
-	order by finishtime desc)
-	If $d(time){
+		FROM %DeepSee_CubeManager.CubeEvent 
+		where cubekey=:cube and cubeevent='Build' 
+		order by finishtime desc)
+	If ($D(time) && (time'="")){
 		Quit time
-	} Else{
+	} Else {
 		Quit "N/A"
 	}
 }
@@ -2602,7 +2604,7 @@ MostRunQueries
 			Do:counter=7 WriteLog("<p> ... </p>",8) //Show up to 6 queries per frequency
 			Quit:counter=7
 			Set query = freqarr(freq,hashed)
-			Do WriteLog("<p>"_query_"</p>",8)
+			Do WriteLog("<p>"_$$encodeMDX(query)_"</p>",8)
 			Set counter= $I(counter)
 		}
 		Do WriteLog("</td>",6)
@@ -2629,13 +2631,20 @@ last5Queries
 			Set query=$Get(^DeepSee.QueryLog(username,counter))
 			If query'=""{
 				Use LogFile  Write ?2  Use PDev
-				Do WriteLog( i_") "_query)
+				Do WriteLog( i_") "_$$encodeMDX(query))
 			}
 		}
 		Use LogFile  Write !  Use PDev		
 	}
 	Do WriteLog("</pre>")
 	Quit
+ 
+encodeMDX(mdx){
+	Set encoded = $REPLACE(mdx,"&","&amp;")
+	Set encoded = $REPLACE(encoded,"<","&lt;")
+	Set encoded = $REPLACE(encoded,">","&gt;")
+	Quit encoded
+}
  
 /// Alerts
 alertDStimeRW(DSTimeMapFrom,alerts) {
