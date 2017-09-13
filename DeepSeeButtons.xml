@@ -116,7 +116,10 @@ GetLogsConfirm
 			Set getLogs=0
 		} ElseIf (getLogs="Y")||(getLogs="YES") {
 			Set getLogs=1
-		} Else {
+		} ElseIf (getLogs=+getLogs) { 
+			//secret option: if getLogs is a number it controls the number of queries by user shown
+			//Just pass getLogs on
+		} Else { 
 			Write !,"Please enter Y or N"	
 			Set getLogs=""
 			Goto GetLogsConfirm
@@ -168,7 +171,7 @@ LaunchLogsErr
 	Do ^%ET //Process will Halt
 	Quit "0|"_$ZError
 
-LogSections(cubeList,getLogs,LogFile)
+LogSections(cubeList,getLogs,LogFile) 
 	New (Debug,LogDirectory,namespace,cubeList,getLogs,LogFile,MgrDir)
 	Do InitVars
 	If OS?1"***".e Quit ""
@@ -180,10 +183,10 @@ LogSections(cubeList,getLogs,LogFile)
 	Do LogCubeSection
 	Do LogCubeRegistry
 	Do:(($D(cubeList)'=0) && (cubeList'="")) LogDetailedCubeInfo
-	Do:getLogs=1 LogQuerylog
-	Do:getLogs=1 LogDeepSeelog
+	Do:getLogs>0 LogQuerylog
+	Do:getLogs>0 LogDeepSeelog
 	Do LogCPF
-	Do:getLogs=1 LogCConsole
+	Do:getLogs>0 LogCConsole
 	Do LogMappings
 	Do LogDataBases
 	Do LogTasks
@@ -1447,7 +1450,8 @@ LogOtherCubeElements
 	Quit
 	
 LogQuerylog
-	//Get last 5 queries run by each user
+	//Get last N queries run by each user, where N can be secretly chosen from the prompt instead of Y/N
+	
 	Do WriteUpdate("Getting Query Log, DeepSee logs, and cconsole.log..")
 	Do WriteParagraph("querylog","Query Log")
 	Do WriteLog("<h4 id=""querylogtoggle"" onclick=""javascript:toggle('querylogdiv','querylogtoggle');"">&rtrif; Expand</h4>",0)
@@ -1498,7 +1502,10 @@ LogQuerylog
 	Do WriteLog("</pre>")
 	//Subsection with 5 last queries for each user
  	Do WriteHeader4("MDX queries by user")
-	Do last5Queries
+ 	//Show the last 5 queries by default unless the user used the secret option on prompt
+ 	Set numqueries = 5
+ 	Set:(getLogs>1) numqueries = getLogs
+	Do lastNQueries(numqueries)
  	Do WriteLog("</div>") //Close Expand/Collapse div
 	Use PDev
 	Quit
@@ -2607,18 +2614,18 @@ MostRunQueries
  	Do WriteLog("</table>")
  	Quit
  
-last5Queries
+lastNQueries(numqueries)
 	Do WriteLog("<pre class=""wrapped"">")
 	Set username=""
 	For k=1:1 {
+		Set numqueriesuser = numqueries
 		Set username=$O(^DeepSee.QueryLog(username),1)
 		If username="" Quit
 		Set totqueries=$O(^DeepSee.QueryLog(username,""),-1)
-		Set numqueries = 5
-		Set:totqueries<5 numqueries = totqueries
-		Do WriteLog("Last "_numqueries_" of "_totqueries_" MDX queries by User: "_username)
+		Set:totqueries<numqueriesuser numqueriesuser = totqueries
+		Do WriteLog("Last "_numqueriesuser_" of "_totqueries_" MDX queries by User: "_username)
 		Set counter=""
-		For i=1:1:numqueries {
+		For i=1:1:numqueriesuser {
 			Quit:i>totqueries				//User has fewer than 5 queries
 			Set counter=$O(^DeepSee.QueryLog(username,counter),-1)
 			Set query=$Get(^DeepSee.QueryLog(username,counter))
