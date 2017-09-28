@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
 <Routine name="DeepSeeButtons" type="MAC" languagemode="0"><![CDATA[
-DeepSeeButtons(namespace="",cubeString="", getLogs="", LogFile="", proceed="") ;;;Collect Evidence and Log;
+DeepSeeButtons(namespace="",cubeString="ask", getLogs="", LogFile="", proceed="") ;;;Collect Evidence and Log;
 #include COPYRIGH
 #include %occConstant
 #include %occStatus
@@ -15,7 +15,7 @@ DeepSeeButtons(namespace="",cubeString="", getLogs="", LogFile="", proceed="") ;
 	;
 	;You can use the following optional arguments:
 	;namespace:		namespace where this routine will run, e.g. "SAMPLES"
-	;cubeString: 	comma separated list of cubes, e.g. "patients,holefoods"
+	;cubeString: 	comma separated list of cubes, e.g. "patients,holefoods" or "" for no cubes at all
 	;getLogs:		""/0/1 to ask to/do not/do  include cconsole.log, Query Log, and DeepSee logs, respectively
 	;LogFile:		output file. By default the output file will be stored in the /mgr directory
 	;proceed:		1 to skip the last prompt before launching DeepSeeButtons
@@ -58,7 +58,7 @@ DeepSeeButtons(namespace="",cubeString="", getLogs="", LogFile="", proceed="") ;
 	;	4) Cube Registry Map
 	;	5) Cube Info: Optional Extra data on a particular cube
 	;		5A) Cube Info- cube class, fact class, caption, fact count, last modified, compound?, abstract?
-	;		5B) Dimensions- dimension list, %Analyze, FieldNameToSpec, %AnalyzeMissing
+	;		5B) Dimensions- dimension list, ^DeepSee.CalcMbrs, %Analyze, FieldNameToSpec, %AnalyzeMissing
 	;		5C) Other Elements- Pivot variables, listing fields, listings
 	;	6) Query Log
 	;		-Number of users runnign queries
@@ -68,10 +68,11 @@ DeepSeeButtons(namespace="",cubeString="", getLogs="", LogFile="", proceed="") ;
 	;	7) DeepSee Logs
 	;	8) CPF file (includes mappings)
 	;	9) cconsole.log
-	;	10) Local Databases
-	;	11) Task schedule
-	;	12) Journaling
-	;	13) Alerts
+	;	10) Mappings - Show global mappings in the namespace
+	;	11) Local Databases
+	;	12) Task schedule
+	;	13) Journaling
+	;	14) Alerts
 
 Start
 	New (namespace,cubeString,getLogs,LogFile,proceed)
@@ -89,8 +90,10 @@ Start
 	}
 	Quit:namespace=""
 	Set namespace=$ZCONVERT(namespace, "U")
-	If cubeString="" {
+	If cubeString="ask" {
 		Set allcubeList=$$GetCubesToLog(namespace)
+	} ElseIf cubeString="" {
+		Set allcubeList=""
 	} ElseIf $LISTVALID(cubeString) {
 		Set allcubeList=cubeString
 	} ElseIf cubeString="ALL"{
@@ -171,7 +174,7 @@ LaunchLogsErr
 	Do ^%ET //Process will Halt
 	Quit "0|"_$ZError
 
-LogSections(cubeList,getLogs,LogFile) 
+LogSections(cubeList,getLogs,LogFile)
 	New (Debug,LogDirectory,namespace,cubeList,getLogs,LogFile,MgrDir)
 	Do InitVars
 	If OS?1"***".e Quit ""
@@ -1291,6 +1294,20 @@ LogCubeDimensions
 		}
 	Do WriteLog("</tbody>",2)
 	Do WriteLog("</table>")
+	//Show calculated members in ^DeepSee.CalcMbrs
+	Do WriteLog("<h4>Calculated Members</h4>")
+	If $D(^DeepSee.CalcMbrs(cube)) {
+	Do WriteLog("<table>")
+	Do WriteLog("<tbody>",2)
+	Do WriteLog("<tr>",4)
+	Do PrintGlobal(namespace,"^DeepSee.CalcMbrs("""_cube_""")",8)
+	Do WriteLog("</tr>",4)
+	Do WriteLog("</tbody>",2)
+	Do WriteLog("</table>")
+	} Else {
+		Do WriteLog("<p>No calculated members found for "_cube_"</p>",0)
+	}
+	//Detailed cube information
 	Do WriteUpdate("Getting detailed cube information for "_cube_": %Analyze")
 	Do WriteLog("<h4>Analyze</h4>")
 	Do WriteLog("<table border=""0"" cellpadding=""5"" cellspacing=""5"">")
@@ -1897,7 +1914,7 @@ LogSidePanel(cubeList,getLogs,numalerts)
 	}	
 	Do WriteLog("<a href=""#serverdetails"" title=""Information on the hosting machine"">Server Details</a>",2)
 	Do WriteLog("<a href=""#cubelist"" title=""Information on all cubes in the namespace"">Cubes</a>",2)
-	Do WriteLog("<a href=""#cuberegistry"">Cube Registry</a>",2)
+	Do WriteLog("<a href=""#cuberegistry"" title=""Cube registry defined by Cube Manager"">Cube Registry</a>",2)
 	If (($D(cubeList)'=0) && (cubeList'="")) {
 		Do WriteLog("<a href=""#cubeinfo"" title=""Detailed information on cubes"">Cube Info</a>",2)
 		Set cubeListLength=$ll(cubeList)
@@ -2205,14 +2222,15 @@ isTrak(namespace){
 NLS
 	Try {
 		New LocCur,LocDesc,LocSrc,oLoc
+		Do WriteHeader4("Current Locale",8)
+		ZN "%SYS"		
 		Set oLoc=##class(Config.NLS.Locales).OpenCurrent()
 		If oLoc="" Set LocCur="Unknown",LocDesc="Unknown"
-		Else  Set LocCur=oLoc.Name,LocDesc=oLoc.Description
-		Do WriteHeader4("Current Locale",8)
+		Else  Set LocCur=oLoc.Name,LocDesc=oLoc.Description		
 		Set LocSrc=$$$LOCALEPATH
 		Do WriteLog("<p>"_LocCur_" ("_LocDesc_")<p>",8)
 	} Catch(ex) {
-		Do WriteLog("<p>An error occurred</p>")
+		Do WriteLog("<p>An error occurred</p>",8)
 	}
 	Quit
 
@@ -2720,17 +2738,20 @@ WriteParagraph(name,title,flag)
 	If flag Do WriteLog("<hr noshade size=""4"" width=""auto"">")
 	Do WriteLog("<a name="""_name_"""></a>")
 	Do WriteLog("<h2>"_title_"</h2>")
+	Quit
 	
 WriteHeader4(header,spaces)
 	Use LogFile
 	If '$D(spaces) Set spaces=0
 	Do WriteLog("<h4>"_header_"</h4>",spaces)
-	//Note: do not add !
+	Quit
 	
 WriteUpdate(msg)
+	New (msg, PDev, LogFile)
 	Use PDev
 	Write $C(13,27)_"[0J"_msg
 	Use LogFile
+	Quit
 
 WriteAdhocPatch
 	Try {
@@ -2748,8 +2769,8 @@ WriteAdhocPatch
 			Set patchvar=$Order(^%qPatch(patchvar))
 		}
 	} Catch(ex) {
-		Set tSC = ex.AsStatus()
-		Do WriteLog("<p>An error occurred</p>")
+		//Set tSC = ex.AsStatus()
+		Do WriteLog("<p>An error occurred</p>",8)
 	}
 	Quit
 
@@ -2782,6 +2803,12 @@ PrintGlobal(namespace,glob,spaces){
 	Set res=@queryary
 	Set quote=""
 	Set:'(res=+res) quote=""""
+	If $ListValid(res) {
+		//This seems to provide good formatting for ^DeepSee.CalcMbrs
+		Set res = "$lb("""_$REPLACE($LISTTOSTRING(res,"@"),"""","""""")_""")"
+		Set res = $REPLACE(res,"@",""",""")
+		Set quote=""
+	}
 	Do WriteLog("<p>"_queryary_" = "_quote_res_quote_"</p>",spaces)
 	For   {
     Set queryary=$QUERY(@queryary) 
@@ -2880,6 +2907,5 @@ ExitCmdNoFile
 	Set $ZTrap=""
 	Set $ZError=""
 	Quit
-
 ]]></Routine>
 </Export>
