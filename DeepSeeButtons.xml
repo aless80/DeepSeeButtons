@@ -1180,13 +1180,39 @@ LogCubeInfo
 		Do WriteLog("</tbody>",2)
     	Do WriteLog("</table>",0)
     	Do WriteLog("<h4>Build Errors</h4>",0)
-    	If ($D(^DeepSee.BuildErrors(cube)) && ^DeepSee.BuildErrors(cube) <4) {
+    	/*If ($D(^DeepSee.BuildErrors(cube)) && ^DeepSee.BuildErrors(cube) <4) {
 			Do WriteLog("<div class=""scrollable"" style=""border:1px solid #D0D0D0;height:400px;"">")
     	} Else {
     		Do WriteLog("<div class=""scrollable"" style=""width:100%;height:400px;"">")
     	}
 		Do WriteLog("<pre>",8)
 		Do ##class(%DeepSee.Utils).%PrintBuildErrors(cube)
+		Do WriteLog("</pre>",8)
+		Do WriteLog("</div>") 
+		*/		
+		If ($D(^DeepSee.BuildErrors(cube)) && ^DeepSee.BuildErrors(cube) <4) {
+			Do WriteLog("<div class=""scrollable"" style=""border:1px solid #D0D0D0;height:400px;"">")
+    	} Else {
+    		Do WriteLog("<div class=""scrollable"" style=""width:100%;height:400px;"">")
+    	}
+		Do WriteLog("<pre>",8)
+		Set totCount = ^DeepSee.BuildErrors(cube)
+		Set tCount = 0
+		Set k = $O(^DeepSee.BuildErrors(cube,""))
+		While (k'="") {
+			Set tCount = tCount + 1
+			Set tSC = $G(^DeepSee.BuildErrors(cube,k))
+			Write $J($FN(tCount,","),5),$J("",3),"Source ID: ",k
+			Write !,?8,$System.Status.GetErrorText(tSC),!!
+			Set k = $O(^DeepSee.BuildErrors(cube,k))
+			If (k>1000) {
+				Write !,?0,"... skipping build errors ..."
+				Write !
+				Write !
+				Quit
+			}			
+		}
+		Write $FN(totCount,",")," build error(s) for '",cube,"'"
 		Do WriteLog("</pre>",8)
 		Do WriteLog("</div>") 
 	} Else {
@@ -2907,5 +2933,6 @@ ExitCmdNoFile
 	Set $ZTrap=""
 	Set $ZError=""
 	Quit
+
 ]]></Routine>
 </Export>
