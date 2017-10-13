@@ -52,12 +52,14 @@ DeepSeeButtons(namespace="",cubeString="ask", getLogs="", LogFile="", proceed=""
 	;		-Build Rate
 	;		-Last Compile
 	;		-Source Class
-	;		-Cube Class
+	;		-Subject Area Class
 	;		-Last update
 	;		-Related Cubes
 	;	4) Cube Registry Map
 	;	5) Cube Info: Optional Extra data on a particular cube
-	;		5A) Cube Info- cube class, fact class, caption, fact count, last modified, compound?, abstract?
+	;		5A) Cube Info- subject area class, fact class, caption, fact count, build restrictions 
+	;			(maxfacts, buildrestriction/filterspec property, and %OnGetFilterSpec), DSTIME & DSINTERVAL, 
+	;			last modified, is compound, is abstract
 	;		5B) Dimensions- dimension list, ^DeepSee.CalcMbrs, %Analyze, FieldNameToSpec, %AnalyzeMissing
 	;		5C) Other Elements- Pivot variables, listing fields, listings
 	;	6) Query Log
@@ -592,6 +594,8 @@ LogDeepSeeSetupSection
 	Do WriteLog("<p>globals="_GlobalKSize_"</p>",8)
 	Do WriteLog("<p>routines="_RoutineSize_"</p>",8)
 	Do WriteLog("<p>bbsiz="_bbsiz_"</p>",8)
+	Set sc = $$alertGlobalKSize(GlobalKSize,.alerts)
+	Set sc = $$alertRoutineSize(RoutineSize,.alerts)	
 	Do WriteLog("</td>",6)
 	Do WriteLog("</tr>",4)
 	Do WriteLog("<tr>",4)
@@ -876,7 +880,7 @@ LogCubeSection
 					Do WriteLog("<td>"_rate_"</td>",6)
 
 					Do WriteLog("<td>"_lastmod_"</td>",6)
-					Set sourceClass = $$GetSourceClass(cubenode,type,isInsight)
+					Set sourceClass = $$GetSourceClass(cubenode,type)
 					Do WriteLog("<td>"_sourceClass_"</td>",6)		//writes sourceClass
 					Do WriteLog("<td>"_cubeclass_"</td>",6)				
 					If lastSync'=""{		//LastUpdate = Last time cube was synced or built, N/A if not done in Cube Manager
@@ -1022,9 +1026,11 @@ LogDetailedCubeInfo
 	Quit
 
 LogCubeInfo
+	//New (namespace,LogFile,PDev,cube)
 	Do WriteUpdate("Getting detailed cube information for "_cube)
 	Use LogFile
-	ZN namespace
+	ZN namespace	
+	Try {
 	Do WriteLog("<hr size=""4"" noshade>")
 	Do WriteLog("<a name=""cubeinfo"_cube_"""></a>")
 	Do WriteLog("<h2>Cube Info for "_cube_"</h2>")	
@@ -1058,24 +1064,24 @@ LogCubeInfo
     Do WriteLog("<td>",6)
 	Do WriteLog("<h4>Cube Type</h4>",8)
 	Set notNormal = 0
-	If base'=""{
+	If base'="" {
 		Set notNormal = 1
-		Do WriteLog("<p>Subject Area: this S.A. based on "_cube_" cube</p>",8)
+		Do WriteLog("<p>Subject Area based on "_base_" cube</p>",8)
 	}
-	If compound{
+	If compound {
 		Set notNormal = 1
-		Do WriteLog("<p>Compound Cube: "_joinlist_"</p>",8)
+		Do WriteLog("<p>Compound Cube based on: "_joinlist_"</p>",8)
 	}
-	If abstract{
+	If abstract {
 		Set notNormal = 1
-		Do WriteLog("<p>Abstract: Cube is abstract</p>",8)
+		Do WriteLog("<p>Abstract Cube</p>",8)
 	}
 	If (notNormal=0) Do WriteLog("<p>Not a subject area, abstract, or a compound cube</p>",8)
     Do WriteLog("</td>",6)
     Do WriteLog("</tr>",4)
     Do WriteLog("<tr>",4)
     Do WriteLog("<td>",6)
-	Do WriteLog("<h4>Cube Class</h4>",8)
+	Do WriteLog("<h4>Subject Area Class</h4>",8)
 	Do WriteLog("<p>"_cubeclass_"</p>",8)
     Do WriteLog("</td>",6)
     Do WriteLog("</tr>",4)
@@ -1095,24 +1101,28 @@ LogCubeInfo
     Do WriteLog("<td>",6)
 	Do WriteLog("<h4>Source Class</h4>",8)
 	//Get the source class. All code is repeated here from DeepSeeButtons
-	
- /*	Try{
-		Set x=##class(HSAA.Utils).GetLogDirectory()	//Just testing to see if this method works
-		Set isInsight = 1
-	} Catch {
-		Set isInsight = 0							//Method did not work so return 0
-	}
-	*/
 	Do ##class(%DeepSee.Utils).%GetCubeList(.plist)
 	Set type = $lg(plist(cube),4)
-	Set sourceclass = $$GetSourceClass(cube,type,isInsight)
+	Set sourceclass = $$GetSourceClass(cube,type)
 	Do WriteLog("<p>"_sourceclass_"</p>",8)
     Do WriteLog("</td>",6)
     Do WriteLog("</tr>",4)
     Do WriteLog("<tr>",4)
     Do WriteLog("<td>",6)
 	Do WriteLog("<h4>SQL Table Name </h4>",8)
-	Set sqlclass = ##class(%DeepSee.Utils).%GetSQLTableName(sourceclass)
+	//Get the SQL table name
+ 	If notNormal {
+	 	Set temp = $P(sourceclass,"Subject Area based on ",2)
+	 	Set sqlclass = ##class(%DeepSee.Utils).%GetSQLTableName(temp)
+	 	//NB: if sourceclass is invalid %GetSQLTableName returns the same string, possibly with _ instead of .
+	 	If (sqlclass=temp) {
+		 	Set sqlclass="Not available" //Abstract cubes
+	 	} Else {
+	 		Set sqlclass = "Subject Area based on "_sqlclass
+	 	}
+ 	} Else {
+		Set sqlclass = ##class(%DeepSee.Utils).%GetSQLTableName(sourceclass) 
+ 	}
 	Do WriteLog("<p>"_sqlclass_"</p>",8)
     Do WriteLog("</td>",6)
     Do WriteLog("</tr>",4)
@@ -1130,10 +1140,64 @@ LogCubeInfo
     Do WriteLog("</tr>",4)
     Do WriteLog("<tr>",4)
     Do WriteLog("<td>",6)
+    Do WriteLog("<h4>Build Restriction</h4>",8)
+    If base="" {
+	    //Log buildRestriction property in cubes
+	    Set tSC = $zobjclassmethod(cubeclass,"%GetSourceInfo",.tSourceInfo)
+		Set buildRestriction = $G(tSourceInfo("buildRestriction"))
+		If buildRestriction="" {
+			Do WriteLog("<p>No build restriction</p>",8)
+		} Else {
+			Do WriteLog("<p>Build restriction: "_$$encode(buildRestriction)_"</p>",8)
+		}
+		//Log maxFacts property in cubes
+		Set maxFacts = $G(tSourceInfo("maxFacts"))
+		If maxFacts="" {
+			Do WriteLog("<p>maxFacts property not found in subject area class</p>",8)
+		} Else {
+			Do WriteLog("<p>maxFacts = "_$FN(maxFacts,",")_"</p>",8)
+		}
+    } Else {
+	    //Log filterspec property in subject areas (not cubes)
+	    //NB $zobjclassmethod(cubeclass,"%GetFilterSpec") would also return the result from %OnGetFilterSpec
+	    Set filterspec = $G(^DeepSee.Cubes("cubes",cube,"filterSpec"))
+	    Set:(filterspec="") filterspec = "filterspec property not defined"
+	    Do WriteLog("<p>"_filterspec_"</p>",8)
+    }
+    Set method = ##class(%Dictionary.CompiledMethod).%OpenId(cubeclass_"||%OnGetFilterSpec")
+	If ((method.Origin="%DeepSee.CubeDefinition")||(method.Origin="%DeepSee.SubjectArea")) {
+		Do WriteLog("<p>%OnGetFilterSpec method not found in subject area class</p>",8)
+	} Else {
+		Do WriteLog("<p>%OnGetFilterSpec method defined in subject area class</p>",8)
+	}
+    Do WriteLog("</td>",6)
+    Do WriteLog("</tr>",4)
+    Do WriteLog("<tr>",4)
+    Do WriteLog("<td>",6)
 	Do WriteLog("<h4>Last Modified</h4>",8)
 	Do WriteLog("<p>"_$ZDT($ZDTH(moddate),3)_"</p>",8)
     Do WriteLog("</td>",6)
     Do WriteLog("</tr>",4)
+    //DSTIME and DSINTERVAL
+    If (base="")&&('notNormal) {
+    	Do WriteLog("<tr>",4)
+    	Do WriteLog("<td>",6)
+		Do WriteLog("<h4>DSTIME, DSINTERVAL</h4>",8)
+		Set dstime = $G(tSourceInfo("dstime"))
+		If dstime="" {
+			Do WriteLog("<p>DSTIME property not found in subject area class</p>",8)
+		} Else {
+			Do WriteLog("<p>DSTIME = "_dstime_"</p>",8)
+			Set dsinterval = $G(tSourceInfo("dsinterval"))
+			If dsinterval="" {
+				Do WriteLog("<p>DSINTERVAL not specified</p>",8)
+			} Else {
+				Do WriteLog("<p>DSINTERVAL = "_dsinterval_"</p>",8)
+			}
+		}
+    	Do WriteLog("</td>",6)
+    	Do WriteLog("</tr>",4)
+    }
     //Cube Registry
     Do WriteLog("<tr>",4)
     Do WriteLog("<td>",6)
@@ -1227,6 +1291,9 @@ LogCubeInfo
     	Do WriteLog("</tbody>",2)
     	Do WriteLog("</table>",0)
     }
+	} Catch exc {
+		S ^Ale($I(^Ale),"exc")=exc
+	}
 	ZN "%SYS"
 	Quit
 
@@ -1237,7 +1304,7 @@ LogCubeDimensions
 	Do WriteLog("<a name=""dimensions"_cube_"""></a>")
 	Do WriteLog("<h2>Dimensions for "_cube_"</h2>")
 	If ##class(%DeepSee.Utils).%IsCubeAbstract(cube) {
-		Do WriteLog("<p>No dimensions because the cube is abstract</p>",6)
+		Do WriteLog("<p>No dimensions because the cube is abstract</p>",0)
 		Quit
 	}	
 	Do WriteLog("<h4>Dimension List</h4>")
@@ -1373,7 +1440,7 @@ LogOtherCubeElements
 	Do WriteLog("<a name=""otherelements""></a>")
 	Do WriteLog("<h2>Other Elements for "_cube_"</h2>")
 	If ##class(%DeepSee.Utils).%IsCubeAbstract(cube) {
-		Do WriteLog("<p>Not available because the cube is abstract</p>",6)
+		Do WriteLog("<p>Not available because the cube is abstract</p>",0)
 		ZN "%SYS"
 		Quit
 	}	
@@ -1531,9 +1598,11 @@ LogQuerylog
  		Do WriteLog("</tbody>",2)
  		Do WriteLog("</table>")
  	}
- 	//Show table with the most run queries
- 	Do WriteHeader4("5 most run queries")
- 	Do MostRunQueries 	
+ 	//Show table with the most run queries, 5 by default unless the user used the secret option on prompt
+ 	Set numqueries = 5
+ 	Set:(getLogs>1) numqueries = getLogs 	
+ 	Do WriteHeader4("Most run queries")
+ 	Do MostRunQueries(numqueries) 
  	//Last Query subsection
  	Do WriteHeader4("Last query")
 	Do WriteLog("<pre>")
@@ -1546,8 +1615,6 @@ LogQuerylog
 	//Subsection with 5 last queries for each user
  	Do WriteHeader4("MDX queries by user")
  	//Show the last 5 queries by default unless the user used the secret option on prompt
- 	Set numqueries = 5
- 	Set:(getLogs>1) numqueries = getLogs
 	Do lastNQueries(numqueries)
  	Do WriteLog("</div>") //Close Expand/Collapse div
 	Use PDev
@@ -1933,7 +2000,7 @@ LogTrailer
 LogSidePanel(cubeList,getLogs,numalerts)
 	Do WriteLog("<div id=""mySidenav"" class=""sidenav"">")
 	Do WriteLog("<a href=""javascript:void(0)"" class=""closebtn"" onclick=""closeNav()"">&times;</a>",2)
-	Do WriteLog("<a href=""#deepseesetup"" title=""General setting relevant for DeepSee"">DeepSee Setup</a>",2)
+	Do WriteLog("<a href=""#top"" title=""General setting relevant for DeepSee"">DeepSee Setup</a>",2)
 	If (isInsight || isTrak) {
 		//Set nOverrides=$$CountNodes(namespace,"^DeepSee.Overrides")
 		Do:(nOverrides>=10) WriteLog("<a href=""#overrides"">DeepSee Overrides</a>",2)
@@ -1950,11 +2017,15 @@ LogSidePanel(cubeList,getLogs,numalerts)
 		}		
 	}
 	If getLogs{
-		Do WriteLog("<a href=""#querylog"" title=""Last 5 MDX queries run by each users in the system"">Query Log</a>",2)
-		Do WriteLog("<a href=""#dslog"" title=""A log file with cube builds and errors occurred in the system"">DeepSee Logs</a>",2)
+		Do WriteLog("<a href=""#querylog"" onclick=""javascript:toggle('querylogdiv','querylogtoggle');"""_
+		" title=""Last 5 MDX queries run by each users in the system"">Query Log</a>",2)
+		Do WriteLog("<a href=""#dslog"" onclick=""javascript:toggle('dslogdiv','dslogtoggle');"""_
+		"title=""A log file with cube builds and errors occurred in the system"">DeepSee Logs</a>",2)
 	}
-	Do WriteLog("<a href=""#cpf"" title=""The Caché Parameter File containing recording the Caché configuration"">cache.cpf</a>",2)
-	Do:getLogs WriteLog("<a href=""#cconsole"" title=""cconsole.log file containing general messages and errors"">cconsole.log</a>",2)
+	Do WriteLog("<a href=""#cpf"" onclick=""javascript:toggle('cpfdiv','cpftoggle');"""_
+	"title=""The Caché Parameter File containing recording the Caché configuration"">cache.cpf</a>",2)
+	Do:getLogs WriteLog("<a href=""#cconsole"" onclick=""javascript:toggle('cconsolediv','cconsoletoggle');"""_
+	"title=""cconsole.log file containing general messages and errors"">cconsole.log</a>",2)
   	Do WriteLog("<a href=""#Mappings"" title=""Global mapppings defined for the "_namespace_" namespace"">Mappings</a>",2)
   	Do WriteLog("<a href=""#LocalDB"" title=""Local databases defined in the instance"">Local Databases</a>",2)  	
   	Do WriteLog("<a href=""#Taskschedule"" title=""Information on background tasks"">Task Schedule</a>",2)
@@ -2463,13 +2534,13 @@ GetRelationships(cube){
 	Quit
 }
 	
-GetSourceClass(cube,type,isInsight)[storageList, inheritList]{
+GetSourceClass(cube,type)[storageList, inheritList]{
 	Try {
 		Set sourceClass=""
 		If type="cube" {
 			Set cubeObj=##class(%DeepSee.Utils).%GetModel(cube)
 			If cubeObj=""{
-				Set sourceClass = "Cube class not compiled"
+				Set sourceClass = "Subject area class not compiled"
 				Quit
 			}
 			Set sourceClass=cubeObj.sourceClass				//Source Class name
@@ -2487,11 +2558,14 @@ GetSourceClass(cube,type,isInsight)[storageList, inheritList]{
 			If super["%DeepSee.DataConnector"{
 				Set $LIST(inheritList,*+1)=cube
 			}
-		}
-		Else{
- 			Set basecube=##class(%DeepSee.Utils).%GetBaseCube(cube)
- 			//Set cubeobj=##class(%DeepSee.Utils).%GetModel(basecube)
- 			Set sourceClass="SA-"_basecube
+		} ElseIf type="subjectArea" {
+			Set basecube=##class(%DeepSee.Utils).%GetBaseCube(cube)
+ 			//Set sourceClass="Subject Area based on "_basecube
+ 			Do ##class(%DeepSee.Utils).%GetCubeList(.plist)
+ 			Set typebasecube = $lg(plist(basecube),4)
+ 			Set sourceClass = "Subject Area based on "_$$GetSourceClass(basecube,typebasecube)
+		} Else {
+ 			Set sourceClass="Not available"
 		}
 	} catch {
 		Set sourceClass = "Not available"
@@ -2591,7 +2665,7 @@ FieldNameToSpec(pCubeName) {
 	}
 }
 
-MostRunQueries
+MostRunQueries(numqueries)
  	//Show table with the most run queries
  	//Use $ZCRC(,7) to hash an MDX query, then create two arrays: 
  	//  queryarr(hashed MDX query) = frequency
@@ -2630,14 +2704,16 @@ MostRunQueries
 	Do WriteLog("<table id=""FrequentQueriesTable"" cellpadding=""5"" cellspacing=""5"" class=""tableWithBorders"">")
 	Do WriteLog("<tbody>",2)
 	Do WriteLog("<tr>",4)
+	Do WriteLog("<th onclick=""sortTable('FrequentQueriesTable',0,0)"">#</th>",6)
 	Do WriteLog("<th onclick=""sortTable('FrequentQueriesTable',0,0)"">Frequency</th>",6)
 	Do WriteLog("<th onclick=""sortTable('FrequentQueriesTable',1,1)"">Query</th>",6)
 	Do WriteLog("</tr>",4)		
 	Set freq = ""
-	For n = 1:1:5 {
+	For n = 1:1:numqueries {
 		Set freq = $O(freqarr(freq),-1)
 		Quit:freq=""
 		Do WriteLog("<tr>",4)
+		Do WriteLog("<td>"_n_"</td>",6)
 		Do WriteLog("<td>"_freq_"</td>",6)
 		Do WriteLog("<td>",6)
 		Set hashed=""
@@ -2648,7 +2724,7 @@ MostRunQueries
 			Do:counter=7 WriteLog("<p> ... </p>",8) //Show up to 6 queries per frequency
 			Quit:counter=7
 			Set query = freqarr(freq,hashed)
-			Do WriteLog("<p>"_query_"</p>",8)
+			Do WriteLog("<p>"_$$encode(query)_"</p>",8)
 			Set counter= $I(counter)
 		}
 		Do WriteLog("</td>",6)
@@ -2675,7 +2751,7 @@ lastNQueries(numqueries)
 			Set query=$Get(^DeepSee.QueryLog(username,counter))
 			If query'=""{
 				Use LogFile  Write ?2  Use PDev
-				Do WriteLog( i_") "_query)
+				Do WriteLog( i_") "_$$encode(query))
 			}
 		}
 		Use LogFile  Write !  Use PDev		
@@ -2683,7 +2759,45 @@ lastNQueries(numqueries)
 	Do WriteLog("</pre>")
 	Quit
  
+encode(string) {
+	Set out = $REPLACE(string,"<","&lt;")
+	//These do not seem to be needed
+	//Set out = $REPLACE(out,"&","&amp;")
+	//Set out = $REPLACE(out,"&","&amp;")
+	Quit out
+}
 /// Alerts
+alertRoutineSize(RoutineSize,alerts) {
+	Try {
+		If (RoutineSize=0) {
+			Set pre="title=""Routine buffers have the default ''0'' value and might need customization"">"
+			Set alert = "Alert: Routine buffers have not been customized"
+			Set alerts($I(alerts)) = pre_alert
+			Do WriteLog("<p class=""red"" "_pre_alert_"</p>",8)
+		}
+		Set tSC = 1
+	} Catch (exc) {
+		Set tSC = exc.AsStatus()
+	}
+	Quit tSC
+}
+
+alertGlobalKSize(GlobalKSize,alerts) {
+	Try {
+		If (GlobalKSize="0,0,0,0,0,0") {
+			Set pre="title=""Global buffers have the default ''0,0,0,0,0,0'' values and might need customization"">"
+			Set alert = "Alert: Global buffers have not been customized"
+			Set alerts($I(alerts)) = pre_alert
+			Do WriteLog("<p class=""red"" "_pre_alert_"</p>",8)
+		}
+		Set tSC = 1
+	} Catch (exc) {
+		Set tSC = exc.AsStatus()
+	}
+	Quit tSC
+}
+
+
 alertDStimeRW(DSTimeMapFrom,alerts) {
 	Try {
 		ZN "%SYS"
