@@ -821,11 +821,12 @@ LogCubeSection
 		 	Do WriteLog("<th onclick=""sortTable('CubeTable',2,0)"">Build Time [s]</th>",6)
 		 	Do WriteLog("<th onclick=""sortTable('CubeTable',3,0)"">Fact Count</th>",6)
 		 	Do WriteLog("<th onclick=""sortTable('CubeTable',4,0)"">Build Rate [Facts/s]</th>",6)
-		 	Do WriteLog("<th onclick=""sortTable('CubeTable',5,1)"">Last Compile</th>",6)
-		 	Do WriteLog("<th onclick=""sortTable('CubeTable',6,1)"">Source Class</th>",6)
-		 	Do WriteLog("<th onclick=""sortTable('CubeTable',7,1)"">Cube Class</th>",6)
-		 	Do WriteLog("<th onclick=""sortTable('CubeTable',8,1)"">Last Build/Synch</th>",6)
-		 	Do WriteLog("<th onclick=""sortTable('CubeTable',9,1)"">Related Cubes</th>",6)
+		 	Do WriteLog("<th onclick=""sortTable('CubeTable',5,0)"">Build Errors</th>",6)
+		 	Do WriteLog("<th onclick=""sortTable('CubeTable',6,1)"">Last Compile</th>",6)
+		 	Do WriteLog("<th onclick=""sortTable('CubeTable',7,1)"">Source Class</th>",6)
+		 	Do WriteLog("<th onclick=""sortTable('CubeTable',8,1)"">Cube Class</th>",6)
+		 	Do WriteLog("<th onclick=""sortTable('CubeTable',9,1)"">Last Build/Synch</th>",6)
+		 	Do WriteLog("<th onclick=""sortTable('CubeTable',10,1)"">Related Cubes</th>",6)
 		 	Do WriteLog("</tr>",4)
 		 	Set storageList=""
 			Set inheritList=""			
@@ -840,11 +841,8 @@ LogCubeSection
 					Do WriteLog("<td>"_cubecaption_"</td>",6)
 					Set cubeclass=##class(%DeepSee.Utils).%GetCubeClass(cubename) //cube class
 					Set lastmod=$zdt($lg(plist(cubenode),3),3)				//last cube compile
-					Set type=$lg(plist(cubenode),4)							//subject area or cube?					
-					Set facts=##class(%DeepSee.Utils).%GetCubeFactCount(cubename)	//number of facts					
-					//Set moddate=$p(lastmod," ",1)
-					//Set modtime=$p(lastmod," ",2)
-					//Set lastmod=moddate_" "_modtime
+					Set type=$lg(plist(cubenode),4)							//subject area or cube?
+					Set facts=##class(%DeepSee.Utils).%GetCubeFactCount(cubename)	//number of facts
   					//DTB422 moved ^DeepSee.Cubes to ^DeepSee.Update
 					If ($d(^DeepSee.Cubes("cubes",cubenode,"lastDataUpdate"))=1) {
 						Set lastDataUpdate = ^DeepSee.Cubes("cubes",cubenode,"lastDataUpdate")
@@ -879,7 +877,8 @@ LogCubeSection
 						Set rate="N/A"
 					}
 					Do WriteLog("<td>"_rate_"</td>",6)
-
+  					Set builderrors = $G(^DeepSee.BuildErrors($ZCONVERT(cubename,"U")),0)
+ 					Do WriteLog("<td>"_$FNUMBER(builderrors,",")_"</td>",6)
 					Do WriteLog("<td>"_lastmod_"</td>",6)
 					Set sourceClass = $$GetSourceClass(cubenode,type)
 					Do WriteLog("<td>"_sourceClass_"</td>",6)		//writes sourceClass
@@ -1156,7 +1155,7 @@ LogCubeInfo
 		If maxFacts="" {
 			Do WriteLog("<p>maxFacts property not found in subject area class</p>",8)
 		} Else {
-			Do WriteLog("<p>maxFacts = "_$FN(maxFacts,",")_"</p>",8)
+			Do WriteLog("<p>maxFacts = "_$FNUMBER(maxFacts,",")_"</p>",8)
 		}
     } Else {
 	    //Log filterspec property in subject areas (not cubes)
@@ -1267,7 +1266,7 @@ LogCubeInfo
 		While (k'="") {
 			Set tCount = tCount + 1
 			Set tSC = $G(^DeepSee.BuildErrors(cube,k))
-			Write $J($FN(tCount,","),5),$J("",3),"Source ID: ",k
+			Write $J($FNUMBER(tCount,","),5),$J("",3),"Source ID: ",k
 			Write !,?8,$System.Status.GetErrorText(tSC),!!
 			Set k = $O(^DeepSee.BuildErrors(cube,k))
 			If (k>1000) {
@@ -1277,7 +1276,7 @@ LogCubeInfo
 				Quit
 			}			
 		}
-		Write $FN(totCount,",")," build error(s) for '",cube,"'"
+		Write $FNUMBER(totCount,",")," build error(s) for '",cube,"'"
 		Do WriteLog("</pre>",8)
 		Do WriteLog("</div>") 
 	} Else {
@@ -1930,7 +1929,7 @@ LogJournal
  		Do WriteLog("<tr>",4)
     	Do WriteLog("<td>",6)
 		Do WriteHeader4("Free Space",8)
-		Do WriteLog("<p>"_$FN(freesp/1024/1024,",",0)_" MB </p>",8)
+		Do WriteLog("<p>"_$FNUMBER(freesp/1024/1024,",",0)_" MB </p>",8)
 		Do WriteLog("</td>",6)
  		Do WriteLog("</tr>",4)
  		Do WriteLog("<tr>",4)
@@ -1955,7 +1954,7 @@ LogJournal
 			While $D(Row(filen)) {			
 				Do WriteLog("<tr>",4)
 				Do WriteLog("<td>"_$LG(Row(filen),1)_"</td>",6)
-				Do WriteLog("<td style=""text-align:right"">"_$FN($LG(Row(filen),2)/1024,",",0)_"</td>",6)
+				Do WriteLog("<td style=""text-align:right"">"_$FNUMBER($LG(Row(filen),2)/1024,",",0)_"</td>",6)
 				Do WriteLog("<td>"_$LG(Row(filen),3)_"</td>",6)
 				Set a=$LG(Row(filen),4)
 				Set reas=$S(a=-1:"<STARTUP>",a=0:"unspecified",a=1:"by user",a=2:"file size limit reached",a=3:"to retry failed I/O",a=4:"by backup",a=5:"by restore",a=6:"by task manager",a=7:"to activate journal changes",a=8:"to reenable journaling",a=9:"by mirror startup",a=10:"by mirror shutdown",a=11:"mirror database removed",1:"Unknown")
