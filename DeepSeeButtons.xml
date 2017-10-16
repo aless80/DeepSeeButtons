@@ -1268,13 +1268,13 @@ LogCubeInfo
 			Set tSC = $G(^DeepSee.BuildErrors(cube,k))
 			Write $J($FNUMBER(tCount,","),5),$J("",3),"Source ID: ",k
 			Write !,?8,$System.Status.GetErrorText(tSC),!!
-			Set k = $O(^DeepSee.BuildErrors(cube,k))
-			If (k>1000) {
+			If (tCount>1000) {
 				Write !,?0,"... skipping build errors ..."
 				Write !
 				Write !
 				Quit
-			}			
+			}
+			Set k = $O(^DeepSee.BuildErrors(cube,k))
 		}
 		Write $FNUMBER(totCount,",")," build error(s) for '",cube,"'"
 		Do WriteLog("</pre>",8)
