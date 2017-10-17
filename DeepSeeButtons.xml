@@ -58,8 +58,8 @@ DeepSeeButtons(namespace="",cubeString="ask", getLogs="", LogFile="", proceed=""
 	;	4) Cube Registry Map
 	;	5) Cube Info: Optional Extra data on a particular cube
 	;		5A) Cube Info- subject area class, fact class, caption, fact count, build restrictions 
-	;			(maxfacts, buildrestriction/filterspec property, and %OnGetFilterSpec), DSTIME & DSINTERVAL, 
-	;			last modified, is compound, is abstract
+	;			(maxfacts, buildrestriction/filterspec property, %OnProcessFact, and %OnGetFilterSpec), 
+	;			DSTIME & DSINTERVAL, last modified, is compound, is abstract
 	;		5B) Dimensions- dimension list, ^DeepSee.CalcMbrs, %Analyze, FieldNameToSpec, %AnalyzeMissing
 	;		5C) Other Elements- Pivot variables, listing fields, listings
 	;	6) Query Log
@@ -621,7 +621,8 @@ LogDeepSeeSetupSection
 				Set NumMaps=$O(DeepSeeMap(namespace,NumMaps))
 			}
 		}
-		Set sc = $$alertCacheMappings(namespace,.DeepSeeMap,.alerts)
+		Set sc = $$alertCacheMappings(namespace,.alerts)
+		//Set sc = $$alertCacheMappingsOLD(namespace,.DeepSeeMap,.alerts)
 		If $D(DSTimeMapFrom(namespace)){
 			Set sc = $$alertDStimeRW(DSTimeMapFrom(namespace),.alerts)
 		}
@@ -825,8 +826,8 @@ LogCubeSection
 		 	Do WriteLog("<th onclick=""sortTable('CubeTable',6,1)"">Last Compile</th>",6)
 		 	Do WriteLog("<th onclick=""sortTable('CubeTable',7,1)"">Source Class</th>",6)
 		 	Do WriteLog("<th onclick=""sortTable('CubeTable',8,1)"">Cube Class</th>",6)
-		 	Do WriteLog("<th onclick=""sortTable('CubeTable',9,1)"">Last Build/Synch</th>",6)
-		 	Do WriteLog("<th onclick=""sortTable('CubeTable',10,1)"">Related Cubes</th>",6)
+		 	Do WriteLog("<th onclick=""sortTable('CubeTable',9,1)"" title=""As logged in ^DeepSee.Update"">Last Build/Synch</th>",6)
+		 	Do WriteLog("<th onclick=""sortTable('CubeTable',10,1)"" title=""Does not reflect build order"">Related Cubes</th>",6)
 		 	Do WriteLog("</tr>",4)
 		 	Set storageList=""
 			Set inheritList=""			
@@ -860,8 +861,7 @@ LogCubeSection
 							Set synctime=$p(lastSync," ",2)
 							Set lastSync=syncdate_" "_synctime
 						}
-					}
-					Else{
+					} Else {
 						Set lastSync="N/A"
 					}					
 					Set buildtime=$$GetBuildTime(cubename)
@@ -885,17 +885,14 @@ LogCubeSection
 					Do WriteLog("<td>"_cubeclass_"</td>",6)				
 					If lastSync'=""{		//LastUpdate = Last time cube was synced or built, N/A if not done in Cube Manager
 						Do WriteLog("<td>"_lastSync_"</td>",6)
-						}
-					Else{
+					} Else{
 						Do WriteLog("<td>N/A</td>",6)
 					}
 					Write !,?6,"<td>" Do GetRelationships(cubenode)  Write "</td>"		//RelatedCubes
 					Do WriteLog("</tr>",4)
-				}
-				ElseIf ##class(%DeepSee.Utils).%IsCubeAbstract(cubenode){
-					If 'isInsight{				//Don't run if Health insight because there are too many abstract cubes
-						Set abstractList($I(abstractcount)) = cubenode
-					}					
+				} ElseIf ##class(%DeepSee.Utils).%IsCubeAbstract(cubenode){
+					//Don't run if Health insight because there are too many abstract cubes
+					Set:('isInsight) abstractList($I(abstractcount)) = cubenode
 				}
 				Set cubenode=$order(plist(cubenode))
 			}
@@ -1164,10 +1161,17 @@ LogCubeInfo
 	    Set:(filterspec="") filterspec = "filterspec property not defined"
 	    Do WriteLog("<p>"_filterspec_"</p>",8)
     }
+    Set method = ##class(%Dictionary.CompiledMethod).%OpenId(cubeclass_"||%OnProcessFact")
+    If ((method="")||(method.Origin="%DeepSee.CubeDefinition")) {
+	    Do WriteLog("<p>%OnProcessFact method not found in subject area class</p>",8)
+    } ElseIf (method.Origin=cubeclass) {
+		Do WriteLog("<p>%OnProcessFact method defined in subject area class</p>",8)
+	}
     Set method = ##class(%Dictionary.CompiledMethod).%OpenId(cubeclass_"||%OnGetFilterSpec")
-	If ((method.Origin="%DeepSee.CubeDefinition")||(method.Origin="%DeepSee.SubjectArea")) {
+	If ((method="")||(method.Origin="%DeepSee.CubeDefinition")||(method.Origin="%DeepSee.SubjectArea")) {
+		//NB: checking (method="") might be overkill
 		Do WriteLog("<p>%OnGetFilterSpec method not found in subject area class</p>",8)
-	} Else {
+	} ElseIf (method.Origin=cubeclass) {
 		Do WriteLog("<p>%OnGetFilterSpec method defined in subject area class</p>",8)
 	}
     Do WriteLog("</td>",6)
@@ -1292,7 +1296,6 @@ LogCubeInfo
     	Do WriteLog("</table>",0)
     }
 	} Catch exc {
-		S ^Ale($I(^Ale),"exc")=exc
 	}
 	ZN "%SYS"
 	Quit
@@ -2387,9 +2390,9 @@ DiskSpace
 	Do WriteHeader4("Disk space",8)
 	Do ##class(%File).DriveListExecute(.drivelist)
 	For {
-		Set st=##class(%File).DriveListFetch(.drivelist,.drive,.AtEnd)  //zw drive  zw AtEnd  zw drivelist
+		Set st=##class(%File).DriveListFetch(.drivelist,.drive,.AtEnd)
 		Set drive = $LG(drive)
-		Do ##class(%Library.File).GetDirectorySpace(drive,.free,.total,1) //w total,!,free
+		Do ##class(%Library.File).GetDirectorySpace(drive,.free,.total,1)
 		Do WriteLog("<p>Total space in """_drive_""" drive: "_$FNUMBER(total,",",0)_" MB</p>",8)
 		Do WriteLog("<p>Free space in """_drive_""" drive:  "_$FNUMBER(free,",",0)_" MB</p>",8)
 		Quit:AtEnd
@@ -2498,14 +2501,12 @@ GetLastBuild(CubeEvent,cubename) [cubename,CubeEvent,cubekey,cubeevent,totaltime
 }
 	
 GetRelationships(cube){
-	If ##class(%DeepSee.Utils).%IsCubeCompound(cube){		//Can't have a related, compound cube
-		Quit
-	}
+	Quit:##class(%DeepSee.Utils).%IsCubeCompound(cube)	//Can't have a related, compound cube
 	Set status=##class(%DeepSee.Utils).%GetDimensionList(cube,.dimlist)
 	Set nodenum=$O(dimlist(""),-1)			//Get last node in dimlist
 	Set count=0
-	If status=1{
-		For{
+	If status=1 {
+		For {
 			If $lg(dimlist(nodenum,0,0),1)="r"{			//If dimension is a relationship...
 				Set count=count+1						//increment count
 				Set dimname=$lg(dimlist(nodenum,0,0),2)	//Get name of relationship
@@ -2513,20 +2514,15 @@ GetRelationships(cube){
 			}
 			Quit:nodenum=0								//If no dimensions defined, first node will be 0
 			Set nodenum=$O(dimlist(nodenum),-1)
-			If $lg(dimlist(nodenum,0,0),1)'="r"{
-				Quit
-			}
+			Quit:$lg(dimlist(nodenum,0,0),1)'="r"
 		}
-		If count=0{
+		If count=0 {
 			Write "-"
-		}
-		Else{		
-			For i=1:1:count{
-				If $g(relationships(i),"null")'="null"{
+		} Else {
+			For i=1:1:count {
+				If $g(relationships(i),"null")'="null" {
 					Write relationships(i)
-					If i'=count{
-						Write ", "
-					}
+					Write:(i'=count) ", "
 				}
 			}
 		}
@@ -2818,8 +2814,38 @@ alertDStimeRW(DSTimeMapFrom,alerts) {
 	Quit tSC
 }
 
-alertCacheMappings(ns,DeepSeeMap,alerts) {
+alertCacheMappings(ns,alerts) {
 	Try {
+		//Check if ^DeepSee.Cache.Results, .Axis, .Cells end up in a journaled DB
+		ZN "%SYS"		
+		Set tSC = $$$OK
+		Set DSCacheGlobals = $LB("DeepSee.Cache.Results","DeepSee.Cache.Axis","DeepSee.Cache.Cells")
+		While 1 {
+			Set cacheGlob=$LG(DSCacheGlobals,$I(i))
+			Quit:(cacheGlob="")
+			Set sysdir=##class(%SYS.Namespace).GetGlobalDest(ns,cacheGlob)
+			//sysdir is system^directory, but only the directory is needed for the following call
+			Set DB=##class(SYS.Database).%OpenId($P(sysdir,"^",2))
+			If (DB.GlobalJournalState = 3) {
+				Do ##Class(Config.Databases).DatabasesByDirectory($P(sysdir,"^",1),$P(sysdir,"^",2),.listDB)
+				Set DBname=$LISTTOSTRING(listDB,",") //In general I would expect one DB but there could be more
+				Set pre="title=""Journaling the DeepSee cache leads to problems with disk size and query performance"">"
+				Set alert = "Alert: The DeepSee cache stored in the "_DBname_" database is journaled"
+				Set alerts($I(alerts)) = pre_alert
+				Do WriteLog("<p class=""red"" "_pre_alert_"</p>",8)
+				Quit
+			}	
+		}
+	} Catch (exc) {
+		Set tSC = ex.AsStatus()
+		Do WriteLog("<p class=""red"" "_tSC_"</p>",8)
+	}
+	Quit tSC
+}
+
+alertCacheMappingsOLD(ns,DeepSeeMap,alerts) {
+	Try {
+		//Parse Map.namespace in cpf file
 		Set mapcount=$O(DeepSeeMap(ns,""))
  		While mapcount'="" {
  			Set global=$P($P(DeepSeeMap(ns,mapcount),"_",2,*),"=",1)
@@ -2828,8 +2854,7 @@ alertCacheMappings(ns,DeepSeeMap,alerts) {
 				//Check if DB is journaled
 				Set sc = ##class(Config.Databases).Get(DB, .prop)
 				Set db=##Class(SYS.Database).%OpenId(prop("Directory"))
-				Set journaled = (db.GlobalJournalState = 3)
-				If journaled {
+				If (db.GlobalJournalState = 3) {
 					Set pre="title=""Journaling the DeepSee cache leads to problems with disk size and query performance"">"
 					Set alert = "Alert: The DeepSee cache stored in the "_DB_" database is journaled"
 					Set alerts($I(alerts)) = pre_alert
