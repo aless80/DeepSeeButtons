@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
 <Routine name="DeepSeeButtons" type="MAC" languagemode="0"><![CDATA[
-DeepSeeButtons(namespace="",cubeString="ask", getLogs="", LogFile="", proceed="") ;;;Collect Evidence and Log;
+DeepSeeButtons(namespace="",cubeString="ask", getLogs="", LogFile="", proceed="")
 #include COPYRIGH
 #include %occConstant
 #include %occStatus
@@ -91,7 +91,6 @@ Start
 		Set namespace= $$ValidateNamespace(namespace)
 	}
 	Quit:namespace=""
-	Set namespace=$ZCONVERT(namespace, "U")
 	If cubeString="ask" {
 		Set allcubeList=$$GetCubesToLog(namespace)
 	} ElseIf cubeString="" {
@@ -105,12 +104,65 @@ Start
 		Set allcubeList=$LFS(cubeString,",")
 	}
 	Set cubeList=$$VerifyInputCubes(allcubeList,namespace)
+ 	Do EstimateLongAnalyze
 	Do GetLogsConfirm
+	Do ReadLogTypeConfirm
+	Do LaunchLogs(Dir,Big,CacheDir,Body,namespace,cubeList,getLogs,goforAnalyze)
 	Quit
+
+EstimateLongAnalyze
+	ZN namespace
+	Set goforAnalyze = 1
+	Try {
+		//Set DB=##class(SYS.Database).%OpenId($P(sysdir,"^",2))
+		Set cubeListLength=$ll(cubeList)
+		Q:'cubeListLength
+		Set sysdir=##class(%SYS.Namespace).GetGlobalDest(namespace,"DeepSee.Index")
+		Set totSize = 0
+		For i=1:1:cubeListLength {
+			Set cube=$LG(cubeList,i)
+			If cube'=""{
+				Do ##class(%Library.GlobalEdit).GetGlobalSizeBySubscript($P(sysdir,"^",2),"DeepSee.Index("""_cube_""")","",.size)
+				Set totSize = totSize + size
+			}
+		}
+		If (totSize>500) {
+			Set goforAnalyze = ""
+			Do GetAnalyzeConfirm
+		}
+	} Catch(ex) {
+		Set tSC = ex.AsStatus()
+	}
+	Quit
+
+
+GetAnalyzeConfirm
+	ZN "%SYS"	
+	//Set goforAnalyze=$ZCONVERT(goforAnalyze,"U")
+	If ('$D(goforAnalyze))||(goforAnalyze="") {
+		Write !,"The size of ^DeepSee.Index for the selected cubes is ",totSize," MB "
+		Write "and running %DeepSee.Utils:%Analyze might take some time."
+		Write !,"Do you still want to analyze indices? [Y/n]"
+		Read goforAnalyze
+		Set goforAnalyze=$ZCONVERT(goforAnalyze,"U")
+		If (goforAnalyze="") {
+			Set goforAnalyze=1		//Default selection
+		} ElseIf (goforAnalyze="N")||(goforAnalyze="NO") {
+			Set goforAnalyze=0
+		} ElseIf (goforAnalyze="Y")||(goforAnalyze="YES") {
+			Set goforAnalyze=1
+		} Else { 
+			Write !,"Please enter Y or N"	
+			Set goforAnalyze=""
+			Goto GetAnalyzeConfirm
+		}
+	}
+	Quit
+
 
 GetLogsConfirm
 	ZN "%SYS"
-	Set getLogs=$ZCONVERT(getLogs,"U")
+	//Set getLogs=$ZCONVERT(getLogs,"U")
 	If (getLogs="") {
 		Write !, "Include cconsole.log, Query Log, and DeepSee Logs? [Y] "
 		Read getLogs
@@ -130,7 +182,6 @@ GetLogsConfirm
 			Goto GetLogsConfirm
 		}
 	}
-	Do ReadLogTypeConfirm
 	Quit
 
 ReadLogTypeConfirm
@@ -141,10 +192,9 @@ ReadLogTypeConfirm
 		If (LogType'="")&(LogType'="Y")&(LogType'="YES") Write !,"Please enter Y or N" Goto ReadLogTypeConfirm	
 	}
  	Set Dir="", CacheDir="",Body=0,Big=0
-	Do LaunchLogs(Dir,,Big,CacheDir,Body,namespace,cubeList,getLogs)
 	Quit
 
-LaunchLogs(LogDirectory,Debug,Big,CacheDir,Body,namespace,cubeList,getLogs)
+LaunchLogs(LogDirectory,Big,CacheDir,Body,namespace,cubeList,getLogs,goforAnalyze)
 	Set Body=$Get(Body,0)
 	Set CacheVerNumber=$System.Version.GetNumber()
 	If +CacheVerNumber<5 Do  Quit Return
@@ -158,7 +208,7 @@ LaunchLogs(LogDirectory,Debug,Big,CacheDir,Body,namespace,cubeList,getLogs)
 	Set $ZTrap="LaunchLogsErr"
 	Set EOF=$ZUtil(68,40)	
 	//Start logging with the DeepSee Setup section
-	Set LogFile=$$LogSections(cubeList,getLogs,LogFile)
+	Set LogFile=$$LogSections(cubeList,getLogs,goforAnalyze,LogFile)
 	Set rc=$$$OK
 	If $ZUtil(68,40,EOF) //Reset $ZEOF to the original setting
 	Break 1 
@@ -176,8 +226,8 @@ LaunchLogsErr
 	Do ^%ET //Process will Halt
 	Quit "0|"_$ZError
 
-LogSections(cubeList,getLogs,LogFile)
-	New (Debug,LogDirectory,namespace,cubeList,getLogs,LogFile,MgrDir)
+LogSections(cubeList,getLogs,goforAnalyze,LogFile)
+	New (LogDirectory,namespace,cubeList,getLogs,goforAnalyze,LogFile,MgrDir)
 	Do InitVars
 	If OS?1"***".e Quit ""
 	If LogFile="" Quit ""
@@ -841,8 +891,8 @@ LogCubeSection
 					Set cubecaption=##class(%DeepSee.Utils).%GetCubeCaption(cubename)
 					Do WriteLog("<td>"_cubecaption_"</td>",6)
 					Set cubeclass=##class(%DeepSee.Utils).%GetCubeClass(cubename) //cube class
-					Set lastmod=$zdt($lg(plist(cubenode),3),3)				//last cube compile
-					Set type=$lg(plist(cubenode),4)							//subject area or cube?
+					Set lastmod=$zdt($LG(plist(cubenode),3),3)				//last cube compile
+					Set type=$LG(plist(cubenode),4)							//subject area or cube?
 					Set facts=##class(%DeepSee.Utils).%GetCubeFactCount(cubename)	//number of facts
   					//DTB422 moved ^DeepSee.Cubes to ^DeepSee.Update
 					If ($d(^DeepSee.Cubes("cubes",cubenode,"lastDataUpdate"))=1) {
@@ -1004,14 +1054,14 @@ LogDetailedCubeInfo
 	Do WriteParagraph("cubeinfo","Cube Info")
 	Set cubeListLength=$ll(cubeList)
  	For i=1:1:cubeListLength{
-		Set cube=$lg(cubeList,i)
+		Set cube=$LG(cubeList,i)
 		If cube'=""{
 			Do WriteLog("<a href=""#cubeinfo"_cube_""">"_cube_"</a>")
 			Do WriteLog("<br>")
 		}
 	}
 	For cubeind=1:1:cubeListLength {
-		Set cube=$lg(cubeList,cubeind)
+		Set cube=$LG(cubeList,cubeind)
  		//Do:cube'="" LogCubeDetails(namespace,cube,PDev,LogFile) //PDev eg "/dev/pts/5"
  		If cube'="" {
  			ZN namespace
@@ -1099,7 +1149,7 @@ LogCubeInfo
 	Do WriteLog("<h4>Source Class</h4>",8)
 	//Get the source class. All code is repeated here from DeepSeeButtons
 	Do ##class(%DeepSee.Utils).%GetCubeList(.plist)
-	Set type = $lg(plist(cube),4)
+	Set type = $LG(plist(cube),4)
 	Set sourceclass = $$GetSourceClass(cube,type)
 	Do WriteLog("<p>"_sourceclass_"</p>",8)
     Do WriteLog("</td>",6)
@@ -1411,8 +1461,11 @@ LogCubeDimensions
 	Do WriteLog("<tr>",4)
 	Do WriteLog("<td>",6)
 	Do WriteLog("<pre>",8)
-	Write "Do ##class(%DeepSee.Utils).%Analyze("""_cube_""",""fic"",0)",!
-	Do ##class(%DeepSee.Utils).%Analyze(cube,"fic",0)
+	
+	Write:goforAnalyze "Do ##class(%DeepSee.Utils).%Analyze("""_cube_""",""fci"",0)",!
+	Write:('goforAnalyze) "Do ##class(%DeepSee.Utils).%Analyze("""_cube_""",""fc"",0)",!
+	Do:goforAnalyze ##class(%DeepSee.Utils).%Analyze(cube,"fci",0)
+	Do:('goforAnalyze) ##class(%DeepSee.Utils).%Analyze(cube,"fc",0)
 	Do WriteLog("")
 	Do WriteLog("")
 	Do WriteLog("")
@@ -1466,10 +1519,10 @@ LogOtherCubeElements
 		Do WriteLog("</tr>",4)
 		For ii=1:1:pivotvars{
 			Do WriteLog("<tr>",4)
-			Do WriteLog("<td>"_$lg(pivotvars(ii),1)_"</td>",6)
-			Do WriteLog("<td>"_$lg(pivotvars(ii),2)_"</td>",6)	//Description
-			Do WriteLog("<td>"_$lg(pivotvars(ii),3)_"</td>",6)	//Default Value
-			Do WriteLog("<td>"_$lg(pivotvars(ii),4)_"</td>",6)	//Type
+			Do WriteLog("<td>"_$LG(pivotvars(ii),1)_"</td>",6)
+			Do WriteLog("<td>"_$LG(pivotvars(ii),2)_"</td>",6)	//Description
+			Do WriteLog("<td>"_$LG(pivotvars(ii),3)_"</td>",6)	//Default Value
+			Do WriteLog("<td>"_$LG(pivotvars(ii),4)_"</td>",6)	//Type
 			Do WriteLog("</tr>",4)
 		}
 		Do WriteLog("</tbody>",2)
@@ -1488,8 +1541,8 @@ LogOtherCubeElements
 		Set ii = $O(namedsets(""))
 		While ii'="" {
 			Do WriteLog("<tr>",4)
-			Do WriteLog("<td>"_$lg(namedsets(ii),1)_"</td>",6)
-			Do WriteLog("<td>"_$lg(namedsets(ii),2)_"</td>",6)	//Set Expression
+			Do WriteLog("<td>"_$LG(namedsets(ii),1)_"</td>",6)
+			Do WriteLog("<td>"_$LG(namedsets(ii),2)_"</td>",6)	//Set Expression
 			Do WriteLog("</tr>",4)
 			Set ii = $O(namedsets(ii))
 		}
@@ -2015,7 +2068,7 @@ LogSidePanel(cubeList,getLogs,numalerts)
 		Do WriteLog("<a href=""#cubeinfo"" title=""Detailed information on cubes"">Cube Info</a>",2)
 		Set cubeListLength=$ll(cubeList)
  		For i=1:1:cubeListLength{
-			Set cube=$lg(cubeList,i)
+			Set cube=$LG(cubeList,i)
 			Do:cube'="" WriteLog("<a class=""cubelinks"" href=""#cubeinfo"_cube_""">"_cube_"</a>",2)
 		}		
 	}
@@ -2048,6 +2101,7 @@ LogCloseBody
 
 /// More helper functions for the Log* functions above
 ValidateNamespace(namespace) [namespace]{
+	Set namespace=$ZCONVERT(namespace, "U")
 	Try {
 		ZN namespace
 		return namespace
@@ -2055,7 +2109,7 @@ ValidateNamespace(namespace) [namespace]{
 	Catch ex {
 		Write !,namespace," is invalid.  Please enter a valid namespace.",!
 		Set namespace=""
-		return namespace
+		Return namespace
 	}
 }
 
@@ -2507,14 +2561,14 @@ GetRelationships(cube){
 	Set count=0
 	If status=1 {
 		For {
-			If $lg(dimlist(nodenum,0,0),1)="r"{			//If dimension is a relationship...
+			If $LG(dimlist(nodenum,0,0),1)="r"{			//If dimension is a relationship...
 				Set count=count+1						//increment count
-				Set dimname=$lg(dimlist(nodenum,0,0),2)	//Get name of relationship
+				Set dimname=$LG(dimlist(nodenum,0,0),2)	//Get name of relationship
 				Set relationships(count)=##class(%DeepSee.Utils).%GetRelatedCube(cube,dimname)	//Related cube name
 			}
 			Quit:nodenum=0								//If no dimensions defined, first node will be 0
 			Set nodenum=$O(dimlist(nodenum),-1)
-			Quit:$lg(dimlist(nodenum,0,0),1)'="r"
+			Quit:$LG(dimlist(nodenum,0,0),1)'="r"
 		}
 		If count=0 {
 			Write "-"
@@ -2558,7 +2612,7 @@ GetSourceClass(cube,type)[storageList, inheritList]{
 			Set basecube=##class(%DeepSee.Utils).%GetBaseCube(cube)
  			//Set sourceClass="Subject Area based on "_basecube
  			Do ##class(%DeepSee.Utils).%GetCubeList(.plist)
- 			Set typebasecube = $lg(plist(basecube),4)
+ 			Set typebasecube = $LG(plist(basecube),4)
  			Set sourceClass = "Subject Area based on "_$$GetSourceClass(basecube,typebasecube)
 		} Else {
  			Set sourceClass="Not available"
