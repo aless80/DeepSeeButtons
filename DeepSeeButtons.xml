@@ -1319,7 +1319,7 @@ LogCubeDimensions
 		Do WriteLog("</tr>",4)
 		Set DimNo=$O(dimensionlist(-1)) //skip Calculated Dimensions
 		Set oldHierNo=0
-		For{
+		For {
 			QUIT:DimNo=""
 			Set HierNo=$O(dimensionlist(DimNo,""))
 			For{
@@ -1331,7 +1331,8 @@ LogCubeDimensions
 				For{
 					QUIT:LevelNo=""
 					Set type=$LG(dimensionlist(DimNo,HierNo,LevelNo),1)
-					If ((HierNo=0) || 0){  //change to H2!
+					If (HierNo=0) {  //Dimension. 
+						//In this case 4th item "type" is actually the caption for all level
 						Do WriteLog("<tr>",4)
 						Do WriteLog("<td>"_$LG(dimensionlist(DimNo,HierNo,LevelNo),2)_"</td>",6) 	//DimName
 						If ($LG(dimensionlist(DimNo,HierNo,LevelNo),1)="r") { //relationships
@@ -1339,15 +1340,25 @@ LogCubeDimensions
 							Do WriteLog("<td></td>",6)
 							Do WriteLog("<td></td>",6)
 						}
+						
+						If ((type="d") && ($LG(dimensionlist(DimNo,HierNo,LevelNo),4)'="")) {
+							Do WriteLog("<td></td>",6)
+							Do WriteLog("<td>"_$LG(dimensionlist(DimNo,HierNo,LevelNo),4)_"</td>",6)
+							Do WriteLog("<td>[All level]</td>",6)
+							Do WriteLog("</tr>",4)
+							Do WriteLog("<tr>",4)
+							Do WriteLog("<td></td>",6) 	//Skip DimName column
+						}
 					} 
 					If (HierNo'=0){
-						If ((LevelNo=0) && (DimNo'=0)){
+						If type="all" {
+							//Skip the all level because it was already shown next to the dimension
+						} ElseIf ((LevelNo=0) && (DimNo'=0)) {
 							Set newHier=0
-							If (oldHierNo && (HierNo'=oldHierNo)){ //Maybe the logic can be simpler but this works
+							If (oldHierNo && (HierNo'=oldHierNo)) { //Maybe the logic could be simpler but this works
 								Do WriteLog("</tr>",4)
 								Do WriteLog("<tr>",4)
-								Do WriteLog("<td>",6)
-								Do WriteLog("</td>",6)	
+								Do WriteLog("<td></td>",6)
 							}
 							Do WriteLog("<td>"_$LG(dimensionlist(DimNo,HierNo,LevelNo),3)_"</td>",6)	//HierName
 						} ElseIf ((LevelNo=0) && (DimNo=0)){ //Measures section
@@ -1359,8 +1370,7 @@ LogCubeDimensions
 							Do WriteLog("<td>"_$LG(dimensionlist(DimNo,HierNo,LevelNo),3)_"</td>",6)	//MeasName
 							Do WriteLog("<td></td>",6)
 							Do WriteLog("<td></td>",6)
-						}
-						ElseIf (DimNo'=0) {
+						} ElseIf (DimNo'=0) {
 							If newHier {
 								Do WriteLog("</tr>",4)
 								Do WriteLog("<tr>",4)
@@ -1368,11 +1378,7 @@ LogCubeDimensions
 								Do WriteLog("<td></td>",6)
 							}
 							Do WriteLog("<td>"_$LG(dimensionlist(DimNo,HierNo,LevelNo),4)_"</td>",6)	//LevelName
-							If (type="all"){
-								Set type="[All level]"
-							} Else {
-								Set type=""
-							}
+							Set type=$S(type="all":"[All level a]",1:"")
 							Do WriteLog("<td>"_type_"</td>",6) 		//type
 							Set newHier=1
 						}
@@ -1418,7 +1424,7 @@ LogCubeDimensions
 		Set:(sizeindex<500) flag="i"_flag
 		If (flag'="c") {
 			//See if analyzing facts is quick
-			Set:(sizefacts<400) flag="f"_flag
+			Set:(sizefacts<300) flag="f"_flag
 			Do WriteLog("Do ##class(%DeepSee.Utils).%Analyze("""_cube_""","""_flag_""",0)")
 			Do ##class(%DeepSee.Utils).%Analyze(cube,flag,0)
 		} Else {
@@ -1872,6 +1878,7 @@ LogTasks
 		ZN namespace
 		ZN "%SYS"
 		Set rs = ##class(%ResultSet).%New("%SYS.Task:TaskListFilter")
+		Set:(rs="") rs = ##class(%ResultSet).%New("%SYS.Task:TaskList") //Old versions
 		Do rs.Execute()
 		Do WriteLog("<table id=""tasksTable"" border=""0"" cellpadding=""7"" cellspacing=""3"" class=""zebraStriped"">")
 		Do WriteLog("<tbody>",2)
