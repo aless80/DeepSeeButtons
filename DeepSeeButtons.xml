@@ -422,7 +422,7 @@ LogHead(cubeList,getLogs)
     Do WriteLog(".tableWithBorders th {",4)
     Do WriteLog("height: 22px;",6)
     Do WriteLog("overflow: hidden;",6)
-    Do WriteLog("vertical-align: middle;",6)
+    Do WriteLog("text-align: left;",6)
     Do WriteLog("border-bottom: 2px solid #D0D0D0;",6)
 	Do WriteLog("}",4)
     Do WriteLog(".tableWithBorders td {",4)
@@ -1087,6 +1087,12 @@ LogCubeInfo
     Do WriteLog("</tr>",4)
     Do WriteLog("<tr>",4)
     Do WriteLog("<td>",6)
+    Do WriteLog("<h4>Resource</h4>",8)
+    Do WriteLog("<p>"_$G(^DeepSee.Cubes("cubes",cube,"resource"))_"</p>",8)
+    Do WriteLog("</td>",6)
+    Do WriteLog("</tr>",4)
+    Do WriteLog("<tr>",4)
+    Do WriteLog("<td>",6)
 	Do WriteLog("<h4>Source Class</h4>",8)
 	//Get the source class from override or from %GetCubeList, then log it
 	If $D(^DeepSee.Overrides(cube,"SOURCECLASS")) {
@@ -1478,7 +1484,7 @@ LogOtherCubeElements
 	} Else {
 		Set defaultListingName = model.defaultListing
 	}
-	/// Pivot Variabled
+	/// Pivot Variables
 	Do WriteLog("<h4>Pivot Variables</h4>")
 	If $D(pivotvars){
 		Do WriteLog("<table id=""PivotVarTable"" cellpadding=""5"" cellspacing=""5"" class=""tableWithBorders"">")
@@ -1502,7 +1508,7 @@ LogOtherCubeElements
 	Do WriteLog("")
 	Merge namedsets = ^DeepSee.Cubes("cubes",cube,"namedSets")
 	If $D(namedsets){
-		Write "<table id=""NamedSetsTable"" cellpadding=""5"" cellspacing=""5"" class=""tableWithBorders"">"
+		Do WriteLog("<table id=""NamedSetsTable"" cellpadding=""5"" cellspacing=""5"" class=""tableWithBorders"">")
 		Do WriteLog("<tbody>",2)
 		Do WriteLog("<tr>",4)
 		Do WriteLog("<th>Name</th><th>Set Expression</th>",6)
@@ -1518,26 +1524,29 @@ LogOtherCubeElements
 		Do WriteLog("</tbody>",2)
 	 	Do WriteLog("</table>")
 	}
+	//Listing fields
 	Do WriteLog("<h4>Listing Fields</h4>")
 	If $D(listingfields){
-		Write !,"<table id=""ListingFields"" cellpadding=""5"" cellspacing=""5"" class=""tableWithBorders"">"
-  		Write !,?2,"<tbody>"
-    	Write !,?4,"<tr>"
-      	Write !,?6,"<th>Name</th><th>Field Expression</th><th>Description</th>"
-    	Write !,?4,"</tr>"
+		Do WriteLog("<table id=""ListingFields"" cellpadding=""5"" cellspacing=""5"" class=""tableWithBorders"">")
+  		Do WriteLog("<tbody>",2)
+    	Do WriteLog("<tr>",4)
+      	Do WriteLog("<th>Name</th><th>Field Expression</th><th>Resource</th><th>Description</th>",6)
+    	Do WriteLog("</tr>",4)
       	Set tIndex = $O(listingfields(""))
       	While tIndex'="" {
-	      	Write !,?4,"<tr>"      	
-	      	Write !,?6,"<td>"_$LG(listingfields(tIndex),1)_"</td>"
-	      	Write !,?6,"<td>"_$LG(listingfields(tIndex),2)_"</td>"
-	    	Write !,?6,"<td>"_$LG(listingfields(tIndex),3)_"</td>"
-	    	Write !,?4,"</tr>"
+	      	Do WriteLog("<tr>",4)
+	      	Do WriteLog("<td>"_$LG(listingfields(tIndex),1)_"</td>",6)
+	      	Do WriteLog("<td>"_$LG(listingfields(tIndex),2)_"</td>",6)
+	      	Do WriteLog("<td>"_$G(^DeepSee.Cubes("cubes",cube,"listingFields",$LG(listingfields(tIndex),1),"resource"))_"</td>",6)
+	    	Do WriteLog("<td>"_$LG(listingfields(tIndex),3)_"</td>",6)
+	    	Do WriteLog("</tr>",4)
 	    	Set tIndex = $O(listingfields(tIndex))
 	    }
-		Write !,?2,"</tbody>"
-		Write !,"</table>"
-		Write !
+		Do WriteLog("</tbody>",2)
+		Do WriteLog("</table>")
+		Do WriteLog("")
 	}
+	//Listings
 	Do WriteLog("<h4>Listings</h4>")
 	If $D(listings){
 		Set node=$O(listings(""))		//Initialize
@@ -1547,40 +1556,56 @@ LogOtherCubeElements
 		Do WriteLog("<th>Listing Name</th>",6)
 		Do WriteLog("<th>Fields</th>",6)
 		Do WriteLog("<th>Source</th>",6)
+		Do WriteLog("<th>Resource</th>",6)
 		Do WriteLog("</tr>",6)
 		Do {										//Write fields of listing nicely
  			Do WriteLog("<td>"_node_$S((node=defaultListingName):" (default)",1:"")_"</td>",8)
 			Set fieldString=$LG(listings(node),2)
  			Set listingSource=$LG(listings(node),5) 			//Listing source
+ 			//Resource
+ 			Set resource = ""
+ 			Set:(listingSource="cube") resource = $G(^DeepSee.Cubes("cubes",cube,"listing",node,"resource"))
+			Set:(listingSource="listingGroup") resource = $G(^DeepSee.ListingGroups("cubes",cube,"listing",node,"resource"))
  			Set listingSource=$S(listingSource="listingGroup":"Listing Group",listingSource="cube":"Cube",1:listingSource)
-			Set:(fieldString="") fieldString="*No Fields - Custom SQL Listing*"
-			//Print the list fields (the source properties) separately in the second column
-			Set fieldList=$LFS(fieldString,",")
-			//Place the first fieldList in the same line
-			Set tInd=0
-			Set field=$LG(fieldList,$I(tInd))
-			Do WriteLog("<td>"_field_"</td>",8)	//FieldName
-			Do WriteLog("<td>"_listingSource_"</td>",8)
-			Set field=$LG(fieldList,$I(tInd))
-			Do WriteLog("</tr>",6)
-			Do WriteLog("<tr>",6)			
-			While field'=""{
+			//Custom SQL listing vs normal listing with fields
+			If (fieldString="") {
+				Do WriteLog("<td>*No Fields - Custom SQL Listing*</td>",8)	//FieldName
+				Do WriteLog("<td>"_listingSource_"</td>",8)
+				Do WriteLog("<td>"_resource_"</td>",8)
 				Do WriteLog("<tr>",6)
-				Do WriteLog("<td></td>",8) //Nothing in the first column
-				Do WriteLog("<td>"_field_"</td>",8)
-				Do WriteLog("<td></td>",8) //Nothing in the third column
+				Do WriteLog("<td></td>",8)	//Skip Listing Name columns
+				Do WriteLog("<td>"_$G(^DeepSee.Cubes("cubes",cube,"listing",node,"sql"))_"</td>",8)  //Custom SQL query
 				Do WriteLog("</tr>",6)
+			} Else {
+				//Print the list fields (the source properties) separately in the second column
+				Set fieldList=$LFS(fieldString,",")
+				//Place the first fieldList in the same line
+				Set tInd=0
 				Set field=$LG(fieldList,$I(tInd))
+				Do WriteLog("<td>"_field_"</td>",8)	//FieldName
+				Do WriteLog("<td>"_listingSource_"</td>",8)
+				Do WriteLog("<td>"_resource_"</td>",8)
+				Set field=$LG(fieldList,$I(tInd))
+				Do WriteLog("</tr>",6)
+				Do WriteLog("<tr>",6)			
+				While field'="" {
+					Do WriteLog("<tr>",6)
+					Do WriteLog("<td></td>",8) //Nothing in the first column
+					Do WriteLog("<td>"_field_"</td>",8)
+					Do WriteLog("<td></td>",8) //Nothing in the 3rd column (Source)
+					Do WriteLog("<td></td>",8) //Nothing in the 4th column (Resource)
+					Do WriteLog("</tr>",6)
+					Set field=$LG(fieldList,$I(tInd))
+				}
 			}
 			Set node=$O(listings(node))
-		} while node'=""
+		} while node'=""		
 		Do WriteLog("</tbody>",2)
 	 	Do WriteLog("</table>")
+	} Else{
+		Do WriteLog("No detail listings defined in this cube")
 	}
-	Else{
-		Write "No detail listings defined in this cube"
-	}
-	Write !	
+	Do WriteLog("")
 	ZN "%SYS"
 	Quit
 	
