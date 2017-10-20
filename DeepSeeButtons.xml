@@ -76,7 +76,7 @@ DeepSeeButtons(namespace="",cubeString="ask", getLogs="", LogFile="", proceed=""
 	;	13) Journaling
 	;	14) Alerts
 
-Start
+StartDialog
 	New (namespace,cubeString,getLogs,LogFile,proceed)
 	Set PDev=$Principal
 	Use PDev
@@ -104,61 +104,10 @@ Start
 		Set allcubeList=$LFS(cubeString,",")
 	}
 	Set cubeList=$$VerifyInputCubes(allcubeList,namespace)
- 	Do EstimateLongAnalyze
 	Do GetLogsConfirm
 	Do ReadLogTypeConfirm
-	Do LaunchLogs(Dir,Big,CacheDir,Body,namespace,cubeList,getLogs,goforAnalyze)
+	Do LaunchLogs(Dir,Big,CacheDir,Body,namespace,cubeList,getLogs)
 	Quit
-
-EstimateLongAnalyze
-	ZN namespace
-	Set goforAnalyze = 1
-	Try {
-		//Set DB=##class(SYS.Database).%OpenId($P(sysdir,"^",2))
-		Set cubeListLength=$ll(cubeList)
-		Q:'cubeListLength
-		Set sysdir=##class(%SYS.Namespace).GetGlobalDest(namespace,"DeepSee.Index")
-		Set totSize = 0
-		For i=1:1:cubeListLength {
-			Set cube=$LG(cubeList,i)
-			If cube'=""{
-				Do ##class(%Library.GlobalEdit).GetGlobalSizeBySubscript($P(sysdir,"^",2),"DeepSee.Index("""_cube_""")","",.size)
-				Set totSize = totSize + size
-			}
-		}
-		If (totSize>500) {
-			Set goforAnalyze = ""
-			Do GetAnalyzeConfirm
-		}
-	} Catch(ex) {
-		Set tSC = ex.AsStatus()
-	}
-	Quit
-
-
-GetAnalyzeConfirm
-	ZN "%SYS"	
-	//Set goforAnalyze=$ZCONVERT(goforAnalyze,"U")
-	If ('$D(goforAnalyze))||(goforAnalyze="") {
-		Write !,"The size of ^DeepSee.Index for the selected cubes is ",totSize," MB "
-		Write "and running %DeepSee.Utils:%Analyze might take some time."
-		Write !,"Do you still want to analyze indices? [Y/n]"
-		Read goforAnalyze
-		Set goforAnalyze=$ZCONVERT(goforAnalyze,"U")
-		If (goforAnalyze="") {
-			Set goforAnalyze=1		//Default selection
-		} ElseIf (goforAnalyze="N")||(goforAnalyze="NO") {
-			Set goforAnalyze=0
-		} ElseIf (goforAnalyze="Y")||(goforAnalyze="YES") {
-			Set goforAnalyze=1
-		} Else { 
-			Write !,"Please enter Y or N"	
-			Set goforAnalyze=""
-			Goto GetAnalyzeConfirm
-		}
-	}
-	Quit
-
 
 GetLogsConfirm
 	ZN "%SYS"
@@ -194,7 +143,7 @@ ReadLogTypeConfirm
  	Set Dir="", CacheDir="",Body=0,Big=0
 	Quit
 
-LaunchLogs(LogDirectory,Big,CacheDir,Body,namespace,cubeList,getLogs,goforAnalyze)
+LaunchLogs(LogDirectory,Big,CacheDir,Body,namespace,cubeList,getLogs)
 	Set Body=$Get(Body,0)
 	Set CacheVerNumber=$System.Version.GetNumber()
 	If +CacheVerNumber<5 Do  Quit Return
@@ -208,7 +157,7 @@ LaunchLogs(LogDirectory,Big,CacheDir,Body,namespace,cubeList,getLogs,goforAnalyz
 	Set $ZTrap="LaunchLogsErr"
 	Set EOF=$ZUtil(68,40)	
 	//Start logging with the DeepSee Setup section
-	Set LogFile=$$LogSections(cubeList,getLogs,goforAnalyze,LogFile)
+	Set LogFile=$$LogSections(cubeList,getLogs,LogFile)
 	Set rc=$$$OK
 	If $ZUtil(68,40,EOF) //Reset $ZEOF to the original setting
 	Break 1 
@@ -226,8 +175,8 @@ LaunchLogsErr
 	Do ^%ET //Process will Halt
 	Quit "0|"_$ZError
 
-LogSections(cubeList,getLogs,goforAnalyze,LogFile)
-	New (LogDirectory,namespace,cubeList,getLogs,goforAnalyze,LogFile,MgrDir)
+LogSections(cubeList,getLogs,LogFile)
+	New (LogDirectory,namespace,cubeList,getLogs,LogFile,MgrDir)
 	Do InitVars
 	If OS?1"***".e Quit ""
 	If LogFile="" Quit ""
@@ -709,7 +658,7 @@ LogDeepSeeSetupSection
 	Do WriteLog("<td>",6)
 	Do WriteHeader4("Server Initialization Code",8)
 	Try {
-		If $d(^[namespace]DeepSee.InitCode){
+		If $D(^[namespace]DeepSee.InitCode){
 			Set initcode=$g(^[namespace]DeepSee.InitCode)
 			Do WriteLog("<p>^DeepSee.InitCode: "_initcode_"</p>",8)
 		} Else{
@@ -895,9 +844,9 @@ LogCubeSection
 					Set type=$LG(plist(cubenode),4)							//subject area or cube?
 					Set facts=##class(%DeepSee.Utils).%GetCubeFactCount(cubename)	//number of facts
   					//DTB422 moved ^DeepSee.Cubes to ^DeepSee.Update
-					If ($d(^DeepSee.Cubes("cubes",cubenode,"lastDataUpdate"))=1) {
+					If ($D(^DeepSee.Cubes("cubes",cubenode,"lastDataUpdate"))=1) {
 						Set lastDataUpdate = ^DeepSee.Cubes("cubes",cubenode,"lastDataUpdate")
-					} ElseIf ($d(^DeepSee.Update("cubes",cubenode,"lastDataUpdate"))=1) { 
+					} ElseIf ($D(^DeepSee.Update("cubes",cubenode,"lastDataUpdate"))=1) { 
 						Set lastDataUpdate = ^DeepSee.Update("cubes",cubenode,"lastDataUpdate")
 					} Else {
 						Set lastDataUpdate = 0
@@ -960,13 +909,13 @@ LogCubeSection
 			Set ptr=0
 			Set testptr=0
 			Do WriteHeader4("Cubes with Source Classes Based on SQL Storage")
-			If ($d(storageList) && (storageList'="")){
+			If ($D(storageList) && (storageList'="")){
 				While $LISTNEXT(storageList,ptr,class){
 					Do WriteLog("<p>"_class_"</p>")
 				}
 			}			
 			Do WriteHeader4("Cubes Based on Data Connectors")
-			If $d(inheritList){	
+			If $D(inheritList){	
 					Set ptr=0
 					While $LISTNEXT(inheritList,ptr,class){
 						Do WriteLog("<p>"_class_"</p>")
@@ -1086,9 +1035,13 @@ LogCubeInfo
 	Set cubecaption=##class(%DeepSee.Utils).%GetCubeCaption(cube)
 	Set factcount=##class(%DeepSee.Utils).%GetCubeFactCount(cube)
 	Set moddate=$zdt(##class(%DeepSee.Utils).%GetCubeModifiedDate(cube))
-	Set compound=##class(%DeepSee.Utils).%IsCubeCompound(cube,.joinlist)
-	Set abstract=##class(%DeepSee.Utils).%IsCubeAbstract(cube)
+ 	//Get the cube type
+ 	Set cubetype=""
+ 	Set:##class(%DeepSee.Utils).%IsCubeCompound(cube,.joinlist) cubetype="Compound"	
+ 	Set:##class(%DeepSee.Utils).%IsCubeAbstract(cube) cubetype="Abstract"
 	Set base=##class(%DeepSee.Utils).%GetBaseCube(cube)	
+	Set:((base'="") && (cubetype="")) cubetype="Subject Area"
+	//Start logging cube info
 	Do WriteLog("<table id=""CubeInfoTable"" cellpadding=""7"" cellspacing=""3"" class=""tableWithBorders tableTabbed"">",0)
   	Do WriteLog("<tbody>",2)
   	Try {
@@ -1110,20 +1063,11 @@ LogCubeInfo
     Do WriteLog("<tr>",4)
     Do WriteLog("<td>",6)
 	Do WriteLog("<h4>Cube Type</h4>",8)
-	Set notNormal = 0
-	If base'="" {
-		Set notNormal = 1
-		Do WriteLog("<p>Subject Area based on "_base_" cube</p>",8)
-	}
-	If compound {
-		Set notNormal = 1
-		Do WriteLog("<p>Compound Cube based on: "_joinlist_"</p>",8)
-	}
-	If abstract {
-		Set notNormal = 1
-		Do WriteLog("<p>Abstract Cube</p>",8)
-	}
-	If (notNormal=0) Do WriteLog("<p>Not a subject area, abstract, or a compound cube</p>",8)
+ 	Do:(cubetype="Subject Area") WriteLog("<p>Subject Area based on "_base_" cube</p>",8)
+ 	Do:(cubetype="Compound") WriteLog("<p>Compound Cube based on: </p>",8)
+ 	Do:(cubetype="Compound") WriteLog("<p>"_joinlist_"</p>",8)
+ 	Do:(cubetype="Abstract") WriteLog("<p>Abstract Cube</p>",8)
+	If (cubetype="") Do WriteLog("<p>Not a subject area, abstract, or a compound cube</p>",8)
     Do WriteLog("</td>",6)
     Do WriteLog("</tr>",4)
     Do WriteLog("<tr>",4)
@@ -1136,41 +1080,44 @@ LogCubeInfo
     Do WriteLog("<td>",6)
 	Do WriteLog("<h4>Inherits from</h4>",8)
 	Set model = ##class(%DeepSee.Utils).%GetModel(cube)
-	If model="" {
-		Set inheritsfrom = ""
-	} Else {
-		Set inheritsfrom = ##class(%DeepSee.Utils).%GetModel(cube).inheritsFrom
-	}
+	Set inheritsfrom = ""
+	Set:(model'="") inheritsfrom = ##class(%DeepSee.Utils).%GetModel(cube).inheritsFrom
 	Do WriteLog("<p>"_inheritsfrom_"</p>",8)
     Do WriteLog("</td>",6)
     Do WriteLog("</tr>",4)
     Do WriteLog("<tr>",4)
     Do WriteLog("<td>",6)
 	Do WriteLog("<h4>Source Class</h4>",8)
-	//Get the source class. All code is repeated here from DeepSeeButtons
-	Do ##class(%DeepSee.Utils).%GetCubeList(.plist)
-	Set type = $LG(plist(cube),4)
-	Set sourceclass = $$GetSourceClass(cube,type)
-	Do WriteLog("<p>"_sourceclass_"</p>",8)
+	//Get the source class from override or from %GetCubeList, then log it
+	If $D(^DeepSee.Overrides(cube,"SOURCECLASS")) {
+		Set sourceclass = ^DeepSee.Overrides(cube,"SOURCECLASS")
+		Do WriteLog("<p>"_sourceclass_" (from ^DeepSee.Overrides)</p>",8)
+	} Else {
+		Do ##class(%DeepSee.Utils).%GetCubeList(.plist)
+		Set type = $LG(plist(cube),4)
+		Set sourceclass = $$GetSourceClass(cube,type)
+ 		If ((cubetype="Subject Area")||(cubetype="Compound")) {
+  			Do WriteLog("<p>Subject Area based on "_sourceclass_"</p>",8)
+ 		} Else {
+			Do WriteLog("<p>"_sourceclass_"</p>",8)
+ 		}
+	}	
     Do WriteLog("</td>",6)
     Do WriteLog("</tr>",4)
     Do WriteLog("<tr>",4)
     Do WriteLog("<td>",6)
+    //Get the SQL table name
 	Do WriteLog("<h4>SQL Table Name </h4>",8)
-	//Get the SQL table name
- 	If notNormal {
-	 	Set temp = $P(sourceclass,"Subject Area based on ",2)
-	 	Set sqlclass = ##class(%DeepSee.Utils).%GetSQLTableName(temp)
-	 	//NB: if sourceclass is invalid %GetSQLTableName returns the same string, possibly with _ instead of .
-	 	If (sqlclass=temp) {
-		 	Set sqlclass="Not available" //Abstract cubes
-	 	} Else {
-	 		Set sqlclass = "Subject Area based on "_sqlclass
-	 	}
- 	} Else {
-		Set sqlclass = ##class(%DeepSee.Utils).%GetSQLTableName(sourceclass) 
+	//NB: if sourceclass is invalid %GetSQLTableName returns the same string, possibly with _ instead of .
+ 	Set sqlclass = ##class(%DeepSee.Utils).%GetSQLTableName(sourceclass)
+ 	If (sqlclass="")||('##class(%SYSTEM.SQL).TableExists(sqlclass)) {
+ 		Set sqlclass="Not available" //Often in abstract cubes
  	}
-	Do WriteLog("<p>"_sqlclass_"</p>",8)
+ 	If ((cubetype="Subject Area")||(cubetype="Compound")) {
+		Do WriteLog("<p>Subject Area based on "_sqlclass_"</p>",8)
+ 	} Else {
+		Do WriteLog("<p>"_sqlclass_"</p>",8)
+ 	}
     Do WriteLog("</td>",6)
     Do WriteLog("</tr>",4)
     Do WriteLog("<tr>",4)
@@ -1233,7 +1180,7 @@ LogCubeInfo
     Do WriteLog("</td>",6)
     Do WriteLog("</tr>",4)
     //DSTIME and DSINTERVAL
-    If (base="")&&('notNormal) {
+    If (base="")&&(cubetype="") {
     	Do WriteLog("<tr>",4)
     	Do WriteLog("<td>",6)
 		Do WriteLog("<h4>DSTIME, DSINTERVAL</h4>",8)
@@ -1461,18 +1408,34 @@ LogCubeDimensions
 	Do WriteLog("<tr>",4)
 	Do WriteLog("<td>",6)
 	Do WriteLog("<pre>",8)
-	
-	Write:goforAnalyze "Do ##class(%DeepSee.Utils).%Analyze("""_cube_""",""fci"",0)",!
-	Write:('goforAnalyze) "Do ##class(%DeepSee.Utils).%Analyze("""_cube_""",""fc"",0)",!
-	Do:goforAnalyze ##class(%DeepSee.Utils).%Analyze(cube,"fci",0)
-	Do:('goforAnalyze) ##class(%DeepSee.Utils).%Analyze(cube,"fc",0)
-	Do WriteLog("")
-	Do WriteLog("")
-	Do WriteLog("")
+	//Execute %Analyze but skip it if indices take too long
+	Try {
+		Set dirindices=##class(%SYS.Namespace).GetGlobalDest(namespace,"DeepSee.Index")
+		Do ##class(%Library.GlobalEdit).GetGlobalSizeBySubscript($P(dirindices,"^",2),"DeepSee.Index("""_cube_""")","",.sizeindex) 
+		Set dirfacts=##class(%SYS.Namespace).GetGlobalDest(namespace,"DeepSee.Fact")
+ 		Do ##class(%Library.GlobalEdit).GetGlobalSizeBySubscript($P(dirfacts,"^",2),"DeepSee.Fact("""_$zu(28,factclass,5)_""")","",.sizefacts)
+		Set flag="c"
+		Set:(sizeindex<500) flag="i"_flag
+		If (flag'="c") {
+			//See if analyzing facts is quick
+			Set:(sizefacts<400) flag="f"_flag
+			Do WriteLog("Do ##class(%DeepSee.Utils).%Analyze("""_cube_""","""_flag_""",0)")
+			Do ##class(%DeepSee.Utils).%Analyze(cube,flag,0)
+		} Else {
+			Do WriteLog("%Analyze was skipped because of the size fact or indices global. If important run the following command:")
+			Do WriteLog("Do ##class(%DeepSee.Utils).%Analyze("""_cube_""",""fci"",0)")
+		}
+		Do WriteLog("")
+		Do WriteLog("")
+		Do WriteLog("")
+	} Catch(ex) {
+		Set tSC = ex.AsStatus()
+		Do WriteLog(tSC)
+	}
 	// Translate the filed names in %Analyze to actual specs
 	Do WriteUpdate("Getting detailed cube information for "_cube_": FieldNameToSpec")
 	Write "FieldNameToSpec("""_cube_""")",!
-	Do FieldNameToSpec(cube)  //worked
+	Do FieldNameToSpec(cube)
 	Do WriteLog("")
 	Do WriteLog("")
 	Do WriteLog("")
@@ -1511,7 +1474,7 @@ LogOtherCubeElements
 	}
 	/// Pivot Variabled
 	Do WriteLog("<h4>Pivot Variables</h4>")
-	If $d(pivotvars){
+	If $D(pivotvars){
 		Do WriteLog("<table id=""PivotVarTable"" cellpadding=""5"" cellspacing=""5"" class=""tableWithBorders"">")
 		Do WriteLog("<tbody>",2)
 		Do WriteLog("<tr>",4)
@@ -1532,7 +1495,7 @@ LogOtherCubeElements
 	Do WriteLog("<h4>Named Sets</h4>")
 	Do WriteLog("")
 	Merge namedsets = ^DeepSee.Cubes("cubes",cube,"namedSets")
-	If $d(namedsets){
+	If $D(namedsets){
 		Write "<table id=""NamedSetsTable"" cellpadding=""5"" cellspacing=""5"" class=""tableWithBorders"">"
 		Do WriteLog("<tbody>",2)
 		Do WriteLog("<tr>",4)
@@ -1550,61 +1513,61 @@ LogOtherCubeElements
 	 	Do WriteLog("</table>")
 	}
 	Do WriteLog("<h4>Listing Fields</h4>")
-	If $d(listingfields){
-		W !,"<table id=""ListingFields"" cellpadding=""5"" cellspacing=""5"" class=""tableWithBorders"">"
-  		W !,?2,"<tbody>"
-    	W !,?4,"<tr>"
-      	W !,?6,"<th>Name</th><th>Field Expression</th><th>Description</th>"
-    	W !,?4,"</tr>"
+	If $D(listingfields){
+		Write !,"<table id=""ListingFields"" cellpadding=""5"" cellspacing=""5"" class=""tableWithBorders"">"
+  		Write !,?2,"<tbody>"
+    	Write !,?4,"<tr>"
+      	Write !,?6,"<th>Name</th><th>Field Expression</th><th>Description</th>"
+    	Write !,?4,"</tr>"
       	Set tIndex = $O(listingfields(""))
       	While tIndex'="" {
-	      	W !,?4,"<tr>"      	
-	      	W !,?6,"<td>"_$LG(listingfields(tIndex),1)_"</td>"
-	      	W !,?6,"<td>"_$LG(listingfields(tIndex),2)_"</td>"
-	    	W !,?6,"<td>"_$LG(listingfields(tIndex),3)_"</td>"
-	    	W !,?4,"</tr>"
+	      	Write !,?4,"<tr>"      	
+	      	Write !,?6,"<td>"_$LG(listingfields(tIndex),1)_"</td>"
+	      	Write !,?6,"<td>"_$LG(listingfields(tIndex),2)_"</td>"
+	    	Write !,?6,"<td>"_$LG(listingfields(tIndex),3)_"</td>"
+	    	Write !,?4,"</tr>"
 	    	Set tIndex = $O(listingfields(tIndex))
 	    }
-		W !,?2,"</tbody>"
-		W !,"</table>"
+		Write !,?2,"</tbody>"
+		Write !,"</table>"
 		Write !
 	}
 	Do WriteLog("<h4>Listings</h4>")
-	If $d(listings){
+	If $D(listings){
 		Set node=$O(listings(""))		//Initialize
 		Do WriteLog("<table id=""ListingTable"" cellpadding=""5"" cellspacing=""5"" class=""tableWithBorders"">")
 		Do WriteLog("<tbody>",2)
 		Do WriteLog("<tr>",4)
 		Do WriteLog("<th>Listing Name</th>",6)
 		Do WriteLog("<th>Fields</th>",6)
+		Do WriteLog("<th>Source</th>",6)
 		Do WriteLog("</tr>",6)
-		Do{										//Write fields of listing nicely
-			If (node=defaultListingName) {
-				Do WriteLog("<td>"_node_" (default)</td>",8)	//Listing name
-			} Else {
-				Do WriteLog("<td>"_node_"</td>",8)				//Listing name
-			}
+		Do {										//Write fields of listing nicely
+ 			Do WriteLog("<td>"_node_$S((node=defaultListingName):" (default)",1:"")_"</td>",8)
 			Set fieldString=$LG(listings(node),2)
-			If fieldString="" {
-				Set fieldString="*No Fields - Custom SQL Listing*"
-			}
+ 			Set listingSource=$LG(listings(node),5) 			//Listing source
+ 			Set listingSource=$S(listingSource="listingGroup":"Listing Group",listingSource="cube":"Cube",1:listingSource)
+			Set:(fieldString="") fieldString="*No Fields - Custom SQL Listing*"
+			//Print the list fields (the source properties) separately in the second column
 			Set fieldList=$LFS(fieldString,",")
 			//Place the first fieldList in the same line
 			Set tInd=0
 			Set field=$LG(fieldList,$I(tInd))
 			Do WriteLog("<td>"_field_"</td>",8)	//FieldName
+			Do WriteLog("<td>"_listingSource_"</td>",8)
 			Set field=$LG(fieldList,$I(tInd))
 			Do WriteLog("</tr>",6)
 			Do WriteLog("<tr>",6)			
 			While field'=""{
 				Do WriteLog("<tr>",6)
-				Do WriteLog("<td></td>",8)
-				Do WriteLog("<td>"_field_"</td>",8)	//FieldName
+				Do WriteLog("<td></td>",8) //Nothing in the first column
+				Do WriteLog("<td>"_field_"</td>",8)
+				Do WriteLog("<td></td>",8) //Nothing in the third column
 				Do WriteLog("</tr>",6)
 				Set field=$LG(fieldList,$I(tInd))
 			}
 			Set node=$O(listings(node))
-		}while node'=""
+		} while node'=""
 		Do WriteLog("</tbody>",2)
 	 	Do WriteLog("</table>")
 	}
@@ -2192,7 +2155,7 @@ GetCubesToLog(namespace) {
 	Set cubeString=""
 	ZN namespace
 	Do ##class(%DeepSee.Utils).%GetCubeList(.cubeList,,1)
-	If '$d(cubeList){
+	If '$D(cubeList){
 		Write !,"There are no cubes in this namespace!"
 		Set cubeList=""
 		Quit cubeList
@@ -2207,15 +2170,19 @@ GetCubesToLog(namespace) {
 			Set cube="QUIT"
 		}
 		Quit:(cube="")||(cube="QUIT")||(cube="Q")
-		If ##class(%DeepSee.Utils).%CubeExists(cube,.status)'=1 {
-			Write !,cube," is an invalid cube selection: "
-			Do $system.OBJ.DisplayError(status)
-			Write !,"Enter '?' to see list of cubes in the "_namespace_" namespace",!
-			Set cube=""
-		}
 		If cube'="" {
-			Set cube=$ZCONVERT(cube,"t")		//Make cube name uppercase to normalize names
-			Set cubeString=cubeString_","_cube
+			If ($LISTFIND($LISTFROMSTRING(cubeString),$ZCONVERT(cube,"t"))'=0) {
+				Write !,"Cube already selected"
+				Set cube=""
+			} ElseIf ##class(%DeepSee.Utils).%CubeExists(cube,.status)'=1 {
+				Write !,cube," is an invalid cube selection: "
+				Do $system.OBJ.DisplayError(status)
+				Write !,"Enter '?' to see list of cubes in the "_namespace_" namespace",!
+				Set cube=""
+			} Else {
+				Set cube=$ZCONVERT(cube,"t")		//Make cube name uppercase to normalize names
+				Set cubeString=cubeString_","_cube
+			}
 		}
 	}
 	Set cubeString=$p(cubeString,",",2,*)		//Eliminate leading comma
@@ -2340,7 +2307,7 @@ WriteLastStartup
 		Set osecs=then-(odays*86400)
 		Set oh=odays_","_osecs
 		//Do WriteLog("Started on "_$ZDATETIME(oh))
-		//W !,"<p>Caché Started on "_$ZDATETIME(oh)_". As of this report Caché has been up for "_days_" days "_hours_" hours "_minutes_" minutes "_seconds_" seconds"_"</p>"
+		//Write !,"<p>Caché Started on "_$ZDATETIME(oh)_". As of this report Caché has been up for "_days_" days "_hours_" hours "_minutes_" minutes "_seconds_" seconds"_"</p>"
 		Do WriteLog("<p>"_$ZDATETIME(oh,3)_". As of this report Caché has been up for "_days_" days "_hours_" hours "_minutes_" minutes "_seconds_" seconds"_"</p>",8)
 	} Catch(ex) {
 		Set tSC = ex.AsStatus()
@@ -2610,10 +2577,9 @@ GetSourceClass(cube,type)[storageList, inheritList]{
 			}
 		} ElseIf type="subjectArea" {
 			Set basecube=##class(%DeepSee.Utils).%GetBaseCube(cube)
- 			//Set sourceClass="Subject Area based on "_basecube
  			Do ##class(%DeepSee.Utils).%GetCubeList(.plist)
  			Set typebasecube = $LG(plist(basecube),4)
- 			Set sourceClass = "Subject Area based on "_$$GetSourceClass(basecube,typebasecube)
+ 			Set sourceClass = $$GetSourceClass(basecube,typebasecube)
 		} Else {
  			Set sourceClass="Not available"
 		}
@@ -2627,20 +2593,20 @@ GetDeepSeeAuditCode
 	Kill auditcode,querycode
 	Do WriteHeader4("Audit",8)
 	Try {
-		If $d(^[namespace]DeepSee.AuditCode){
+		If $D(^[namespace]DeepSee.AuditCode){
 			Set auditcode=$g(^[namespace]DeepSee.AuditCode)
 			Do WriteLog("<p>DeepSee.AuditCode: "_auditcode_"</p>",8)
 		} Else{
 			Do WriteLog("<p>^DeepSee.AuditCode is undefined</p>",8)
 		}
-		If $d(^[namespace]DeepSee.AuditQueryCode){
+		If $D(^[namespace]DeepSee.AuditQueryCode){
 			Set querycode=$g(^[namespace]DeepSee.AuditQueryCode)
 			Do WriteLog("<p>DeepSee.AuditQueryCode: "_querycode_"</p>",8)
 		} Else{
 			Do WriteLog("<p>^DeepSee.AuditQueryCode is undefined</p>",8)
 		}
 	} Catch {
-		W "Not Available"
+		Write "Not Available"
 	}	
 	Quit 
 	
@@ -2652,7 +2618,7 @@ GetBuildTime(cube)
 	FROM %DeepSee_CubeManager.CubeEvent 
 	where cubekey=:cube and cubeevent='Build' 
 	order by finishtime desc)
-	If $d(time){
+	If $D(time){
 		Quit time
 	} Else{
 		Quit "N/A"
@@ -2685,7 +2651,7 @@ FieldNameToSpec(pCubeName) {
 			 				Set hiername = $LG(list,3)
 			 				Set levelname = $LG(list,4)
 			 				Set fieldname2spec(tIndexName) = "["_dimname_"].["_hiername_"].["_levelname_"]"
-		 					W !,?4,tIndexName,?41," ",fieldname2spec(tIndexName)
+		 					Write !,?4,tIndexName,?41," ",fieldname2spec(tIndexName)
 		 				} ElseIf ((type="m") && (tIndex'="")) { //e.g. COUNT has no tIndex 
 		 					Set dimname = $LG(list,2) 	//this is always "Measures"
 		 					Set measname = $LG(list,3)
@@ -2695,11 +2661,11 @@ FieldNameToSpec(pCubeName) {
 	 							Set fieldname2spec(tIndexName) = fieldname2spec(tIndexName)_", ["_dimname_"].["_measname_"]"
 							}
 		 					Set fieldname2spec(tIndexName) = "["_dimname_"].["_measname_"]"
-		 					W !,?4,tIndexName,?41," ",fieldname2spec(tIndexName)
+		 					Write !,?4,tIndexName,?41," ",fieldname2spec(tIndexName)
 		 				} ElseIf (type="r") {
 		 					Set dimname = $LG(list,2)
 		 					Set fieldname2spec(tIndexName) = "["_dimname_"]"
-		 					W !,?4,tIndexName,?41," ",fieldname2spec(tIndexName)
+		 					Write !,?4,tIndexName,?41," ",fieldname2spec(tIndexName)
 		 				}
 		 			}
 		 			Set indL = $O(^DeepSee.Cubes("cubes",tCube,"mbr#",indD,indH,indL))
