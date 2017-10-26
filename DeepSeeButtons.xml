@@ -1549,45 +1549,75 @@ LogOtherCubeElements
 	//Listings
 	Do WriteLog("<h4>Listings</h4>")
 	If $D(listings){
-		Set node=$O(listings(""))		//Initialize
+		Set listing=$O(listings(""))		//Initialize
 		Do WriteLog("<table id=""ListingTable"" cellpadding=""5"" cellspacing=""5"" class=""tableWithBorders"">")
 		Do WriteLog("<tbody>",2)
 		Do WriteLog("<tr>",4)
 		Do WriteLog("<th>Listing Name</th>",6)
-		Do WriteLog("<th>Fields</th>",6)
+		Do WriteLog("<th title='Fields are retrieved by parsing SQL expression by comma'>Fields</th>",6)
 		Do WriteLog("<th>Source</th>",6)
 		Do WriteLog("<th>Resource</th>",6)
 		Do WriteLog("</tr>",6)
 		Do {										//Write fields of listing nicely
- 			Do WriteLog("<td>"_node_$S((node=defaultListingName):" (default)",1:"")_"</td>",8)
-			Set fieldString=$LG(listings(node),2)
- 			Set listingSource=$LG(listings(node),5) 			//Listing source
+ 			Do WriteLog("<td>"_listing_$S((listing=defaultListingName):" (default)",1:"")_"</td>",8)
+			Set fieldString=$LG(listings(listing),2)
+ 			Set listingSource=$LG(listings(listing),5) 			//Listing source
  			//Resource
  			Set resource = ""
- 			Set:(listingSource="cube") resource = $G(^DeepSee.Cubes("cubes",cube,"listing",node,"resource"))
-			Set:(listingSource="listingGroup") resource = $G(^DeepSee.ListingGroups("cubes",cube,"listing",node,"resource"))
+ 			Set:(listingSource="cube") resource = $G(^DeepSee.Cubes("cubes",cube,"listing",listing,"resource"))
+			Set:(listingSource="listingGroup") resource = $G(^DeepSee.ListingGroups("cubes",cube,"listing",listing,"resource"))
  			Set listingSource=$S(listingSource="listingGroup":"Listing Group",listingSource="cube":"Cube",1:listingSource)
 			//Custom SQL listing vs normal listing with fields
 			If (fieldString="") {
 				Do WriteLog("<td>*No Fields - Custom SQL Listing*</td>",8)	//FieldName
 				Do WriteLog("<td>"_listingSource_"</td>",8)
 				Do WriteLog("<td>"_resource_"</td>",8)
+				Do WriteLog("</tr>",6)
+				//Split on multiple lines on SQL keywords: FROM, WHERE
+				//Split an write FROM part
+				Set listingExpr = $G(^DeepSee.Cubes("cubes",cube,"listing",listing,"sql"))
+				Set tInd = $FIND($ZCONVERT(listingExpr,"U")," FROM ")
+				Set stub = $E(listingExpr,0,tInd-6)  
+				Set listingExpr = $E(listingExpr,tInd-5,*)
+				If tInd {
+					Do WriteLog("<tr>",6)
+					Do WriteLog("<td></td>",8)	//Skip Listing Name columns
+					Do WriteLog("<td>"_stub_"</td>",8)
+					Do WriteLog("<td></td>",8)	//Skip Listing Name column
+					Do WriteLog("<td></td>",8)	//Skip Listing Name column
+					Do WriteLog("</tr>",6)
+				}
+				//Split an write WHERE part
+				Set tInd = $FIND($ZCONVERT(listingExpr,"U")," WHERE ")
+				Set stub = $E(listingExpr,0,tInd-7)
+				Set listingExpr = $E(listingExpr,tInd-6,*)
+				If tInd {
+					Do WriteLog("<tr>",6)					
+					Do WriteLog("<td></td>",8)	//Skip Listing Name column
+					Do WriteLog("<td>"_stub_"</td>",8)
+					Do WriteLog("<td></td>",8)	//Skip Listing Name column
+					Do WriteLog("<td></td>",8)	//Skip Listing Name column
+					Do WriteLog("</tr>",6)
+				}
+				//Write all that is left
 				Do WriteLog("<tr>",6)
-				Do WriteLog("<td></td>",8)	//Skip Listing Name columns
-				Do WriteLog("<td>"_$G(^DeepSee.Cubes("cubes",cube,"listing",node,"sql"))_"</td>",8)  //Custom SQL query
+				Do WriteLog("<td></td>",8)
+				Do WriteLog("<td>"_listingExpr_"</td>",8)
+				Do WriteLog("<td></td>",8)	//Skip Listing Name column
+				Do WriteLog("<td></td>",8)	//Skip Listing Name column
 				Do WriteLog("</tr>",6)
 			} Else {
 				//Print the list fields (the source properties) separately in the second column
 				Set fieldList=$LFS(fieldString,",")
 				//Place the first fieldList in the same line
 				Set tInd=0
-				Set field=$LG(fieldList,$I(tInd))
-				Do WriteLog("<td>"_field_"</td>",8)	//FieldName
+				Do WriteLog("<td></td>",8)	//Skip first field column
 				Do WriteLog("<td>"_listingSource_"</td>",8)
 				Do WriteLog("<td>"_resource_"</td>",8)
-				Set field=$LG(fieldList,$I(tInd))
 				Do WriteLog("</tr>",6)
-				Do WriteLog("<tr>",6)			
+				Do WriteLog("<tr>",6)
+				//Write one field per row
+				Set field=$LG(fieldList,$I(tInd))
 				While field'="" {
 					Do WriteLog("<tr>",6)
 					Do WriteLog("<td></td>",8) //Nothing in the first column
@@ -1598,8 +1628,8 @@ LogOtherCubeElements
 					Set field=$LG(fieldList,$I(tInd))
 				}
 			}
-			Set node=$O(listings(node))
-		} while node'=""		
+			Set listing=$O(listings(listing))
+		} while listing'=""		
 		Do WriteLog("</tbody>",2)
 	 	Do WriteLog("</table>")
 	} Else{
