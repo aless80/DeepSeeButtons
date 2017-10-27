@@ -32,6 +32,7 @@ DeepSeeButtons(namespace="",cubeString="ask", getLogs="", LogFile="", proceed=""
 	;		-Config section of cpf file
 	;		-Important mappings
 	;		-Server Initialization Code
+	;		-Deepsee enabled webapps
 	;	2) Server Details
 	;		-Configuration
 	;		-Customer name
@@ -669,6 +670,46 @@ LogDeepSeeSetupSection
 	}
 	Do WriteLog("</td>",6)
 	Do WriteLog("</tr>",4)
+	
+	//Webapps that are deepsee enabled
+	Do WriteLog("<tr>",4)
+	Do WriteLog("<td>",6)
+	Do WriteHeader4("DeepSee-enabled namespaces",8)
+	Do ##class(%CSP.Portal.Utils).%GetNamespaceList(.nsList)
+	SET ns=$o(nsList(""))
+	While ns'="" {
+		If ##class(%DeepSee.Utils).%IsDeepSeeEnabled(ns) {
+			Do WriteLog("<p>"_ns_" with default webapp: "_$system.CSP.GetDefaultApp(ns)_"</p>",8)
+		}
+		Set ns=$O(nsList(ns))
+	}
+	Do WriteLog("</td>",6)
+	Do WriteLog("</tr>",4)	
+	
+	
+	/*
+	Do WriteLog("<tr>",4)
+	Do WriteLog("<td>",6)
+	Do WriteHeader4("DeepSee-enabled webapps",8)
+	Set rsWeb=##class(%ResultSet).%New("Security.Applications:Detail")
+	Do rsWeb.Execute()
+	Set onefound=0
+	For {
+		Quit:'rsWeb.Next()
+		If rsWeb.DeepSeeEnabled="Yes" {
+			Do WriteLog("<p>"_rsWeb.Name_"</p>",8)
+			Set onefound=1
+		}
+		Do WriteLog("<p>"_rsWeb.Name_"</p>",8)
+		If $D(^SYS("Security", "CSP", "AllowPrefix", rsWeb.Name_"/","%DeepSee.")) {
+			Do WriteLog("<p>--"_rsWeb.Name_"</p>",8)
+		}
+	}
+	Do:'onefound WriteLog("<p>-</p>",8)
+	Do WriteLog("</td>",6)
+	Do WriteLog("</tr>",4)	
+	*/
+	
 	
 	//DeepSee overrides
 	If (isInsight || isTrak) {
@@ -1573,7 +1614,7 @@ LogOtherCubeElements
 				Do WriteLog("<td>"_listingSource_"</td>",8)
 				Do WriteLog("<td>"_resource_"</td>",8)
 				Do WriteLog("</tr>",6)
-				//Split on multiple lines on SQL keywords: FROM, WHERE
+				//Split listign expression on multiple lines on SQL keywords: FROM, WHERE
 				//Split an write FROM part
 				Set listingExpr = $G(^DeepSee.Cubes("cubes",cube,"listing",listing,"sql"))
 				Set tInd = $FIND($ZCONVERT(listingExpr,"U")," FROM ")
@@ -1606,7 +1647,7 @@ LogOtherCubeElements
 				Do WriteLog("<td></td>",8)	//Skip Listing Name column
 				Do WriteLog("<td></td>",8)	//Skip Listing Name column
 				Do WriteLog("</tr>",6)
-			} Else {
+			} Else { //Normal listings
 				//Print the list fields (the source properties) separately in the second column
 				Set fieldList=$LFS(fieldString,",")
 				//Place the first fieldList in the same line
@@ -1626,6 +1667,9 @@ LogOtherCubeElements
 					Do WriteLog("<td></td>",8) //Nothing in the 4th column (Resource)
 					Do WriteLog("</tr>",6)
 					Set field=$LG(fieldList,$I(tInd))
+					If ($FIND($ZCONVERT(field,"U"),"$$$TEXT[") && '$FIND(field,"]")) { //Typical of Health Insight
+						Set field=field_","_$LG(fieldList,$I(tInd))
+					}
 				}
 			}
 			Set listing=$O(listings(listing))
