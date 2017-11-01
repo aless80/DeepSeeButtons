@@ -15,7 +15,7 @@ DeepSeeButtons(namespace="",cubeString="ask", getLogs="", LogFile="", proceed=""
 	;
 	;You can use the following optional arguments:
 	;namespace:		namespace where this routine will run, e.g. "SAMPLES"
-	;cubeString: 	comma separated list of cubes, e.g. "patients,holefoods" or "" for no cubes at all
+	;cubeString: 	comma separated list of cubes, e.g. "patients,holefoods", "ALL", or "" for no cubes at all
 	;getLogs:		""/0/1 to ask to/do not/do  include cconsole.log, Query Log, and DeepSee logs, respectively
 	;LogFile:		output file. By default the output file will be stored in the /mgr directory
 	;proceed:		1 to skip the last prompt before launching DeepSeeButtons
@@ -107,7 +107,7 @@ StartDialog
 	Set cubeList=$$VerifyInputCubes(allcubeList,namespace)
 	Do GetLogsConfirm
 	Do ReadLogTypeConfirm
-	Do LaunchLogs(Dir,Big,CacheDir,Body,namespace,cubeList,getLogs)
+	Do:proceed LaunchLogs(Dir,CacheDir,namespace,cubeList,getLogs)
 	Quit
 
 GetLogsConfirm
@@ -135,17 +135,21 @@ GetLogsConfirm
 	Quit
 
 ReadLogTypeConfirm
+	Set Dir="", CacheDir=""
 	If (proceed'=1) {
 		Write !,"Continue? [Y]" Read LogType
 		Set LogType=$ZCONVERT(LogType,"U")
-		If (LogType="NO")!(LogType="N")!(LogType="Q")!(LogType="QUIT") Quit
-		If (LogType'="")&(LogType'="Y")&(LogType'="YES") Write !,"Please enter Y or N" Goto ReadLogTypeConfirm	
+		If ((LogType="NO")!(LogType="N")!(LogType="Q")!(LogType="QUIT")) {
+			Set proceed=0 } 
+		ElseIf ((LogType="YES")!(LogType="Y")!(LogType="")) {
+			Set proceed=1
+		} Else {
+			Write !,"Please enter Y or N" Goto ReadLogTypeConfirm
+		}
 	}
- 	Set Dir="", CacheDir="",Body=0,Big=0
 	Quit
 
-LaunchLogs(LogDirectory,Big,CacheDir,Body,namespace,cubeList,getLogs)
-	Set Body=$Get(Body,0)
+LaunchLogs(LogDirectory,CacheDir,namespace,cubeList,getLogs)
 	Set CacheVerNumber=$System.Version.GetNumber()
 	If +CacheVerNumber<5 Do  Quit Return
 	.	Set Message="*** Wrong version of Diagnostic Report utility ! ***"_$Char(13,10)_$Char(13,10)_"You are running on Cache "_CacheVerNumber_" and this is the code for Cache 5.0 and later"
