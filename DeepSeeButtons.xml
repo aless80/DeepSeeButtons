@@ -1691,7 +1691,7 @@ LogQuerylog
 	Do WriteLog("<h4 id=""querylogtoggle"" onclick=""javascript:toggle('querylogdiv','querylogtoggle');"">&rtrif; Expand</h4>",0)
 	Do WriteLog("<div id=""querylogdiv"" style=""display:none;"">")
 	ZN namespace
-	Do:($D(^DeepSee.QueryLog)<10) WriteLog("<p>Query log global not found</p>",0)
+	Do:($D(^DeepSee.QueryLog)<10) WriteLog("<p>Query log global not found</p></div>",0)  
 	Quit:($D(^DeepSee.QueryLog)<10)
 	//Get usercount in ^DeepSee.QueryLog
  	Set user=$O(^DeepSee.QueryLog(""))
