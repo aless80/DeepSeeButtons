@@ -84,16 +84,29 @@ StartDialog
 	Write !,"DeepSee Diagnostic Report Evidence Logging Tool"
 	Write !,"This reporting tool provides the information required for"
 	Write !,"InterSystems Technical Support to analyze DeepSee issues. "
+	Set namespace=$$GetNamespace(namespace)
+	Quit:namespace=""
+	Set cubeList=$$GetCubesToLog(cubeString,namespace)
+	Do GetLogsConfirm
+	Do ReadLogTypeConfirm
+	Quit:'proceed
+	Do LaunchLogs(Dir,CacheDir,namespace,cubeList,getLogs)
+	Quit
+
+GetNamespace(namespace) {
 	Set namespace=$$ValidateNamespace(namespace)	//Make sure namespace exists
-	While namespace=""{		//User didn't enter a namespace when calling routine
-		Write !!,"Enter namespace to run DeepSeeButtons for or enter to quit: "
+	While namespace="" {		//User didn't enter a namespace when calling routine
+		Write !!,"Type namespace or press enter to exit: "
 		Read namespace
 		Quit:namespace=""
-		Set namespace= $$ValidateNamespace(namespace)
+		Set namespace=$$ValidateNamespace(namespace)
 	}
-	Quit:namespace=""
+	Quit namespace
+}
+
+GetCubesToLog(cubeString,namespace) {
 	If cubeString="ask" {
-		Set allcubeList=$$GetCubesToLog(namespace)
+		Set allcubeList=$$DialogCubes(namespace)
 	} ElseIf cubeString="" {
 		Set allcubeList=""
 	} ElseIf $LISTVALID(cubeString) {
@@ -105,14 +118,11 @@ StartDialog
 		Set allcubeList=$LFS(cubeString,",")
 	}
 	Set cubeList=$$VerifyInputCubes(allcubeList,namespace)
-	Do GetLogsConfirm
-	Do ReadLogTypeConfirm
-	Do:proceed LaunchLogs(Dir,CacheDir,namespace,cubeList,getLogs)
-	Quit
+	Quit cubeList
+}
 
 GetLogsConfirm
 	ZN "%SYS"
-	//Set getLogs=$ZCONVERT(getLogs,"U")
 	If (getLogs="") {
 		Write !, "Include cconsole.log, Query Log, and DeepSee Logs? [Y] "
 		Read getLogs
@@ -2171,16 +2181,14 @@ LogCloseBody
 	Quit
 
 
-
 /// More helper functions for the Log* functions above
 ValidateNamespace(namespace) [namespace]{
 	Set namespace=$ZCONVERT(namespace, "U")
 	Try {
 		ZN namespace
 		return namespace
-	}
-	Catch ex {
-		Write !,namespace," is invalid.  Please enter a valid namespace.",!
+	} Catch ex {
+		Write !,namespace," is invalid.  Please enter a valid namespace."
 		Set namespace=""
 		Return namespace
 	}
@@ -2260,8 +2268,8 @@ ST()
 	Do ^ST
 	Set MgrNsp=%ST("MGRNSP")
 	Quit MgrNsp
-	
-GetCubesToLog(namespace) {
+
+DialogCubes(namespace) {
 	Set cubeString=""
 	ZN namespace
 	Do ##class(%DeepSee.Utils).%GetCubeList(.cubeList,,1)
@@ -2273,17 +2281,17 @@ GetCubesToLog(namespace) {
 	For i=1:1 {
 		Write !,"Give cube name for detailed cube info or press enter to continue: "
 		Read cube
-		If cube="?" {
-			Set cube=$$ListCubes()
-		} ElseIf cube="ALL" { //Secreat ALL keyword
-			Set cubeString=$$GetAllCubes(namespace)
-			Set cube="QUIT"
-		}
-		Quit:(cube="")||(cube="QUIT")||(cube="Q")
-		If cube'="" {
+		Set:cube="?" cube=$$ListCubes()
+		If (cube="")||(cube="QUIT")||(cube="Q") {
+			Quit
+		} ElseIf (cube'="") {
 			If ($LISTFIND($LISTFROMSTRING(cubeString),$ZCONVERT(cube,"t"))'=0) {
 				Write !,"Cube already selected"
 				Set cube=""
+			} ElseIf (cube="ALL") { //problem: it asks again
+				Set cubeString=$$GetAllCubes(namespace)
+				Set cube="QUIT" //prob useless
+				Quit
 			} ElseIf ##class(%DeepSee.Utils).%CubeExists(cube,.status)'=1 {
 				Write !,cube," is an invalid cube selection: "
 				Do $system.OBJ.DisplayError(status)
@@ -2359,17 +2367,21 @@ ListCubes(){
 	Do ##class(%DeepSee.Utils).%GetCubeList(.cubeList,,1)
 	Write !, "Cubes in this namespace: ",!!
 	Set cubetmp=""
-	For i=1:1{
+	//For i=1:1{
+	While 1 {
 		Set cubetmp=$order(cubeList(cubetmp))
 		Quit:cubetmp=""
-		Write i_") "_cubetmp,!	
+		//Write i_") "_cubetmp,!
+		Write cubetmp,!
 	}
-	Write !, "Select a cube name or press enter to continue: "
+	Write "ALL",!	
+	//Write !, "Select a cube name or press enter to continue: "
+	Write !, "Give cube name for detailed cube info or press enter to continue: "
 	Read cube
-	If cube'=""{
+	/*If cube'=""{
 		Write !,"Getting detailed information on "_cube
 		Hang 1
-	}
+	}*/
 	Quit cube		//returns "" if no cube number entered
 }
  
