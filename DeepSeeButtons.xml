@@ -90,7 +90,7 @@ StartDialog
 	Do GetLogsConfirm
 	Do ReadLogTypeConfirm
 	Quit:'proceed
-	Do LaunchLogs(namespace,cubeList,getLogs)
+	Do LaunchLogs(Dir,CacheDir,namespace,cubeList,getLogs) //Ale: I suspect removing Dir,CacheDir was bad
 	Quit
 
 GetNamespace(namespace) {
@@ -145,6 +145,7 @@ GetLogsConfirm
 	Quit
 
 ReadLogTypeConfirm
+	Set Dir="", CacheDir=""  //Ale: I suspect removing Dir,CacheDir was bad
 	If (proceed'=1) {
 		Write !,"Continue? [Y] " Read LogType
 		Set LogType=$ZCONVERT(LogType,"U")
@@ -158,7 +159,8 @@ ReadLogTypeConfirm
 	}
 	Quit
 
-LaunchLogs(namespace,cubeList,getLogs)
+LaunchLogs(LogDirectory,CacheDir,namespace,cubeList,getLogs)
+ 	//Ale: I suspect removing Dir,CacheDir was bad
 	Set CacheVerNumber=$System.Version.GetNumber()
 	If +CacheVerNumber<5 Do  Quit Return
 	.	Set Message="*** Wrong version of Diagnostic Report utility ! ***"_$Char(13,10)_$Char(13,10)_"You are running on Cache "_CacheVerNumber_" and this is the code for Cache 5.0 and later"
