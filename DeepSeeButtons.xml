@@ -79,18 +79,25 @@ DeepSeeButtons(namespace="",cubeString="ask", getLogs="", LogFile="", proceed=""
 
 StartDialog
 	New (namespace,cubeString,getLogs,LogFile,proceed)
-	Set PDev=$Principal
-	Use PDev
-	Write !,"DeepSee Diagnostic Report Evidence Logging Tool"
-	Write !,"This reporting tool provides the information required for"
-	Write !,"InterSystems Technical Support to analyze DeepSee issues. "
-	Set namespace=$$GetNamespace(namespace)
-	Quit:namespace=""
-	Set cubeList=$$GetCubesToLog(cubeString,namespace)
-	Do GetLogsConfirm
-	Do ReadLogTypeConfirm
-	Quit:'proceed
-	Do LaunchLogs(Dir,CacheDir,namespace,cubeList,getLogs) //Ale: I suspect removing Dir,CacheDir was bad
+	Try {
+		Set PDev=$Principal
+		Use PDev
+		Write !,"DeepSee Diagnostic Report Evidence Logging Tool"
+		Write !,"This reporting tool provides the information required for"
+		Write !,"InterSystems Technical Support to analyze DeepSee issues. "
+		Set namespace=$$GetNamespace(namespace)
+		Quit:namespace=""
+		Set cubeList=$$GetCubesToLog(cubeString,namespace)
+		Do GetLogsConfirm
+		Do ReadLogTypeConfirm
+		Quit:'proceed
+		Do LaunchLogs(Dir,CacheDir,namespace,cubeList,getLogs) //Ale: I suspect removing Dir,CacheDir was bad
+	
+ 	} Catch(ex) {
+		Set tSC = ex.AsStatus()
+		Use $Principal
+		Write !,$System.Status.DisplayError(tSC)
+ 	}
 	Quit
 
 GetNamespace(namespace) {
