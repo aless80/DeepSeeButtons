@@ -91,7 +91,7 @@ StartDialog
 		Do GetLogsConfirm
 		Do ReadLogTypeConfirm
 		Quit:'proceed
-		Do LaunchLogs(Dir,CacheDir,namespace,cubeList,getLogs) //Ale: I suspect removing Dir,CacheDir was bad
+		Do LaunchLogs(namespace,cubeList,getLogs)
 	
  	} Catch(ex) {
 		Set tSC = ex.AsStatus()
@@ -152,7 +152,6 @@ GetLogsConfirm
 	Quit
 
 ReadLogTypeConfirm
-	Set Dir="", CacheDir=""  //Ale: I suspect removing Dir,CacheDir was bad
 	If (proceed'=1) {
 		Write !,"Continue? [Y] " Read LogType
 		Set LogType=$ZCONVERT(LogType,"U")
@@ -166,37 +165,38 @@ ReadLogTypeConfirm
 	}
 	Quit
 
-LaunchLogs(LogDirectory,CacheDir,namespace,cubeList,getLogs)
- 	//Ale: I suspect removing Dir,CacheDir was bad
+LaunchLogs(namespace,cubeList,getLogs)
+ 	Try {
 	Set CacheVerNumber=$System.Version.GetNumber()
-	If +CacheVerNumber<5 Do  Quit Return
-	.	Set Message="*** Wrong version of Diagnostic Report utility ! ***"_$Char(13,10)_$Char(13,10)_"You are running on Cache "_CacheVerNumber_" and this is the code for Cache 5.0 and later"
-	.	Use PDev Write:$X ! Write !,Message
-	.	Set Return="0|"_Message
-	.	Quit	
+	If +CacheVerNumber<5 { //Do  Quit Return
+		Set Message="*** Wrong version of Diagnostic Report utility ! ***"_$Char(13,10)_$Char(13,10)_"You are running on Cache "_CacheVerNumber_" and this is the code for Cache 5.0 and later"
+		Use PDev Write:$X ! Write !,Message
+		Set Return="0|"_Message
+		Quit
+	}
 	Use PDev Write:$X ! 
 	Write "Collecting information, please do not interrupt this process.",!,"Do not close terminal until the process has completed"
  	Break 0
-	Set $ZTrap="LaunchLogsErr"
 	Set EOF=$ZUtil(68,40)	
 	//Start logging with the DeepSee Setup section
 	Set LogFile=$$LogSections(cubeList,getLogs,LogFile)
 	Set rc=$$$OK
 	If $ZUtil(68,40,EOF) //Reset $ZEOF to the original setting
 	Break 1 
-	If LogFile="" Do  Quit Return
-	.	Set Message="*** Log file could not be created in "_LogDirectory_". Check directory permissions. ***"
-	.	Use PDev Write:$X ! Write !,Message
-	.	Set Return="0|"_Message
-	.	Quit
+	If LogFile="" {
+		Set Message="*** Log file could not be created in "_LogDirectory_". Check directory permissions. ***"
+		Use PDev Write:$X ! Write !,Message
+		Set Return="0|"_Message
+		Quit
+	}
 	Use PDev
 	Write:$X ! Write !,"DeepSeeButtons report saved to: ",!,LogFile
 	Write !,"Please send the html file above to InterSystems Support."
+	} Catch(ex) {
+		Set tSC = ex.AsStatus()
+		W $System.Status.DisplayError(tSC)
+	}
 	Quit
-
-LaunchLogsErr
-	Do ^%ET //Process will Halt
-	Quit "0|"_$ZError
 
 LogSections(cubeList,getLogs,LogFile)
 	New (LogDirectory,namespace,cubeList,getLogs,LogFile,MgrDir)
@@ -1367,6 +1367,7 @@ LogCubeInfo
 	Quit
 
 LogCubeDimensions
+	Try {
 	Do WriteUpdate("Getting detailed cube information for "_cube_": get dimension list")
 	ZN namespace
 	Do WriteLog("<hr size=""4"" noshade>")
@@ -1462,18 +1463,78 @@ LogCubeDimensions
 		}
 	Do WriteLog("</tbody>",2)
 	Do WriteLog("</table>")
-	//Show calculated members in ^DeepSee.CalcMbrs
-	Do WriteLog("<h4>Calculated Members</h4>")
-	If $D(^DeepSee.CalcMbrs(cube)) {
-	Do WriteLog("<table>")
-	Do WriteLog("<tbody>",2)
-	Do WriteLog("<tr>",4)
-	Do PrintGlobal(namespace,"^DeepSee.CalcMbrs("""_cube_""")",8)
-	Do WriteLog("</tr>",4)
-	Do WriteLog("</tbody>",2)
-	Do WriteLog("</table>")
+	//Show calculated members in cube. First measures, then dimensions
+	Kill tCalcMbrs
+	Merge tCalcMbrs=^DeepSee.Cubes("cubes",cube,"calcMbrs")
+	//Calculated measures defined in cube
+	Do WriteLog("<h4 title='Defined in the "_cube_" cube'>Calculated Measures</h4>")
+	If $D(tCalcMbrs) && ($D(tCalcMbrs("MEASURES"))) {		
+		Set meas=$O(tCalcMbrs("MEASURES",""))
+		Set tList=tCalcMbrs("MEASURES",meas)
+		Do WriteLog("<table id=""CubeCalcMeasTable"" border=""0"" class=""tableWithBorders"" cellpadding=""3"" cellspacing=""3"">")
+		Do WriteLog("<tbody>",2)
+		Do WriteLog("<tr>",4)
+		Do WriteLog("<th>Type</th>",6)
+		Do WriteLog("<th>Name</th>",6)
+		Do WriteLog("<th>Expression</th>",6)
+		Do:($LL(tList)>5) WriteLog("<th>Listing Filter</th>",6)
+		Do WriteLog("</tr>",4)
+ 		While (meas'="") {
+			Set tList=tCalcMbrs("MEASURES",meas)
+			Do WriteLog("<tr>",4)
+			Do WriteLog("<td>Measure</td>",6)
+			Do WriteLog("<td>"_$LG(tList,2)_"</td>",6)
+			Do WriteLog("<td>"_$LG(tList,3)_"</td>",6)
+			Do:($LL(tList)>5) WriteLog("<td>"_$LG(tList,6)_"</td>",6)
+			Do WriteLog("</tr>",4)
+			Kill tCalcMbrs("MEASURES",meas)
+			Set meas=$O(tCalcMbrs("MEASURES",""))
+		}
+		Do WriteLog("</tbody>",2)
+		Do WriteLog("</table>")
 	} Else {
-		Do WriteLog("<p>No calculated members found for "_cube_"</p>",0)
+		Do WriteLog("<p>No calculated measures defined in cube</p>",0)
+	}
+	//Calculated dimensions defined in cube
+	Do WriteLog("<h4 title='Defined in the "_cube_" cube'>Calculated Dimensions</h4>")	
+	If $D(tCalcMbrs) && ($D(tCalcMbrs)) {
+		Do WriteLog("<table id=""CubeCalcDimTable"" border=""0"" class=""tableWithBorders"" cellpadding=""3"" cellspacing=""3"">")
+		Do WriteLog("<tbody>",2)
+		Do WriteLog("<tr>",4)
+		Do WriteLog("<th>Dimension</th>",6)
+		Do WriteLog("<th>Name</th>",6)
+		Do WriteLog("<th>Expression</th>",6)
+ 		Set dim=$O(tCalcMbrs(""))
+ 		While (dim'="") {
+ 			Set name=$O(tCalcMbrs(dim,""))
+			While (name'="") {
+				Set tList=tCalcMbrs(dim,name)
+				Do WriteLog("<tr>",4)
+				Do WriteLog("<td>"_$LG(tList,1)_"</td>",6)
+				Do WriteLog("<td>"_$LG(tList,2)_"</td>",6)
+				Do WriteLog("<td>"_$LG(tList,3)_"</td>",6)
+				Do WriteLog("</tr>",4)
+				Set name=$O(tCalcMbrs(dim,name))
+			}
+			Set dim=$O(tCalcMbrs(dim))
+ 		}
+		Do WriteLog("</tbody>",2)
+		Do WriteLog("</table>")
+	} Else {
+		Do WriteLog("<p>No calculated dimensions defined in cube</p>",0)
+	}
+	//Show calculated members in ^DeepSee.CalcMbrs
+	Do WriteLog("<h4 title='From ^DeepSee.CalcMbrs("""_cube_""")'>Calculated Members in Shared Storage</h4>")	
+	If $D(^DeepSee.CalcMbrs(cube)) {
+		Do WriteLog("<table>")
+		Do WriteLog("<tbody>",2)
+		Do WriteLog("<tr>",4)
+		Do PrintGlobal(namespace,"^DeepSee.CalcMbrs("""_cube_""")",8)
+		Do WriteLog("</tr>",4)
+		Do WriteLog("</tbody>",2)
+		Do WriteLog("</table>")
+	} Else {
+		Do WriteLog("<p>No shared calculated members found</p>",0)
 	}
 	//Detailed cube information
 	Do WriteUpdate("Getting detailed cube information for "_cube_": %Analyze")
@@ -1525,6 +1586,13 @@ LogCubeDimensions
 	Do WriteLog("")
 	ZN "%SYS"
 	Quit
+	} Catch(ex) {
+		Set tSC = ex.AsStatus()
+		W $System.Status.DisplayError(tSC)
+		Do WriteLog("</table>")
+		ZN "%SYS"
+	}
+
 	
 
 LogOtherCubeElements
