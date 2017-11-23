@@ -1682,6 +1682,27 @@ LogOtherCubeElements
 				//Write one field per row
 				Set field=$LG(fieldList,$I(tInd))
 				While field'="" {
+					//Try to parse $$$TEXT[] in listings correctly 
+					If ($FIND($ZCONVERT(field,"U"),"$$$TEXT[") && '$FIND(field,"]")) { //Typical of Health Insight
+						Set field=field_","_$LG(fieldList,$I(tInd))
+					}
+					//Health Insight has often NVL() || NVL() in listings
+					If ($E($ZCONVERT(field,"U"),1,5)["NVL(") {
+						Set field=field_","_$LG(fieldList,$I(tInd))
+						While ($L(field)<1000) { //Stop in case things go wrong
+ 							Set fieldafter=$LG(fieldList,tInd+1)
+ 							If (($E(fieldafter)="'") || ($E(fieldafter)=")")) {
+								Set field=field_","_fieldafter
+								Set tInd=tInd+1
+							} Else {
+								Quit
+							}
+						}
+					}
+					/*//I don't think field can start with single quote but that happens when using eg NVL()
+					If (($E(field)="'") || ($E(field,2)="'")) {
+						Set field=field_$LG(fieldList,$I(tInd))
+					}*/
 					Do WriteLog("<tr>",6)
 					Do WriteLog("<td></td>",8) //Nothing in the first column
 					Do WriteLog("<td>"_field_"</td>",8)
@@ -1689,29 +1710,6 @@ LogOtherCubeElements
 					Do WriteLog("<td></td>",8) //Nothing in the 4th column (Resource)
 					Do WriteLog("</tr>",6)
 					Set field=$LG(fieldList,$I(tInd))
-					//Try to parse $$$TEXT[] in listings correctly 
-					If ($FIND($ZCONVERT(field,"U"),"$$$TEXT[") && '$FIND(field,"]")) { //Typical of Health Insight
-						Set field=field_","_$LG(fieldList,$I(tInd))
-					}
-									
-					//Health Insight has often NVL() || NVL() in listings
-					If ($E($ZCONVERT(field,"U"),1,5)["NVL(") {
-						Set field=field_","_$LG(fieldList,$I(tInd))
-					/*	While ($L(field)<150) { //Stop in case things go wrong
-							Set fieldafter=$LG(fieldList,$I(tInd))
-							If ($E(fieldafter)="'") {
-								Set field=field_fieldafter
-							} Else {
-								Set field=fieldafter
-								Quit
-							}
-						}
-					*/		
-					}
-					//I don't think you can start with single quote but that happens when using eg NVL()
-					If (($E(field)="'") || ($E(field,2)="'")) {
-						Set field=field_","_$LG(fieldList,$I(tInd))
-					}					
 				}
 			}
 			Set listing=$O(listings(listing))
