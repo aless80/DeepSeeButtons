@@ -183,7 +183,7 @@ LaunchLogs(namespace,cubeList,getLogs)
 	Set rc=$$$OK
 	If $ZUtil(68,40,EOF) //Reset $ZEOF to the original setting
 	Break 1 
-	If LogFile="" {
+	If LogFile="" { //Do  Quit Return
 		Set Message="*** Log file could not be created in "_LogDirectory_". Check directory permissions. ***"
 		Use PDev Write:$X ! Write !,Message
 		Set Return="0|"_Message
@@ -1367,7 +1367,6 @@ LogCubeInfo
 	Quit
 
 LogCubeDimensions
-	Try {
 	Do WriteUpdate("Getting detailed cube information for "_cube_": get dimension list")
 	ZN namespace
 	Do WriteLog("<hr size=""4"" noshade>")
@@ -1463,78 +1462,18 @@ LogCubeDimensions
 		}
 	Do WriteLog("</tbody>",2)
 	Do WriteLog("</table>")
-	//Show calculated members in cube. First measures, then dimensions
-	Kill tCalcMbrs
-	Merge tCalcMbrs=^DeepSee.Cubes("cubes",cube,"calcMbrs")
-	//Calculated measures defined in cube
-	Do WriteLog("<h4 title='Defined in the "_cube_" cube'>Calculated Measures</h4>")
-	If $D(tCalcMbrs) && ($D(tCalcMbrs("MEASURES"))) {		
-		Set meas=$O(tCalcMbrs("MEASURES",""))
-		Set tList=tCalcMbrs("MEASURES",meas)
-		Do WriteLog("<table id=""CubeCalcMeasTable"" border=""0"" class=""tableWithBorders"" cellpadding=""3"" cellspacing=""3"">")
-		Do WriteLog("<tbody>",2)
-		Do WriteLog("<tr>",4)
-		Do WriteLog("<th>Type</th>",6)
-		Do WriteLog("<th>Name</th>",6)
-		Do WriteLog("<th>Expression</th>",6)
-		Do:($LL(tList)>5) WriteLog("<th>Listing Filter</th>",6)
-		Do WriteLog("</tr>",4)
- 		While (meas'="") {
-			Set tList=tCalcMbrs("MEASURES",meas)
-			Do WriteLog("<tr>",4)
-			Do WriteLog("<td>Measure</td>",6)
-			Do WriteLog("<td>"_$LG(tList,2)_"</td>",6)
-			Do WriteLog("<td>"_$LG(tList,3)_"</td>",6)
-			Do:($LL(tList)>5) WriteLog("<td>"_$LG(tList,6)_"</td>",6)
-			Do WriteLog("</tr>",4)
-			Kill tCalcMbrs("MEASURES",meas)
-			Set meas=$O(tCalcMbrs("MEASURES",""))
-		}
-		Do WriteLog("</tbody>",2)
-		Do WriteLog("</table>")
-	} Else {
-		Do WriteLog("<p>No calculated measures defined in cube</p>",0)
-	}
-	//Calculated dimensions defined in cube
-	Do WriteLog("<h4 title='Defined in the "_cube_" cube'>Calculated Dimensions</h4>")	
-	If $D(tCalcMbrs) && ($D(tCalcMbrs)) {
-		Do WriteLog("<table id=""CubeCalcDimTable"" border=""0"" class=""tableWithBorders"" cellpadding=""3"" cellspacing=""3"">")
-		Do WriteLog("<tbody>",2)
-		Do WriteLog("<tr>",4)
-		Do WriteLog("<th>Dimension</th>",6)
-		Do WriteLog("<th>Name</th>",6)
-		Do WriteLog("<th>Expression</th>",6)
- 		Set dim=$O(tCalcMbrs(""))
- 		While (dim'="") {
- 			Set name=$O(tCalcMbrs(dim,""))
-			While (name'="") {
-				Set tList=tCalcMbrs(dim,name)
-				Do WriteLog("<tr>",4)
-				Do WriteLog("<td>"_$LG(tList,1)_"</td>",6)
-				Do WriteLog("<td>"_$LG(tList,2)_"</td>",6)
-				Do WriteLog("<td>"_$LG(tList,3)_"</td>",6)
-				Do WriteLog("</tr>",4)
-				Set name=$O(tCalcMbrs(dim,name))
-			}
-			Set dim=$O(tCalcMbrs(dim))
- 		}
-		Do WriteLog("</tbody>",2)
-		Do WriteLog("</table>")
-	} Else {
-		Do WriteLog("<p>No calculated dimensions defined in cube</p>",0)
-	}
 	//Show calculated members in ^DeepSee.CalcMbrs
-	Do WriteLog("<h4 title='From ^DeepSee.CalcMbrs("""_cube_""")'>Calculated Members in Shared Storage</h4>")	
+	Do WriteLog("<h4>Calculated Members</h4>")
 	If $D(^DeepSee.CalcMbrs(cube)) {
-		Do WriteLog("<table>")
-		Do WriteLog("<tbody>",2)
-		Do WriteLog("<tr>",4)
-		Do PrintGlobal(namespace,"^DeepSee.CalcMbrs("""_cube_""")",8)
-		Do WriteLog("</tr>",4)
-		Do WriteLog("</tbody>",2)
-		Do WriteLog("</table>")
+	Do WriteLog("<table>")
+	Do WriteLog("<tbody>",2)
+	Do WriteLog("<tr>",4)
+	Do PrintGlobal(namespace,"^DeepSee.CalcMbrs("""_cube_""")",8)
+	Do WriteLog("</tr>",4)
+	Do WriteLog("</tbody>",2)
+	Do WriteLog("</table>")
 	} Else {
-		Do WriteLog("<p>No shared calculated members found</p>",0)
+		Do WriteLog("<p>No calculated members found for "_cube_"</p>",0)
 	}
 	//Detailed cube information
 	Do WriteUpdate("Getting detailed cube information for "_cube_": %Analyze")
@@ -1586,13 +1525,6 @@ LogCubeDimensions
 	Do WriteLog("")
 	ZN "%SYS"
 	Quit
-	} Catch(ex) {
-		Set tSC = ex.AsStatus()
-		W $System.Status.DisplayError(tSC)
-		Do WriteLog("</table>")
-		ZN "%SYS"
-	}
-
 	
 
 LogOtherCubeElements
@@ -1704,7 +1636,7 @@ LogOtherCubeElements
 				Do WriteLog("<td>"_listingSource_"</td>",8)
 				Do WriteLog("<td>"_resource_"</td>",8)
 				Do WriteLog("</tr>",6)
-				//Split listign expression on multiple lines on SQL keywords: FROM, WHERE
+				//Split listing expression on multiple lines on SQL keywords: FROM, WHERE
 				//Split an write FROM part
 				Set listingExpr = $G(^DeepSee.Cubes("cubes",cube,"listing",listing,"sql"))
 				Set tInd = $FIND($ZCONVERT(listingExpr,"U")," FROM ")
@@ -1757,9 +1689,29 @@ LogOtherCubeElements
 					Do WriteLog("<td></td>",8) //Nothing in the 4th column (Resource)
 					Do WriteLog("</tr>",6)
 					Set field=$LG(fieldList,$I(tInd))
+					//Try to parse $$$TEXT[] in listings correctly 
 					If ($FIND($ZCONVERT(field,"U"),"$$$TEXT[") && '$FIND(field,"]")) { //Typical of Health Insight
 						Set field=field_","_$LG(fieldList,$I(tInd))
 					}
+									
+					//Health Insight has often NVL() || NVL() in listings
+					If ($E($ZCONVERT(field,"U"),1,5)["NVL(") {
+						Set field=field_","_$LG(fieldList,$I(tInd))
+					/*	While ($L(field)<150) { //Stop in case things go wrong
+							Set fieldafter=$LG(fieldList,$I(tInd))
+							If ($E(fieldafter)="'") {
+								Set field=field_fieldafter
+							} Else {
+								Set field=fieldafter
+								Quit
+							}
+						}
+					*/		
+					}
+					//I don't think you can start with single quote but that happens when using eg NVL()
+					If (($E(field)="'") || ($E(field,2)="'")) {
+						Set field=field_","_$LG(fieldList,$I(tInd))
+					}					
 				}
 			}
 			Set listing=$O(listings(listing))
@@ -2283,12 +2235,26 @@ InitVars()
 	Set CacheVerNumber=$System.Version.GetNumber()
 	Set HostName=$ZUtil(54,0)
 	Set CacheDir=""
-	#define USEIPV6 $zbitget($zversion(0)_$c(0,0,0,0),42)
-	#define HostNameToIPText(%h,%f)  $s($$$USEIPV6:$SYSTEM.INetInfo.HostNameToAddr(%h,%f),1:$p($ZU(54,13,%h),",",1))
-	#define IPTextToBinary(%ip)      $s($$$USEIPV6:$SYSTEM.INetInfo.TextAddrToBinary(%ip),1:$ZU(54,1,%ip))
-	#define IPBinaryToHostName(%ip)  $s($$$USEIPV6:$SYSTEM.INetInfo.AddrToHostName(%ip),1:$p($ZU(54,14,%ip),",",2))
-	#define IPTextToHostName(%ip)    $$$IPBinaryToHostName($$$IPTextToBinary(%ip))
-	Set IPAddr=$$$HostNameToIPText(HostName,0),FullHostName=$$$IPTextToHostName(IPAddr)	Set MgrDir=$ZUtil(12)
+	
+	Set IPAddr="unknown"
+	Set FullHostName="unknown"
+	Try {
+		//$zversion(0) is a bit string that informs what features are enabled in cache'. 
+		//It can fail behind a firewalls
+		#define USEIPV6 $zbitget($zversion(0)_$c(0,0,0,0),42)
+		w 0/0
+		#define HostNameToIPText(%h,%f)  $s($$$USEIPV6:$SYSTEM.INetInfo.HostNameToAddr(%h,%f),1:$p($ZU(54,13,%h),",",1))
+		#define IPTextToBinary(%ip)      $s($$$USEIPV6:$SYSTEM.INetInfo.TextAddrToBinary(%ip),1:$ZU(54,1,%ip))
+		#define IPBinaryToHostName(%ip)  $s($$$USEIPV6:$SYSTEM.INetInfo.AddrToHostName(%ip),1:$p($ZU(54,14,%ip),",",2))
+		#define IPTextToHostName(%ip)    $$$IPBinaryToHostName($$$IPTextToBinary(%ip))
+		Set IPAddr=$$$HostNameToIPText(HostName,0)
+		Set FullHostName=$$$IPTextToHostName(IPAddr)
+	} Catch(ex) {
+		Set tSC = ex.AsStatus()
+		Set FullHostName="Unknown"
+		Set IPAddr="unknown (due to "_$System.Status.GetErrorText(tSC)_")"
+	}
+	Set MgrDir=$ZUtil(12)
 	Set MgrNsp=$$ST()
 	Set CurDir=$ZUtil(12,"")
 	Set CurNsp=$ZUtil(5)
