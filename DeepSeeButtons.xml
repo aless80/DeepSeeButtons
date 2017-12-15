@@ -2240,7 +2240,6 @@ InitVars()
 		//$zversion(0) is a bit string that informs what features are enabled in cache'. 
 		//It can fail behind a firewalls
 		#define USEIPV6 $zbitget($zversion(0)_$c(0,0,0,0),42)
-		w 0/0
 		#define HostNameToIPText(%h,%f)  $s($$$USEIPV6:$SYSTEM.INetInfo.HostNameToAddr(%h,%f),1:$p($ZU(54,13,%h),",",1))
 		#define IPTextToBinary(%ip)      $s($$$USEIPV6:$SYSTEM.INetInfo.TextAddrToBinary(%ip),1:$ZU(54,1,%ip))
 		#define IPBinaryToHostName(%ip)  $s($$$USEIPV6:$SYSTEM.INetInfo.AddrToHostName(%ip),1:$p($ZU(54,14,%ip),",",2))
