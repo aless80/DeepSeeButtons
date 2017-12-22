@@ -208,6 +208,7 @@ LogSections(cubeList,getLogs,LogFile)
 	Do LogDeepSeeSetupSection   //Note Ale: here rs.%Execute("") messes up my ZW in DumpToFile
 	Do LogServerSetup
 	Do LogCubeSection
+	Do LogBuildSynchSection
 	Do LogCubeRegistry
 	Do:(($D(cubeList)'=0) && (cubeList'="")) LogDetailedCubeInfo
 	Do:getLogs>0 LogQuerylog
@@ -331,6 +332,13 @@ LogHead(cubeList,getLogs)
   	Do WriteLog("</script>",2)
   	/// Style section
 	Do WriteLog("<style>",2)
+	Do WriteLog("pre {",4)
+ 	Do WriteLog("white-space: pre-wrap;       /* css-3 */",6)
+ 	Do WriteLog("white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */",6)
+ 	Do WriteLog("white-space: -pre-wrap;      /* Opera 4-6 */",6)
+ 	Do WriteLog("white-space: -o-pre-wrap;    /* Opera 7 */",6)
+ 	Do WriteLog("word-wrap: break-word;       /* Internet Explorer 5.5+ */",6)
+	Do WriteLog("}",4)
 	Do WriteLog(".sidenav {",4)
 	Do WriteLog("box-sizing: border-box;",6)
 	Do WriteLog("height: 100%;",6)
@@ -412,6 +420,12 @@ LogHead(cubeList,getLogs)
     Do WriteLog("border-bottom: 2px solid #D0D0D0;",6)
     Do WriteLog("border-top: 2px solid #D0D0D0;",6)
 	Do WriteLog("}",4)
+	Do WriteLog(".zebraStriped td {",4)
+    Do WriteLog("border-right: 2px solid #D0D0D0;",6)
+    Do WriteLog("border-left: 2px solid #D0D0D0;",6)
+    Do WriteLog("border-bottom: 2px solid #D0D0D0;",6)
+    Do WriteLog("border-top: 2px solid #D0D0D0;",6)
+	Do WriteLog("}",4)
     Do WriteLog(".scrollable {",4)
     Do WriteLog("overflow:auto;",6)
     Do WriteLog("resize:both;",6)
@@ -422,12 +436,6 @@ LogHead(cubeList,getLogs)
     Do WriteLog("white-space: -o-pre-wrap; /* Opera */",6)
     Do WriteLog("white-space: pre-wrap; /* CSS3 - Text module (Candidate Recommendation) http://www.w3.org/TR/css3-text/#white-space */",6)
     Do WriteLog("word-wrap: break-word; /* IE 5.5+ */",6)
-	Do WriteLog("}",4)	
-    Do WriteLog(".zebraStriped td {",4)
-    Do WriteLog("border-right: 2px solid #D0D0D0;",6)
-    Do WriteLog("border-left: 2px solid #D0D0D0;",6)
-    Do WriteLog("border-bottom: 2px solid #D0D0D0;",6)
-    Do WriteLog("border-top: 2px solid #D0D0D0;",6)
 	Do WriteLog("}",4)
     Do WriteLog(".tableWithBorders {",4)
     Do WriteLog("position: relative;",6)
@@ -679,7 +687,7 @@ LogDeepSeeSetupSection
 	//Initialization code
 	Do WriteLog("<tr>",4)
 	Do WriteLog("<td>",6)
-	Do WriteHeader4("Server Initialization Code",8)
+	Do WriteHeader4("Server Initialization Code",8,"Defined in the ^DeepSee.InitCode global")
 	Try {
 		If $D(^[namespace]DeepSee.InitCode){
 			Set initcode=$g(^[namespace]DeepSee.InitCode)
@@ -856,7 +864,7 @@ LogServerSetup()
 
 LogCubeSection
 	Try {
-		Do WriteUpdate("Getting information on cubes and cube registry..")
+		Do WriteUpdate("Getting cube information..")
 		Do WriteParagraph("cubelist","Cubes in "_namespace)
 		Use PDev
 		ZN namespace
@@ -870,34 +878,22 @@ LogCubeSection
 		 	Quit
 	 	} Else {
 		 	Use LogFile
-		 	If ##class(%DeepSee.CubeManager.Utils).GetActiveRegistry()=""{
-			 	Do WriteLog("<p>No active registry so BuildTime and BuildRate will not be populated.</p>")
-			 	Do WriteLog("")
-		 	} Else {
-			 	Do WriteLog("<p>A value of 'N/A' for BuildTime and BuildRate means the cube has not been built from Cube Manager.</p>")
-		 	} 	
 		 	Do WriteLog("<table id=""CubeTable"" border=""0"" cellpadding=""7"" cellspacing=""3"" class=""zebraStriped"">")
 		 	Do WriteLog("<tbody>",2)
 		 	Do WriteLog("<tr>",4)
 		 	Do WriteLog("<th onclick=""sortTable('CubeTable',0,1)"">Cube Name</th>",6)
 		 	Do WriteLog("<th onclick=""sortTable('CubeTable',1,1)"">Display Name</th>",6)
-		 	Do WriteLog("<th onclick=""sortTable('CubeTable',2,0)"">Build Time [s]</th>",6)
-		 	Do WriteLog("<th onclick=""sortTable('CubeTable',3,0)"">Fact Count</th>",6)
-		 	Do WriteLog("<th onclick=""sortTable('CubeTable',4,0)"">Build Rate [Facts/s]</th>",6)
-		 	Do WriteLog("<th onclick=""sortTable('CubeTable',5,0)"">Build Errors</th>",6)
-		 	Do WriteLog("<th onclick=""sortTable('CubeTable',6,1)"">Last Compile</th>",6)
-		 	Do WriteLog("<th onclick=""sortTable('CubeTable',7,1)"">Source Class</th>",6)
-		 	Do WriteLog("<th onclick=""sortTable('CubeTable',8,1)"">Cube Class</th>",6)
-		 	Do WriteLog("<th onclick=""sortTable('CubeTable',9,1)"" title=""As logged in ^DeepSee.Update"">Last Build/Synch</th>",6)
-		 	Do WriteLog("<th onclick=""sortTable('CubeTable',10,1)"" title=""Does not reflect build order"">Related Cubes</th>",6)
+		 	Do WriteLog("<th onclick=""sortTable('CubeTable',2,1)"">Source Class</th>",6)
+		 	Do WriteLog("<th onclick=""sortTable('CubeTable',3,1)"">Cube Class</th>",6)
+		 	Do WriteLog("<th onclick=""sortTable('CubeTable',4,1)"" title=""Does not reflect build order"">Related Cubes</th>",6)
 		 	Do WriteLog("</tr>",4)
 		 	Set storageList=""
 			Set inheritList=""			
 			Set abstractcount = 0
 			For {
-				QUIT:cubenode=""				//Do the work to get info and write out the table
+				Quit:cubenode=""				//Do the work to get info and write out the table
 				Set cubename=$list(plist(cubenode),1)
-				If (cubename'="" && '##class(%DeepSee.Utils).%IsCubeAbstract(cubenode)) {		//if cube is not abstract
+				If (cubename'="" && '##class(%DeepSee.Utils).%IsCubeAbstract(cubenode)) {	//if cube is not abstract
 					Do WriteLog("<tr>",4)
 					Do WriteLog("<td>"_cubename_"</td>",6)					//cubename					
 					Set cubecaption=##class(%DeepSee.Utils).%GetCubeCaption(cubename)
@@ -905,51 +901,9 @@ LogCubeSection
 					Set cubeclass=##class(%DeepSee.Utils).%GetCubeClass(cubename) //cube class
 					Set lastmod=$zdt($LG(plist(cubenode),3),3)				//last cube compile
 					Set type=$LG(plist(cubenode),4)							//subject area or cube?
-					Set facts=##class(%DeepSee.Utils).%GetCubeFactCount(cubename)	//number of facts
-  					//DTB422 moved ^DeepSee.Cubes to ^DeepSee.Update
-					If ($D(^DeepSee.Cubes("cubes",cubenode,"lastDataUpdate"))=1) {
-						Set lastDataUpdate = ^DeepSee.Cubes("cubes",cubenode,"lastDataUpdate")
-					} ElseIf ($D(^DeepSee.Update("cubes",cubenode,"lastDataUpdate"))=1) { 
-						Set lastDataUpdate = ^DeepSee.Update("cubes",cubenode,"lastDataUpdate")
-					} Else {
-						Set lastDataUpdate = 0
-					}
-					If (lastDataUpdate'=0){
-						Set lastSync=$zdt(lastDataUpdate,3)	//Last cube sync from cube global
-						If lastSync="1840-12-31"{
-							Set lastSync="-"
-						} Else{
-							Set syncdate=$p(lastSync," ",1)
-							Set synctime=$p(lastSync," ",2)
-							Set lastSync=syncdate_" "_synctime
-						}
-					} Else {
-						Set lastSync="N/A"
-					}					
-					Set buildtime=$$GetBuildTime(cubename)
-					Do WriteLog("<td>"_$FNUMBER(buildtime,",")_"</td>",6)
-					Do WriteLog("<td>"_$FNUMBER(facts,",")_"</td>",6)
-					Try {
-						If ((buildtime="N/A") || (facts=0)) {
-							Set rate="N/A"
-						} Else {
-							Set rate=$FNUMBER(facts/buildtime,",",2)
-						}
-					} Catch {
-						Set rate="N/A"
-					}
-					Do WriteLog("<td>"_rate_"</td>",6)
-  					Set builderrors = $G(^DeepSee.BuildErrors($ZCONVERT(cubename,"U")),0)
- 					Do WriteLog("<td>"_$FNUMBER(builderrors,",")_"</td>",6)
-					Do WriteLog("<td>"_lastmod_"</td>",6)
 					Set sourceClass = $$GetSourceClass(cubenode,type)
 					Do WriteLog("<td>"_sourceClass_"</td>",6)		//writes sourceClass
-					Do WriteLog("<td>"_cubeclass_"</td>",6)				
-					If lastSync'=""{		//LastUpdate = Last time cube was synced or built, N/A if not done in Cube Manager
-						Do WriteLog("<td>"_lastSync_"</td>",6)
-					} Else{
-						Do WriteLog("<td>N/A</td>",6)
-					}
+					Do WriteLog("<td>"_cubeclass_"</td>",6)					
 					Write !,?6,"<td>" Do GetRelationships(cubenode)  Write "</td>"		//RelatedCubes
 					Do WriteLog("</tr>",4)
 				} ElseIf ##class(%DeepSee.Utils).%IsCubeAbstract(cubenode){
@@ -959,8 +913,8 @@ LogCubeSection
 				Set cubenode=$order(plist(cubenode))
 			}
 		 	Do WriteLog("</tbody>",2)
-		 	Do WriteLog("</table>")
-			//write out list of abstract cubes, storageList, inheritList
+		 	Do WriteLog("</table>")		 	
+			//Write out list of abstract cubes, storageList, inheritList
 			Do WriteHeader4("Abstract Cube List")
 			If abstractcount {
 				Set ind = $O(abstractList(""))
@@ -985,35 +939,164 @@ LogCubeSection
 					}
 			}
 	 	}
-	 	//Build Errors section
-	 	Do WriteHeader4("BuildErrors")
-	 	Set tCube = $O(^DeepSee.BuildErrors(""))
-	 	Set errs = 0
-	 	While (tCube'="") {
-		 	If (^DeepSee.BuildErrors(tCube)) {
-			 	Set errs(tCube) = ^DeepSee.BuildErrors(tCube)
-			 	Set errs = errs + errs(tCube)
-		 	}
-		 	Set tCube = $O(^DeepSee.BuildErrors(tCube))
-		}
-		If (errs) {
-			Set pre="title=""Build errors are logged in the ^DeepSee.BuildErrors global."">"
-			Set alert = "Alert: "_$FNUMBER(errs,",")_" build error(s) found"
-			Set alerts($I(alerts)) = pre_alert
-			Do WriteLog("<p class=""red"" "_pre_alert_":</p>",0)
-			Set tCube = $O(errs(""))
-			While (tCube'="") {
-				Do WriteLog("<p>"_$FNUMBER(errs(tCube),",")_" build error(s) for '"_tCube_"'</p>")
-				Set tCube = $O(errs(tCube))
-			}
-		}
- 	}
- 	catch exc {
+ 	} catch exc {
 	 	Use PDev
 	 	zw exc
 	}
 	ZN "%SYS"
  	Quit
+
+LogBuildSynchSection
+	Try {
+		Do WriteUpdate("Getting information on cube registry..")
+		Do WriteParagraph("buildsynchlist","Cube Build/Synch")
+		Use PDev
+		ZN namespace
+	 	Do ##class(%DeepSee.Utils).%GetCubeList(.plist)
+		Set cubenode=$order(plist(""))
+		If cubenode=""{
+			Use LogFile 
+			Do WriteLog("<p>")
+		 	Do WriteLog("There are no cubes in this namespace")
+		 	Write "</p>"  Use PDev
+		 	Quit
+	 	} Else {
+		 	If ##class(%DeepSee.CubeManager.Utils).GetActiveRegistry()=""{
+			 	Do WriteLog("<p>No active registry so Build Time and Build Rate will not be populated.</p>")
+			 	Do WriteLog("")
+		 	} Else {
+			 	Do WriteLog("<p>BuildTime, BuildRate, Build Errors show no values when the cube has not been built from Cube Manager.</p>")
+		 	}
+		 	
+		 	//Get the latest DSTIME
+		 	//DTB422 moved ^DeepSee.Cubes to ^DeepSee.Update
+			If ($D(^DeepSee.Update)#10) { //1 (only top node) or 11 (top node and descendants)
+				Set DSTIME = ^DeepSee.Update
+				Do WriteLog("<p>DSTIME from ^DeepSee.Update is "_DSTIME_"</p>")
+			} ElseIf ($D(DSTIME)#10) { 				
+				Set DSTIME = ^OBJ.DSTIME
+				Do WriteLog("<p>DSTIME from ^OBJ.DSTIME is "_DSTIME_"</p>")
+			} Else {
+				Set lastDataUpdate = 0
+				Set dstime = ""
+				Do WriteLog("<p>Could not find DSTIME</p>")
+			}
+		 	
+		 	
+		 	Do WriteLog("<table id=""BuildSynchTable"" border=""0"" cellpadding=""7"" cellspacing=""3"" class=""zebraStriped"">")
+		 	Do WriteLog("<tbody>",2)
+		 	Do WriteLog("<tr>",4)
+		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',0,1)"">Cube Name</th>",6)
+		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',1,0)"">Fact Count</th>",6)
+		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',2,0)"">Build Time [s]</th>",6)
+		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',3,0)"">Build Rate [Facts/s]</th>",6)
+		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',4,0)"">Build Errors</th>",6)
+			Do WriteLog("<th onclick=""sortTable('BuildSynchTable',5,0)"""_
+				"title=""From ^DeepSeeUpdate (or ^OBJ.DSTIME before DTB422)"">DSTIME</th>",6)
+		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',6,1)"">Last Compile</th>",6)
+		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',7,1)"" title=""As logged in ^DeepSee.Update (or ^OBJ.DSTIME before DTB422)"">Last Build/Synch</th>",6)
+		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',8,1)"" title=""Does not reflect build order"">Related Cubes</th>",6)
+		 	Do WriteLog("</tr>",4)
+		 	Set storageList=""
+			Set inheritList=""			
+			Set abstractcount = 0
+			For {
+				QUIT:cubenode=""				//Do the work to get info and write out the table
+				Set cubename=$list(plist(cubenode),1)
+				If (cubename'="" && '##class(%DeepSee.Utils).%IsCubeAbstract(cubenode)) {		//if cube is not abstract
+					Do WriteLog("<tr>",4)
+					Do WriteLog("<td>"_cubename_"</td>",6)					//cubename
+					Set lastmod=$zdt($LG(plist(cubenode),3),3)				//last cube compile
+					Set facts=##class(%DeepSee.Utils).%GetCubeFactCount(cubename)	//number of facts
+  					//DTB422 moved ^DeepSee.Cubes to ^DeepSee.Update
+					If ($D(^DeepSee.Cubes("cubes",cubenode,"lastDataUpdate"))=1) {
+						Set lastDataUpdate = ^DeepSee.Cubes("cubes",cubenode,"lastDataUpdate")
+						Set dstime = $G(^DeepSee.Cubes("cubes",cubenode,"dstime"),"")
+					} ElseIf ($D(^DeepSee.Update("cubes",cubenode,"lastDataUpdate"))=1) { 
+						Set lastDataUpdate = ^DeepSee.Update("cubes",cubenode,"lastDataUpdate")
+						Set dstime = $G(^DeepSee.Update("cubes",cubenode,"dstime"),"")
+					} Else {
+						Set lastDataUpdate = 0
+						Set dstime = ""
+					}
+					If (lastDataUpdate'=0){
+						Set lastSync=$zdt(lastDataUpdate,3)	//Last cube sync from cube global
+						If lastSync="1840-12-31"{
+							Set lastSync="-"
+						} Else{
+							Set syncdate=$p(lastSync," ",1)
+							Set synctime=$p(lastSync," ",2)
+							Set lastSync=syncdate_" "_synctime
+						}
+					} Else {
+						Set lastSync=""
+					}					
+					Set buildtime=$$GetBuildTime(cubename)
+					Do WriteLog("<td>"_$FNUMBER(facts,"O,")_"</td>",6)
+					If buildtime=""{
+						Do WriteLog("<td></td>",6)
+					} Else {
+						Do WriteLog("<td>"_$FNUMBER(buildtime,"O,")_"</td>",6)
+					}
+					Try {
+						If ((buildtime="") || (facts=0)) {
+							Set rate=""
+						} Else {
+							Set rate=$FNUMBER(facts/buildtime,",",2)
+						}
+					} Catch {
+						Set rate=""
+					}
+					Do WriteLog("<td>"_rate_"</td>",6)
+  					Set builderrors = $G(^DeepSee.BuildErrors($ZCONVERT(cubename,"U")),"")
+  					If (builderrors="") {
+ 						Do WriteLog("<td></td>",6)
+  					} Else {
+	  					Do WriteLog("<td>"_$FNUMBER(builderrors,"O,")_"</td>",6)
+	  				}
+  					Do WriteLog("<td>"_dstime_"</td>",6)
+					Do WriteLog("<td>"_lastmod_"</td>",6)
+					Do WriteLog("<td>"_lastSync_"</td>",6) 		//LastUpdate = Last time cube was synced or built, "" if not done in Cube Manager
+					Write !,?6,"<td>" Do GetRelationships(cubenode)  Write "</td>"		//RelatedCubes
+					Do WriteLog("</tr>",4)
+				} ElseIf ##class(%DeepSee.Utils).%IsCubeAbstract(cubenode){
+					//Don't run if Health insight because there are too many abstract cubes
+					Set:('isInsight) abstractList($I(abstractcount)) = cubenode
+				}
+				Set cubenode=$order(plist(cubenode))
+			}
+		 	Do WriteLog("</tbody>",2)
+		 	Do WriteLog("</table>")
+		}
+		//Build Errors section
+		Do WriteHeader4("BuildErrors")
+		Set tCube = $O(^DeepSee.BuildErrors(""))
+		Set errs = 0
+		While (tCube'="") {
+		 	If (^DeepSee.BuildErrors(tCube)) {
+			 	Set errs(tCube) = ^DeepSee.BuildErrors(tCube)
+			 	Set errs = errs + errs(tCube)
+			}
+			Set tCube = $O(^DeepSee.BuildErrors(tCube))
+		}
+		If (errs) {
+			Set pre="title=""Build errors are logged in the ^DeepSee.BuildErrors global."">"
+			Set alert = "Alert: "_$FNUMBER(errs,"O,")_" build error(s) found"
+			Set alerts($I(alerts)) = pre_alert
+			Do WriteLog("<p class=""red"" "_pre_alert_":</p>",0)
+			Set tCube = $O(errs(""))
+			While (tCube'="") {
+				Do WriteLog("<p>"_$FNUMBER(errs(tCube),"O,")_" build error(s) for '"_tCube_"'</p>")
+				Set tCube = $O(errs(tCube))
+			}
+		}
+ 	} catch exc {
+	 	Use PDev
+	 	zw exc
+	}
+	ZN "%SYS"
+ 	Quit
+	
 
 LogCubeRegistry
 	Do WriteParagraph("cuberegistry","Cube Registry")
@@ -1198,7 +1281,7 @@ LogCubeInfo
     Do WriteLog("<tr>",4)
     Do WriteLog("<td>",6)
     Do WriteLog("<h4>Fact Count</h4>",8)
-	Do WriteLog("<p>"_$FNUMBER(factcount,",")_"</p>",8)
+	Do WriteLog("<p>"_$FNUMBER(factcount,"O,")_"</p>",8)
 	Do WriteLog("</td>",6)
     Do WriteLog("</tr>",4)
     Do WriteLog("<tr>",4)
@@ -1218,7 +1301,7 @@ LogCubeInfo
 		If maxFacts="" {
 			Do WriteLog("<p>maxFacts property not found in subject area class</p>",8)
 		} Else {
-			Do WriteLog("<p>maxFacts = "_$FNUMBER(maxFacts,",")_"</p>",8)
+			Do WriteLog("<p>maxFacts = "_$FNUMBER(maxFacts,"O,")_"</p>",8)
 		}
     } Else {
 	    //Log filterspec property in subject areas (not cubes)
@@ -1336,7 +1419,7 @@ LogCubeInfo
 		While (k'="") {
 			Set tCount = tCount + 1
 			Set tSC = $G(^DeepSee.BuildErrors(cube,k))
-			Write $J($FNUMBER(tCount,","),5),$J("",3),"Source ID: ",k
+			Write $J($FNUMBER(tCount,"O,"),5),$J("",3),"Source ID: ",k
 			Write !,?8,$System.Status.GetErrorText(tSC),!!
 			If (tCount>1000) {
 				Write !,?0,"... skipping build errors ..."
@@ -1346,7 +1429,7 @@ LogCubeInfo
 			}
 			Set k = $O(^DeepSee.BuildErrors(cube,k))
 		}
-		Write $FNUMBER(totCount,",")," build error(s) for '",cube,"'"
+		Write $FNUMBER(totCount,"O,")," build error(s) for '",cube,"'"
 		Do WriteLog("</pre>",8)
 		Do WriteLog("</div>") 
 	} Else {
@@ -1975,11 +2058,12 @@ LogDataBases
 		//Do WriteLog("<th>Database</th><th>Directory</th><th>Size in MB</th><th>Status</th><th>Resource</th><th>Encrypted</th><th>Journal</th>",6)
 		Do WriteLog("<th onclick=""sortTable('databaseTable',0,1)"">Database</th>",6)
 		Do WriteLog("<th onclick=""sortTable('databaseTable',1,1)"">Directory</th>",6)
-		Do WriteLog("<th onclick=""sortTable('databaseTable',2,0)"">Size in MB</th>",6)
-		Do WriteLog("<th onclick=""sortTable('databaseTable',3,1)"">Status</th>",6)
-		Do WriteLog("<th onclick=""sortTable('databaseTable',4,1)"">Resource</th>",6)
-		Do WriteLog("<th onclick=""sortTable('databaseTable',5,1)"">Encrypted</th>",6)
-		Do WriteLog("<th onclick=""sortTable('databaseTable',6,1)"">Journal</th>",6)	
+		Do WriteLog("<th onclick=""sortTable('databaseTable',2,0)"">Size [MB]</th>",6)
+		Do WriteLog("<th onclick=""sortTable('databaseTable',3,0)"">Block Size [KB]</th>",6)
+		Do WriteLog("<th onclick=""sortTable('databaseTable',4,1)"">Status</th>",6)
+		Do WriteLog("<th onclick=""sortTable('databaseTable',5,1)"">Resource</th>",6)
+		Do WriteLog("<th onclick=""sortTable('databaseTable',6,1)"">Encrypted</th>",6)
+		Do WriteLog("<th onclick=""sortTable('databaseTable',7,1)"">Journal</th>",6)	
 		Do WriteLog("</tr>",4)
 		Set Maj=##class(%SYSTEM.Version).GetMajor()
 		If Maj<2009 {
@@ -1994,6 +2078,8 @@ LogDataBases
 			Do WriteLog("<td>"_result.Data("Name")_"</td>",8)
 			Do WriteLog("<td>"_result.Data("Directory")_"</td>",8)
 			Do WriteLog("<td>"_$FNUMBER(result.Data("Size in MB"),",",0)_"</td>",8)
+			Set db=##class(SYS.Database).%OpenId(result.Data("Directory"))
+			Do WriteLog("<td>"_$FNUMBER(db.BlockSize/1024,",",0)_"</td>",8)
 			Do WriteLog("<td>"_result.Data("Status")_"</td>",8)
 			Do WriteLog("<td>"_result.Data("Resource")_"</td>",8)
 			Do WriteLog("<td>"_result.Data("Encrypted")_"</td>",8)
@@ -2172,6 +2258,7 @@ LogSidePanel(cubeList,getLogs,numalerts)
 	}	
 	Do WriteLog("<a href=""#serverdetails"" title=""Information on the hosting machine"">Server Details</a>",2)
 	Do WriteLog("<a href=""#cubelist"" title=""Information on all cubes in the namespace"">Cubes</a>",2)
+	Do WriteLog("<a href=""#buildsynchlist"" title=""Information on cube build and synchronization"">Build/Synch</a>",2)
 	Do WriteLog("<a href=""#cuberegistry"" title=""Cube registry defined by Cube Manager"">Cube Registry</a>",2)
 	If (($D(cubeList)'=0) && (cubeList'="")) {
 		Do WriteLog("<a href=""#cubeinfo"" title=""Detailed information on cubes"">Cube Info</a>",2)
@@ -2664,13 +2751,13 @@ GetLastBuild(CubeEvent,cubename) [cubename,CubeEvent,cubekey,cubeevent,totaltime
 	}
 	IF SQLCODE=0 {
 		If CubeEvent="Synch"{
-    		Set string=$FNUMBER(factsupdated,",")_" facts synched on "_finishtime_" in "_totaltime_" seconds"
+    		Set string=$FNUMBER(factsupdated,"O,")_" facts synched on "_finishtime_" in "_totaltime_" seconds"
 		} ElseIf CubeEvent="Build"{
-			Set string=$FNUMBER(cubesize,",")_" facts built on "_finishtime_" in "_totaltime_" seconds"
+			Set string=$FNUMBER(cubesize,"O,")_" facts built on "_finishtime_" in "_totaltime_" seconds"
 		} ElseIf CubeEvent="Update"{
 			Set string="on "_finishtime
 		} ElseIf CubeEvent="Repair"{
-			Set string=$FNUMBER(cubesize,",")_" facts built on "_finishtime_" in "_totaltime_" seconds"
+			Set string=$FNUMBER(cubesize,"O,")_" facts built on "_finishtime_" in "_totaltime_" seconds"
 		} Else {			
 			Set string=CubeEvent_" event on "_finishtime_" in "_totaltime
 		}
@@ -2783,7 +2870,7 @@ GetBuildTime(cube)
 	If $D(time){
 		Quit time
 	} Else{
-		Quit "N/A"
+		Quit ""
 	}
 }
 
@@ -3082,15 +3169,16 @@ WriteLog(string,spaces)
  
 WriteParagraph(name,title,flag)
 	If '$D(flag) Set flag = 1
-	If flag Do WriteLog("<hr noshade size=""4"" width=""auto"">")
+	Do:flag WriteLog("<hr noshade size=""4"" width=""auto"">")
 	Do WriteLog("<a name="""_name_"""></a>")
 	Do WriteLog("<h2>"_title_"</h2>")
 	Quit
 	
-WriteHeader4(header,spaces)
+WriteHeader4(header,spaces,title)
 	Use LogFile
 	If '$D(spaces) Set spaces=0
-	Do WriteLog("<h4>"_header_"</h4>",spaces)
+	If '$D(title) Set title=""
+	Do WriteLog("<h4"_$S(title="":"",1:" title="""_title_"""")_">"_header_"</h4>",spaces)
 	Quit
 	
 WriteUpdate(msg)
