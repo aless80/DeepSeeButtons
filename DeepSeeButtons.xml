@@ -267,6 +267,13 @@ LogHead(cubeList,getLogs)
     Do WriteLog("document.getElementById(""mySidenav"").style.width = ""0px"";",6)
     Do WriteLog("document.getElementById(""main"").style.marginLeft= ""0px"";",6)
     Do WriteLog("}",4)
+    /// highlightLink function
+    Do WriteLog("function highlightLink(obj, mousein) {",4)
+    Do WriteLog("bkg=(mousein ? 'rgb(40,94,124)' : '');",6)
+    Do WriteLog("color=(mousein ? 'white' : '');",6)
+    Do WriteLog("document.getElementById('l'+obj.id).style.background=bkg;",6)
+    Do WriteLog("document.getElementById('l'+obj.id).style.color=color;",6)
+    Do WriteLog("}",4)
 	/// sortTable function
     Do WriteLog("function sortTable(id,n,stringSort) {",4)
   	Do WriteLog("var table, rows, switching, i, x1, x2, shouldSwitch, dir, switchcount = 0;",6)
@@ -504,6 +511,7 @@ LogDeepSeeSetupSection
 	Do WriteLog("<span onclick=""openNav()""> &#9776; </span>",2)
 	Do WriteLog("</div>")
 	Do WriteUpdate("Getting system information..")
+	Do WriteLog("<div id=""DSSetupDiv"" onmouseover=""highlightLink(this,1)"" onmouseout=""highlightLink(this,0)"">")
 	Do WriteParagraph("deepseesetup","DeepSee Setup in "_namespace,0)
  	//Agent Count
  	ZN namespace
@@ -520,7 +528,9 @@ LogDeepSeeSetupSection
 	 	}
  	ZN "%SYS"
  	Use LogFile
- 	Do WriteLog("<table id=""DSSetupTable"" cellpadding=""7"" cellspacing=""3"" class=""tableWithBorders tableTabbed"">")
+ 	Do WriteLog("<table id=""DSSetupTable"" cellpadding=""7"" cellspacing=""3"" "_
+ 	            "class=""tableWithBorders tableTabbed"">")
+ 	            
   	Do WriteLog("<tbody>",2)
     Do WriteLog("<tr>",4)
     Do WriteLog("<td>",6)
@@ -773,112 +783,115 @@ LogDeepSeeSetupSection
 		Do WriteLog("</tbody>",2)
  		Do WriteLog("</table>",0)
 	}
+	Do WriteLog("</div>")
 	Quit
 
 LogServerSetup()
 	///Server Details section
+	Do WriteLog("<div id=""ServerDetailsDiv"" onmouseover=""highlightLink(this,1)"""_
+	            " onmouseout=""highlightLink(this,0)"">")
 	Do WriteParagraph("serverdetails","Server Details",1)
 	///The old "Configuration" section
-	Do WriteLog("<table id=""ServerDetailsTable"" cellpadding=""7"" cellspacing=""3"" class=""tableWithBorders tableTabbed"">",0)
-  	Do WriteLog("<tbody>",2)
-	Do WriteLog("<tr>",4)
-	Do WriteLog("<td>",6)
-	Do WriteHeader4("Configuration",8)
-	Do WriteLog("<p>"_ConfigName_" on Machine """_HostName_""""_"</p>",8)
-	Do WriteLog("</td>",6)
-	Do WriteLog("</tr>",4)	
-	Do WriteLog("<tr>",4)
-	Do WriteLog("<td>",6)
+	Do WriteLog("<table id=""ServerDetailsTable"" cellpadding=""7"" cellspacing=""3"" "_
+	            "class=""tableWithBorders tableTabbed"">",2)
+  	Do WriteLog("<tbody>",4)
+	Do WriteLog("<tr>",6)
+	Do WriteLog("<td>",8)
+	Do WriteHeader4("Configuration",10)
+	Do WriteLog("<p>"_ConfigName_" on Machine """_HostName_""""_"</p>",10)
+	Do WriteLog("</td>",8)
+	Do WriteLog("</tr>",6)	
+	Do WriteLog("<tr>",6)
+	Do WriteLog("<td>",8)
 	If CustomerName'?1a.e Set CustomerName="Unknown"
-	Do WriteHeader4("Customer Name",8)
-	Do WriteLog("<p>"_CustomerName_"</p>",8)
-	Do WriteLog("</td>",6)
-	Do WriteLog("</tr>",4)	
-	Do WriteLog("<tr>",4)
-	Do WriteLog("<td>",6)
-	Do WriteHeader4("License Order Number",8)
-	Do WriteLog("<p>"_OrderNumber_"</p>",8)
-	Do WriteLog("</td>",6)
-	Do WriteLog("</tr>",4)	
-	Do WriteLog("<tr>",4)
-	Do WriteLog("<td>",6)
-	Do WriteHeader4("Fully Qualified Host Name",8)
-	Do WriteLog("<p>"_FullHostName_" with IP Address: "_IPAddr_"</p>",8)
+	Do WriteHeader4("Customer Name",10)
+	Do WriteLog("<p>"_CustomerName_"</p>",10)
+	Do WriteLog("</td>",8)
+	Do WriteLog("</tr>",6)	
+	Do WriteLog("<tr>",6)
+	Do WriteLog("<td>",8)
+	Do WriteHeader4("License Order Number",10)
+	Do WriteLog("<p>"_OrderNumber_"</p>",10)
+	Do WriteLog("</td>",8)
+	Do WriteLog("</tr>",6)	
+	Do WriteLog("<tr>",6)
+	Do WriteLog("<td>",8)
+	Do WriteHeader4("Fully Qualified Host Name",10)
+	Do WriteLog("<p>"_FullHostName_" with IP Address: "_IPAddr_"</p>",10)
 	Do INT^%D,INT^%T
-	Do WriteLog("</td>",6)
-	Do WriteLog("</tr>",4)	
-	Do WriteLog("<tr>",4)
-	Do WriteLog("<td>",6)
-	Do WriteHeader4("Log created by User",8)
-	Do WriteLog("<p>"_CurUser_" on "_$ZD($ZDH(%DAT,7),3)_" at "_%TIM_"</p>",8)
-	Do WriteLog("</td>",6)
-	Do WriteLog("</tr>",4)
+	Do WriteLog("</td>",8)
+	Do WriteLog("</tr>",6)	
+	Do WriteLog("<tr>",6)
+	Do WriteLog("<td>",8)
+	Do WriteHeader4("Log created by User",10)
+	Do WriteLog("<p>"_CurUser_" on "_$ZD($ZDH(%DAT,7),3)_" at "_%TIM_"</p>",10)
+	Do WriteLog("</td>",8)
+	Do WriteLog("</tr>",6)
 	//Last Caché Startup
-	Do WriteLog("<tr>",4)
-	Do WriteLog("<td>",6)
-	Do WriteHeader4("Last Caché Startup",8)
+	Do WriteLog("<tr>",6)
+	Do WriteLog("<td>",8)
+	Do WriteHeader4("Last Caché Startup",10)
 	Do WriteLastStartup
-	Do WriteLog("</td>",6)
-	Do WriteLog("</tr>",4)	
-	Do WriteLog("<tr>",4)
-	Do WriteLog("<td>",6)
-	Do WriteHeader4("Caché Version String",8)
-	Do WriteLog("<p>"_CacheVerStr_"</p>",8)
+	Do WriteLog("</td>",8)
+	Do WriteLog("</tr>",6)	
+	Do WriteLog("<tr>",6)
+	Do WriteLog("<td>",8)
+	Do WriteHeader4("Caché Version String",10)
+	Do WriteLog("<p>"_CacheVerStr_"</p>",10)
 	//Set isInsight=$$isHealthInsight(namespace) 	//Determine if this is a Health Insight namespace (1 if yes)
 	Do:isInsight WriteLog("<p>"_##class(%ZHSLIB.HealthShareMgr).VersionInfo()_"</p>",8)
 	Do WriteAdhocPatch //write information on Adhoc patch
 	//Current Locale subsection
-	Do WriteLog("</td>",6)
-	Do WriteLog("</tr>",4)	
-	Do WriteLog("<tr>",4)
-	Do WriteLog("<td>",6)
+	Do WriteLog("</td>",8)
+	Do WriteLog("</tr>",6)	
+	Do WriteLog("<tr>",6)
+	Do WriteLog("<td>",8)
 	Do NLS
-	Do WriteLog("</td>",6)
-	Do WriteLog("</tr>",4)	
+	Do WriteLog("</td>",8)
+	Do WriteLog("</tr>",6)	
 	//Operating System Version section
-	Do WriteLog("<tr>",4)
-	Do WriteLog("<td>",6)	
+	Do WriteLog("<tr>",6)
+	Do WriteLog("<td>",8)	
 	Do OSVer
-	Do WriteLog("</td>",6)
-	Do WriteLog("</tr>",4)
+	Do WriteLog("</td>",8)
+	Do WriteLog("</tr>",6)
 	//Disk space
-	Do WriteLog("<tr>",4)
-	Do WriteLog("<td>",6)
+	Do WriteLog("<tr>",6)
+	Do WriteLog("<td>",8)
 	Do DiskSpace
-	Do WriteLog("</td>",6)
-	Do WriteLog("</tr>",4)
+	Do WriteLog("</td>",8)
+	Do WriteLog("</tr>",6)
 	//RAM physical memory space
-	Do WriteLog("<tr>",4)
-	Do WriteLog("<td>",6)	
+	Do WriteLog("<tr>",6)
+	Do WriteLog("<td>",8)	
 	Do RAM
-	Do WriteLog("</td>",6)
-	Do WriteLog("</tr>",4)
+	Do WriteLog("</td>",8)
+	Do WriteLog("</tr>",6)
 	//Close the table
 	Use PDev
 	If OS?1"Win".e!(OS="VMS"),OS'="Win9x" 
 	Use LogFile	
-	Do WriteLog("</tbody>",2)
-	Do WriteLog("</table>",0)
+	Do WriteLog("</tbody>",4)
+	Do WriteLog("</table>",2)
+	Do WriteLog("</div>")
 	Use PDev
 	Quit
 
 LogCubeSection
 	Try {
 		Do WriteUpdate("Getting cube information..")
+		Do WriteLog("<div id=""CubesDiv"" onmouseover=""highlightLink(this,1)"" onmouseout=""highlightLink(this,0)"">")
 		Do WriteParagraph("cubelist","Cubes in "_namespace)
 		Use PDev
 		ZN namespace
 	 	Do ##class(%DeepSee.Utils).%GetCubeList(.plist)
 		Set cubenode=$order(plist(""))
 		If cubenode=""{
-			Use LogFile 
-			Do WriteLog("<p>")
-		 	Do WriteLog("There are no cubes in this namespace")
-		 	Write "</p>"  Use PDev
-		 	Quit
+			Do WriteLog("<p>There are no cubes in this namespace</p>")
 	 	} Else {
 		 	Use LogFile
-		 	Do WriteLog("<table id=""CubeTable"" border=""0"" cellpadding=""7"" cellspacing=""3"" class=""zebraStriped"">")
+		 	Do WriteLog("<table id=""CubeTable"" border=""0"" cellpadding=""7"" cellspacing=""3"" "_
+		 	            "class=""zebraStriped"">")
 		 	Do WriteLog("<tbody>",2)
 		 	Do WriteLog("<tr>",4)
 		 	Do WriteLog("<th onclick=""sortTable('CubeTable',0,1)"">Cube Name</th>",6)
@@ -939,6 +952,7 @@ LogCubeSection
 					}
 			}
 	 	}
+	 	Do WriteLog("</div>")
  	} catch exc {
 	 	Use PDev
 	 	zw exc
@@ -949,6 +963,7 @@ LogCubeSection
 LogBuildSynchSection
 	Try {
 		Do WriteUpdate("Getting information on cube registry..")
+		Do WriteLog("<div id=""BuildSynchDiv"" onmouseover=""highlightLink(this,1)"" onmouseout=""highlightLink(this,0)"">")
 		Do WriteParagraph("buildsynchlist","Cube Build/Synch")
 		Use PDev
 		ZN namespace
@@ -956,56 +971,57 @@ LogBuildSynchSection
 		Set cubenode=$order(plist(""))
 		If cubenode=""{
 			Use LogFile 
-			Do WriteLog("<p>")
-		 	Do WriteLog("There are no cubes in this namespace")
-		 	Write "</p>"  Use PDev
+			Do WriteLog("<p>There are no cubes in this namespace</p>",2)
+		 	Do WriteLog("</div>")
+		 	Use PDev
 		 	Quit
 	 	} Else {
 		 	If ##class(%DeepSee.CubeManager.Utils).GetActiveRegistry()=""{
-			 	Do WriteLog("<p>No active registry so Build Time and Build Rate will not be populated.</p>")
+			 	Do WriteLog("<p>No active registry so Build Time and Build Rate will not be populated.</p>",2)
 			 	Do WriteLog("")
 		 	} Else {
-			 	Do WriteLog("<p>BuildTime, BuildRate, Build Errors show no values when the cube has not been built from Cube Manager.</p>")
+			 	Do WriteLog("<p>BuildTime, BuildRate, Build Errors show no values when the cube has not been built from Cube Manager.</p>",2)
 		 	}
 		 	
 		 	//Get the latest DSTIME
 		 	//DTB422 moved ^DeepSee.Cubes to ^DeepSee.Update
 			If ($D(^DeepSee.Update)#10) { //1 (only top node) or 11 (top node and descendants)
 				Set DSTIME = ^DeepSee.Update
-				Do WriteLog("<p>DSTIME from ^DeepSee.Update is "_DSTIME_"</p>")
-			} ElseIf ($D(DSTIME)#10) { 				
+				Do WriteLog("<p>DSTIME from ^DeepSee.Update is "_DSTIME_"</p>",2)
+			} ElseIf ($D(^OBJ.DSTIME)#10) { 				
 				Set DSTIME = ^OBJ.DSTIME
-				Do WriteLog("<p>DSTIME from ^OBJ.DSTIME is "_DSTIME_"</p>")
+				Do WriteLog("<p>DSTIME from ^OBJ.DSTIME is "_DSTIME_"</p>",2)
 			} Else {
 				Set lastDataUpdate = 0
 				Set dstime = ""
-				Do WriteLog("<p>Could not find DSTIME</p>")
+				Do WriteLog("<p>Could not find DSTIME</p>",2)
 			}
 		 	
 		 	
-		 	Do WriteLog("<table id=""BuildSynchTable"" border=""0"" cellpadding=""7"" cellspacing=""3"" class=""zebraStriped"">")
-		 	Do WriteLog("<tbody>",2)
-		 	Do WriteLog("<tr>",4)
-		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',0,1)"">Cube Name</th>",6)
-		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',1,0)"">Fact Count</th>",6)
-		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',2,0)"">Build Time [s]</th>",6)
-		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',3,0)"">Build Rate [Facts/s]</th>",6)
-		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',4,0)"">Build Errors</th>",6)
+		 	Do WriteLog("<table id=""BuildSynchTable"" border=""0"" cellpadding=""7"" cellspacing=""3"" "_
+		 	            "class=""zebraStriped"">",2)
+		 	Do WriteLog("<tbody>",4)
+		 	Do WriteLog("<tr>",6)
+		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',0,1)"">Cube Name</th>",8)
+		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',1,0)"">Fact Count</th>",8)
+		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',2,0)"">Build Time [s]</th>",8)
+		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',3,0)"">Build Rate [Facts/s]</th>",8)
+		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',4,0)"">Build Errors</th>",8)
 			Do WriteLog("<th onclick=""sortTable('BuildSynchTable',5,0)"""_
-				"title=""From ^DeepSeeUpdate (or ^OBJ.DSTIME before DTB422)"">DSTIME</th>",6)
-		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',6,1)"">Last Compile</th>",6)
-		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',7,1)"" title=""As logged in ^DeepSee.Update (or ^OBJ.DSTIME before DTB422)"">Last Build/Synch</th>",6)
-		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',8,1)"" title=""Does not reflect build order"">Related Cubes</th>",6)
-		 	Do WriteLog("</tr>",4)
+				"title=""From ^DeepSeeUpdate (or ^OBJ.DSTIME before DTB422)"">DSTIME</th>",8)
+		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',6,1)"">Last Compile</th>",8)
+		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',7,1)"" title=""As logged in ^DeepSee.Update (or ^OBJ.DSTIME before DTB422)"">Last Build/Synch</th>",8)
+		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',8,1)"" title=""Does not reflect build order"">Related Cubes</th>",8)
+		 	Do WriteLog("</tr>",6)
 		 	Set storageList=""
 			Set inheritList=""			
 			Set abstractcount = 0
 			For {
-				QUIT:cubenode=""				//Do the work to get info and write out the table
+				QUIT:cubenode=""		//Do the work to get info and write out the table
 				Set cubename=$list(plist(cubenode),1)
 				If (cubename'="" && '##class(%DeepSee.Utils).%IsCubeAbstract(cubenode)) {		//if cube is not abstract
-					Do WriteLog("<tr>",4)
-					Do WriteLog("<td>"_cubename_"</td>",6)					//cubename
+					Do WriteLog("<tr>",6)
+					Do WriteLog("<td>"_cubename_"</td>",8)					//cubename
 					Set lastmod=$zdt($LG(plist(cubenode),3),3)				//last cube compile
 					Set facts=##class(%DeepSee.Utils).%GetCubeFactCount(cubename)	//number of facts
   					//DTB422 moved ^DeepSee.Cubes to ^DeepSee.Update
@@ -1020,9 +1036,9 @@ LogBuildSynchSection
 						Set dstime = ""
 					}
 					If (lastDataUpdate'=0){
-						Set lastSync=$zdt(lastDataUpdate,3)	//Last cube sync from cube global
+						Set lastSync=$zdt(lastDataUpdate,3)	//Last cube sync from cube global						
 						If lastSync="1840-12-31"{
-							Set lastSync="-"
+							Set lastSync=" "
 						} Else{
 							Set syncdate=$p(lastSync," ",1)
 							Set synctime=$p(lastSync," ",2)
@@ -1032,11 +1048,11 @@ LogBuildSynchSection
 						Set lastSync=""
 					}					
 					Set buildtime=$$GetBuildTime(cubename)
-					Do WriteLog("<td>"_$FNUMBER(facts,"O,")_"</td>",6)
+					Do WriteLog("<td>"_$FNUMBER(facts,"O,")_"</td>",8)
 					If buildtime=""{
-						Do WriteLog("<td></td>",6)
+						Do WriteLog("<td></td>",8)
 					} Else {
-						Do WriteLog("<td>"_$FNUMBER(buildtime,"O,")_"</td>",6)
+						Do WriteLog("<td>"_$FNUMBER(buildtime,"O,")_"</td>",8)
 					}
 					Try {
 						If ((buildtime="") || (facts=0)) {
@@ -1047,26 +1063,26 @@ LogBuildSynchSection
 					} Catch {
 						Set rate=""
 					}
-					Do WriteLog("<td>"_rate_"</td>",6)
+					Do WriteLog("<td>"_rate_"</td>",8)
   					Set builderrors = $G(^DeepSee.BuildErrors($ZCONVERT(cubename,"U")),"")
   					If (builderrors="") {
- 						Do WriteLog("<td></td>",6)
+ 						Do WriteLog("<td></td>",8)
   					} Else {
-	  					Do WriteLog("<td>"_$FNUMBER(builderrors,"O,")_"</td>",6)
+	  					Do WriteLog("<td>"_$FNUMBER(builderrors,"O,")_"</td>",8)
 	  				}
-  					Do WriteLog("<td>"_dstime_"</td>",6)
-					Do WriteLog("<td>"_lastmod_"</td>",6)
-					Do WriteLog("<td>"_lastSync_"</td>",6) 		//LastUpdate = Last time cube was synced or built, "" if not done in Cube Manager
-					Write !,?6,"<td>" Do GetRelationships(cubenode)  Write "</td>"		//RelatedCubes
-					Do WriteLog("</tr>",4)
+  					Do WriteLog("<td>"_dstime_"</td>",8)
+					Do WriteLog("<td>"_lastmod_"</td>",8)
+					Do WriteLog("<td>"_lastSync_"</td>",8) 		//LastUpdate = Last time cube was synced or built, "" if not done in Cube Manager
+					Write !,?8,"<td>" Do GetRelationships(cubenode)  Write "</td>"		//RelatedCubes
+					Do WriteLog("</tr>",6)
 				} ElseIf ##class(%DeepSee.Utils).%IsCubeAbstract(cubenode){
 					//Don't run if Health insight because there are too many abstract cubes
 					Set:('isInsight) abstractList($I(abstractcount)) = cubenode
 				}
 				Set cubenode=$order(plist(cubenode))
 			}
-		 	Do WriteLog("</tbody>",2)
-		 	Do WriteLog("</table>")
+		 	Do WriteLog("</tbody>",4)
+		 	Do WriteLog("</table>",2)
 		}
 		//Build Errors section
 		Do WriteHeader4("BuildErrors")
@@ -1083,13 +1099,14 @@ LogBuildSynchSection
 			Set pre="title=""Build errors are logged in the ^DeepSee.BuildErrors global."">"
 			Set alert = "Alert: "_$FNUMBER(errs,"O,")_" build error(s) found"
 			Set alerts($I(alerts)) = pre_alert
-			Do WriteLog("<p class=""red"" "_pre_alert_":</p>",0)
+			Do WriteLog("<p class=""red"" "_pre_alert_":</p>",2)
 			Set tCube = $O(errs(""))
 			While (tCube'="") {
-				Do WriteLog("<p>"_$FNUMBER(errs(tCube),"O,")_" build error(s) for '"_tCube_"'</p>")
+				Do WriteLog("<p>"_$FNUMBER(errs(tCube),"O,")_" build error(s) for '"_tCube_"'</p>",2)
 				Set tCube = $O(errs(tCube))
 			}
 		}
+		Do WriteLog("</div>")
  	} catch exc {
 	 	Use PDev
 	 	zw exc
@@ -1099,70 +1116,75 @@ LogBuildSynchSection
 	
 
 LogCubeRegistry
+	Do WriteLog("<div id=""RegistryMapDiv"" onmouseover=""highlightLink(this,1)"" onmouseout=""highlightLink(this,0)"">")
 	Do WriteParagraph("cuberegistry","Cube Registry")
 	ZN namespace	
 	Set registry=##class(%DeepSee.CubeManager.Utils).GetActiveRegistry()
 	If registry=""{
-		Do WriteLog("<p>No cube registry defined in this namespace</p>")
-		ZN "%SYS"
-		Quit
+		Do WriteLog("<p>No cube registry defined in this namespace</p>",2)
 	}
 	Else{
 		Set rs=##class(%ResultSet).%New("%DeepSee.CubeManager.RegistryMap:RegistryMapTableView")
 		Do rs.Execute()
-		Do WriteLog("<table id=""RegistryMap"" cellpadding=""7"" cellspacing=""3"" class=""tableWithBorders"">")
-		Do WriteLog("<tbody>",2)
-		Do WriteLog("<tr>",4)
-		Do WriteLog("<th>Cube Name</th>",6)
-		Do WriteLog("<th>Group Name</th>",6)
-		Do WriteLog("<th>Registered</th>",6)
-		Do WriteLog("<th>Exclude</th>",6)
-		Do WriteLog("<th>Group Build Order</th>",6)
-		Do WriteLog("<th>Update Plan</th>",6)
-		Do WriteLog("<th>Supports Synchronize</th>",6)
-		Do WriteLog("<th>Build Every</th>",6)
-		Do WriteLog("<th>Synch Every</th>",6)
-		Do WriteLog("</tr>",4)	
+		Do WriteLog("<table id=""RegistryMapDiv"" cellpadding=""7"" cellspacing=""3"" "_
+		"class=""tableWithBorders"">")
+		Do WriteLog("<tbody>",4)
+		Do WriteLog("<tr>",6)
+		Do WriteLog("<th>Cube Name</th>",8)
+		Do WriteLog("<th>Group Name</th>",8)
+		Do WriteLog("<th>Registered</th>",8)
+		Do WriteLog("<th>Exclude</th>",8)
+		Do WriteLog("<th>Group Build Order</th>",8)
+		Do WriteLog("<th>Update Plan</th>",8)
+		Do WriteLog("<th>Supports Synchronize</th>",8)
+		Do WriteLog("<th>Build Every</th>",8)
+		Do WriteLog("<th>Synch Every</th>",8)
+		Do WriteLog("</tr>",6)
 		For {
 			Quit:'rs.Next()		
-			Do WriteLog("<tr class="""_$S(rs.Get("IsRegistered")="No":"darkgrey",rs.Get("Disabled")="Yes":"grey",1:"")_""">",4)
-			Do WriteLog("<td>"_rs.Get("CubeKey")_"</td>",6)
-			Do WriteLog("<td>"_rs.Get("MgmtGroup")_"</td>",6)
-			Do WriteLog("<td>"_rs.Get("IsRegistered")_"</td>",6)
-			Do WriteLog("<td>"_rs.Get("Disabled")_"</td>",6)
-			Do WriteLog("<td>"_rs.Get("CustomBuildOrder")_"</td>",6)
-			Do WriteLog("<td>"_rs.Get("UpdatePlan")_"</td>",6)
-			Do WriteLog("<td>"_rs.Get("DSTimeEnabled")_"</td>",6)
-			Do WriteLog("<td>"_rs.Get("BuildEvery")_"</td>",6)
-			Do WriteLog("<td>"_rs.Get("SynchEvery")_"</td>",6)
-			Do WriteLog("</tr>",4)
+			Do WriteLog("<tr class="""_$S(rs.Get("IsRegistered")="No":"darkgrey",rs.Get("Disabled")="Yes":"grey",1:"")_""">",6)
+			Do WriteLog("<td>"_rs.Get("CubeKey")_"</td>",8)
+			Do WriteLog("<td>"_rs.Get("MgmtGroup")_"</td>",8)
+			Do WriteLog("<td>"_rs.Get("IsRegistered")_"</td>",8)
+			Do WriteLog("<td>"_rs.Get("Disabled")_"</td>",8)
+			Do WriteLog("<td>"_rs.Get("CustomBuildOrder")_"</td>",8)
+			Do WriteLog("<td>"_rs.Get("UpdatePlan")_"</td>",8)
+			Do WriteLog("<td>"_rs.Get("DSTimeEnabled")_"</td>",8)
+			Do WriteLog("<td>"_rs.Get("BuildEvery")_"</td>",8)
+			Do WriteLog("<td>"_rs.Get("SynchEvery")_"</td>",8)
+			Do WriteLog("</tr>",6)
 		}
 	
-		Do WriteLog("</tbody>",2)
-		Do WriteLog("</table>",0)
-		Do WriteLog("<br>")	
+		Do WriteLog("</tbody>",4)
+		Do WriteLog("</table>",2)
+		Do WriteLog("<br>",2)
 	}
+	Do WriteLog("</div>")
 	ZN "%SYS"
 	Quit
 
 LogDetailedCubeInfo
+	Do WriteLog("<div id=""CubeInfoDiv"" onmouseover=""highlightLink(this,1)"" onmouseout=""highlightLink(this,0)"">")
 	Do WriteParagraph("cubeinfo","Cube Info")
 	Set cubeListLength=$ll(cubeList)
  	For i=1:1:cubeListLength{
 		Set cube=$LG(cubeList,i)
 		If cube'=""{
-			Do WriteLog("<a href=""#cubeinfo"_cube_""">"_cube_"</a>")
+			Do WriteLog("<a href=""#cubeinfo"_cube_""">"_cube_"</a>",2)
 			Do WriteLog("<br>")
 		}
 	}
+	Do WriteLog("</div>")
 	For cubeind=1:1:cubeListLength {
 		Set cube=$LG(cubeList,cubeind)
  		//Do:cube'="" LogCubeDetails(namespace,cube,PDev,LogFile) //PDev eg "/dev/pts/5"
  		If cube'="" {
  			ZN namespace
+ 			Do WriteLog("<div id=""CubeInfoDiv"_cube_""" onmouseover=""highlightLink(this,1)"" onmouseout=""highlightLink(this,0)"">")
 			Do LogCubeInfo
 			Do LogCubeDimensions
 			Do LogOtherCubeElements
+			Do WriteLog("</div>")
 		}
  	}
 	Quit
@@ -1188,7 +1210,8 @@ LogCubeInfo
 	Set base=##class(%DeepSee.Utils).%GetBaseCube(cube)	
 	Set:((base'="") && (cubetype="")) cubetype="Subject Area"
 	//Start logging cube info
-	Do WriteLog("<table id=""CubeInfoTable"" cellpadding=""7"" cellspacing=""3"" class=""tableWithBorders tableTabbed"">",0)
+	Do WriteLog("<table id=""CubeInfoTable"_cube_""" cellpadding=""7"" cellspacing=""3"""_
+	            " class=""tableWithBorders tableTabbed"">",0)
   	Do WriteLog("<tbody>",2)
   	Try {
     	Set versionedcube = ##class(%DeepSee.CubeVersion.Utils).%GetVersionedCubeName(cube,.vn)
@@ -1810,11 +1833,12 @@ LogQuerylog
 	//Get last N queries run by each user, where N can be secretly chosen from the prompt instead of Y/N
 	
 	Do WriteUpdate("Getting Query Log, DeepSee logs, and cconsole.log..")
+	Do WriteLog("<div id=""queryLogMainDiv"" onmouseover=""highlightLink(this,1)"" onmouseout=""highlightLink(this,0)"">")
 	Do WriteParagraph("querylog","Query Log")
-	Do WriteLog("<h4 id=""querylogtoggle"" onclick=""javascript:toggle('querylogdiv','querylogtoggle');"">&rtrif; Expand</h4>",0)
-	Do WriteLog("<div id=""querylogdiv"" style=""display:none;"">")
+	Do WriteLog("<h4 id=""querylogtoggle"" onclick=""javascript:toggle('querylogdiv','querylogtoggle');"">&rtrif; Expand</h4>",2)
+	Do WriteLog("<div id=""querylogdiv"" style=""display:none;"">",2)
 	ZN namespace
-	Do:($D(^DeepSee.QueryLog)<10) WriteLog("<p>Query log global not found</p></div>",0)  
+	Do:($D(^DeepSee.QueryLog)<10) WriteLog("<p>Query log global not found</p></div>",2)
 	Quit:($D(^DeepSee.QueryLog)<10)
 	//Get usercount in ^DeepSee.QueryLog
  	Set user=$O(^DeepSee.QueryLog(""))
@@ -1825,45 +1849,46 @@ LogQuerylog
 		Set user=$O(^DeepSee.QueryLog(user))
  	}	
  	//Show table with number of queries run by users
- 	Do WriteHeader4("Users running MDX queries")
+ 	Do WriteHeader4("Users running MDX queries",2)
  	//Do WriteLog("<p>Number of users = "_usercount_"</p>")
  	If $D(userqueries) {
- 		Do WriteLog("<table id=""QueryLogTable"" cellpadding=""5"" cellspacing=""5"" class=""tableWithBorders"">")
-		Do WriteLog("<tbody>",2)
-		Do WriteLog("<tr>",4)
-		Do WriteLog("<th onclick=""sortTable('QueryLogTable',0,1)"">User ("_usercount_" total) </th>",6)
-		Do WriteLog("<th onclick=""sortTable('QueryLogTable',1,0)"">Queries run</th>",6)
-		Do WriteLog("</tr>",4)
+ 		Do WriteLog("<table id=""QueryLogTable"" cellpadding=""5"" cellspacing=""5"" class=""tableWithBorders"">",2)
+		Do WriteLog("<tbody>",4)
+		Do WriteLog("<tr>",6)
+		Do WriteLog("<th onclick=""sortTable('QueryLogTable',0,1)"">User ("_usercount_" total) </th>",8)
+		Do WriteLog("<th onclick=""sortTable('QueryLogTable',1,0)"">Queries run</th>",8)
+		Do WriteLog("</tr>",6)
 		Set u = $O(userqueries(""))
 		While (u'="") {
-			Do WriteLog("<tr>",4)
-			Do WriteLog("<td>"_u_"</td>",6)
-			Do WriteLog("<td>"_userqueries(u)_"</td>",6)
-			Do WriteLog("</tr>",4)
+			Do WriteLog("<tr>",6)
+			Do WriteLog("<td>"_u_"</td>",8)
+			Do WriteLog("<td>"_userqueries(u)_"</td>",8)
+			Do WriteLog("</tr>",6)
 			Set u = $O(userqueries(u))		
 		}	
- 		Do WriteLog("</tbody>",2)
- 		Do WriteLog("</table>")
+ 		Do WriteLog("</tbody>",4)
+ 		Do WriteLog("</table>",2)
  	}
  	//Show table with the most run queries, 5 by default unless the user used the secret option on prompt
  	Set numqueries = 5
  	Set:(getLogs>1) numqueries = getLogs 	
- 	Do WriteHeader4("Most run queries")
+ 	Do WriteHeader4("Most run queries",2)
  	Do MostRunQueries(numqueries) 
  	//Last Query subsection
- 	Do WriteHeader4("Last query")
+ 	Do WriteHeader4("Last query",2)
 	Do WriteLog("<pre>")
 	Set lastquery=$g(^[namespace]DeepSee.LastQuery)		//Display last query
 	If lastquery'=""{		
 		Do WriteLog(lastquery)
-		Use LogFile  Use PDev
+		Use PDev
 	}
-	Do WriteLog("</pre>")
+	Do WriteLog("</pre>",2)
 	//Subsection with 5 last queries for each user
- 	Do WriteHeader4("MDX queries by user")
+ 	Do WriteHeader4("MDX queries by user",2)
  	//Show the last 5 queries by default unless the user used the secret option on prompt
 	Do lastNQueries(numqueries)
- 	Do WriteLog("</div>") //Close Expand/Collapse div
+ 	Do WriteLog("</div>",2) //Close Expand/Collapse div
+ 	Do WriteLog("</div>")
 	Use PDev
 	Quit
 
@@ -1872,33 +1897,35 @@ LogDeepSeelog
 	Try {
 		New x
 		Set DSFile=$zu(12)_"DeepSeeTasks_"_namespace_".log"
+		Do WriteLog("<div id=""DSLogMainDiv"" onmouseover=""highlightLink(this,1)"" onmouseout=""highlightLink(this,0)"">")
 		Do WriteParagraph("dslog","DeepSee Logs")
-		Do WriteLog("<h4 id=""dslogtoggle"" onclick=""javascript:toggle('dslogdiv','dslogtoggle');"">&rtrif; Expand</h4>",0)	
+		Do WriteLog("<h4 id=""dslogtoggle"" onclick=""javascript:toggle('dslogdiv','dslogtoggle');"">&rtrif; Expand</h4>",2)
 		//Do WriteLog("<div id=""dslogdiv"" class=""scrollable"" style=""width:100%;height:400px;"">")
-		Do WriteLog("<div id=""dslogdiv"" style=""display:none;"">")
-		Do WriteLog("<pre>",2)
-		Use PDev	
+		Do WriteLog("<div id=""dslogdiv"" style=""display:none;"">",2)
+		Do WriteLog("<pre>",4)
 		Do WriteLog("DeepSee Logs File "_DSFile_":"),WriteLog("")
 		Open DSFile:"R":FileOpenTimeOut
 		If '$Test Do  Quit
 		.	Do WriteLog("Error: could not open DeepSee Logs File "_DSFile)
 		.	Use LogFile 
-		.	Do WriteLog("</pre>")
-		.	Do WriteLog("</div>")
+		.	Do WriteLog("</pre>",4)
+		.	Do WriteLog("</div>",2)
 		.	Use PDev
 		.	Quit
 		//Read timeout added to prevent the case where neither <ENDOFFILE> error nor $ZEOF terminate the loop
 		For  Use DSFile Read x:FileReadTimeOut Set ZEOF=$ZEof Use PDev Quit:'$Test!(ZEOF)  Use LogFile Write x,CRLF Use PDev
 		Close DSFile
 		Use LogFile
-		Do WriteLog("</pre>",2)
+		Do WriteLog("</pre>",4)
+		Do WriteLog("</div>",2)
 		Do WriteLog("</div>")
 		Use PDev
 	} Catch(ex) {
 		Set tSC = ex.AsStatus()
 		Close DSFile
 		Use LogFile
-		Do WriteLog("</pre>",2)
+		Do WriteLog("</pre>",4)
+		Do WriteLog("</div>",2)
 		Do WriteLog("</div>")
 		Use PDev
 	}
@@ -1908,14 +1935,15 @@ LogCPF
 	Try {
 		//Processes Cache configuration file (usually Cache.cpf)
 		New x
+		Do WriteLog("<div id=""cpfMainDiv"" onmouseover=""highlightLink(this,1)"" onmouseout=""highlightLink(this,0)"">")
 		Do WriteParagraph("cpf","cache.cpf file")
 		Use PDev
 		Do WriteLog("")
-		Do WriteLog("<h4 id=""cpftoggle"" onclick=""javascript:toggle('cpfdiv','cpftoggle');"">&rtrif; Expand</h4>",0)
+		Do WriteLog("<h4 id=""cpftoggle"" onclick=""javascript:toggle('cpfdiv','cpftoggle');"">&rtrif; Expand</h4>",2)
 		//Do WriteLog("<div id=""cpfdiv"" class=""scrollable"" style=""width:100%;height:400px;"">")
-		Do WriteLog("<div id=""cpfdiv"" style=""display:none;"">")
-		Do WriteLog("<p>Caché Configuration File "_ConfigFile_":"_"</p>",2)
-		Do WriteLog("<pre>",2)
+		Do WriteLog("<div id=""cpfdiv"" style=""display:none;"">",2)
+		Do WriteLog("<p>Caché Configuration File "_ConfigFile_":"_"</p>",4)
+		Do WriteLog("<pre>",4)
 		Open ConfigFile:"R":FileOpenTimeOut
 		If '$Test Do  Quit
 		.	Do WriteLog("Error: could not open Caché Configuration File "_ConfigFile)
@@ -1954,14 +1982,16 @@ LogCPF
 			}	
 		}
 		Use LogFile 
-		Do WriteLog("</pre>",2)
+		Do WriteLog("</pre>",4)
+		Do WriteLog("</div>",2)
 		Do WriteLog("</div>")
 		Use PDev
 	} Catch(ex) {
 		Set tSC = ex.AsStatus()
 		Close ConfigFile
 		Use LogFile 
-		Do WriteLog("</pre>",2)
+		Do WriteLog("</pre>",4)
+		Do WriteLog("</div>",2)
 		Do WriteLog("</div>")
 		Use PDev
 	}
@@ -1971,47 +2001,52 @@ LogCConsole
 	Try {
 		//Processes cconsole.log
 		New cconsoleFile,cconsoleSize,x
+		Do WriteLog("<div id=""cconsoleMainDiv"" onmouseover=""highlightLink(this,1)"" onmouseout=""highlightLink(this,0)"">")
 		Do WriteParagraph("cconsole","cconsole.log")
-		Do WriteLog("<h4 id=""cconsoletoggle"" onclick=""javascript:toggle('cconsolediv','cconsoletoggle');"">&rtrif; Expand</h4>",0)	
-		//Do WriteLog("<div id=""cconsolediv"" class=""scrollable"" style=""width:100%;height:400px;"">")
-		Do WriteLog("<div id=""cconsolediv"" style=""display:none;"">")
-		Do WriteLog("<pre>",2)
+		Do WriteLog("<h4 id=""cconsoletoggle"" onclick=""javascript:toggle('cconsolediv','cconsoletoggle');"">&rtrif; Expand</h4>",2)
+		Do WriteLog("<div id=""cconsolediv"" style=""display:none;"">",2)
+		Do WriteLog("<pre>",4)
 		Use PDev
 		If $Data(NoRun("cconsole")) Do  Quit
 		.	Do WriteLog(""),WriteLog("cconsole.log information inhibited by User.")
-		.	Do WriteLog("</pre>",2)
+		.	Do WriteLog("</pre>",4)
+		.	Do WriteLog("</div>",2)
 		.	Do WriteLog("</div>")
 		.	Use PDev
-		.	Quit
+		
 		If OS?1"Win".e!(OS="UNIX"){
 			Set cconsoleFile=MgrDir_DirDelim_"cconsole.log"
 		} Else {
-			If OS="VMS" Set cconsoleFile=MgrDir_"CCONSOLE.LOG"
+			Set:(OS="VMS") cconsoleFile=MgrDir_"CCONSOLE.LOG"
 		}
 		Set cconsoleSize=$ZUtil(140,1,cconsoleFile)
 		If 'cconsoleSize Do  Quit
 		.	Do WriteLog("File "_cconsoleFile_" is zero bytes long.")
-		.	Do WriteLog("</pre>",2)
+		.	Do WriteLog("</pre>",4)
+		.	Do WriteLog("</div>",2)
 		.	Do WriteLog("</div>")
 		.	Use PDev
 		.	Quit
 		//Only put the last 8mb in the file
 		If cconsoleSize>(8388608 /* 8mb */) {
 			Set SkipSize=cconsoleSize-8388608
-			Do WriteLog("File "_cconsoleFile_" is too large, skipping first "_SkipSize_" bytes")
+			Do WriteLog("File "_cconsoleFile_" is too large, skipping first "_SkipSize_" bytes",2)
 		} Else {
-			s SkipSize=0
+			Set SkipSize=0
 		}
 		Do CopyToLog(cconsoleFile,"Caché cconsole.log",SkipSize)
-		Do WriteLog("</div>")
-		Use PDev
 	} Catch(ex) {
 		Set tSC = ex.AsStatus()
 		Do WriteLog("Error in logging the cconsole.log file")
 	}
+	Do WriteLog("</pre>",4)
+	Do WriteLog("</div>",2)
+	Do WriteLog("</div>")
+	Use PDev
 	Quit
 
 LogMappings
+	Do WriteLog("<div id=""mappingsDiv"" onmouseover=""highlightLink(this,1)"" onmouseout=""highlightLink(this,0)"">")
 	Do WriteParagraph("mappings","Mappings")
 	ZN "%SYS"
 	Try {
@@ -2020,51 +2055,52 @@ LogMappings
 		Set next=rs.Next()
 		If ('next) {
 			Do WriteLog("<p>No mappings for the "_namespace_" namespace</p>",2)
+			Do WriteLog("</div>")
 			Return
 		}
 		Do rs.Execute(namespace)
-		Do WriteLog("<table id=""mappingsTable"" border=""0"" cellpadding=""7"" cellspacing=""3"" class=""zebraStriped"">")
-		Do WriteLog("<tbody>",2)
-		Do WriteLog("<tr>",4)
-		Do WriteLog("<th>Global</th>",6)
-		Do WriteLog("<th>Database</th>",6)
-		Do WriteLog("</tr>",4)	
+		Do WriteLog("<table id=""mappingsTable"" border=""0"" cellpadding=""7"" cellspacing=""3"" class=""zebraStriped"">",2)
+		Do WriteLog("<tbody>",4)
+		Do WriteLog("<tr>",6)
+		Do WriteLog("<th>Global</th>",8)
+		Do WriteLog("<th>Database</th>",8)
+		Do WriteLog("</tr>",6)
 		For {
 			Quit:'rs.Next()
-			Do WriteLog("<tr>",4)
-			Do WriteLog("<td>"_rs.Get("Name")_"</td>",6)
-			Do WriteLog("<td>"_rs.Get("Database")_"</td>",6)
-			Do WriteLog("</tr>",4)
+			Do WriteLog("<tr>",6)
+			Do WriteLog("<td>"_rs.Get("Name")_"</td>",8)
+			Do WriteLog("<td>"_rs.Get("Database")_"</td>",8)
+			Do WriteLog("</tr>",6)
 		}
-		Do WriteLog("</tbody>",2)
-		Do WriteLog("</table>",0)
-		Do WriteLog("<br>")	
-		ZN "%SYS"
-		
+		Do WriteLog("</tbody>",4)
+		Do WriteLog("</table>",2)
+		Do WriteLog("<br>",2)		
 	} Catch(ex) {
 		Set tSC = ex.AsStatus()
 	}
+	Do WriteLog("</div>")
+	ZN "%SYS"
 	Quit
 
 LogDataBases
 	Try {
 		Do WriteUpdate("Getting local databases information..")
 		//CKEY^%SYS.LICENSE
+		Do WriteLog("<div id=""LocalDBDiv"" onmouseover=""highlightLink(this,1)"" onmouseout=""highlightLink(this,0)"">")
 		Do WriteParagraph("LocalDB","Local Databases")
-		Do WriteLog("<br>")
-		Do WriteLog("<table id=""databaseTable"" border=""0"" cellpadding=""7"" cellspacing=""3"" class=""zebraStriped"">")
-		Do WriteLog("<tbody>",2)
-		Do WriteLog("<tr>",4)
-		//Do WriteLog("<th>Database</th><th>Directory</th><th>Size in MB</th><th>Status</th><th>Resource</th><th>Encrypted</th><th>Journal</th>",6)
-		Do WriteLog("<th onclick=""sortTable('databaseTable',0,1)"">Database</th>",6)
-		Do WriteLog("<th onclick=""sortTable('databaseTable',1,1)"">Directory</th>",6)
-		Do WriteLog("<th onclick=""sortTable('databaseTable',2,0)"">Size [MB]</th>",6)
-		Do WriteLog("<th onclick=""sortTable('databaseTable',3,0)"">Block Size [KB]</th>",6)
-		Do WriteLog("<th onclick=""sortTable('databaseTable',4,1)"">Status</th>",6)
-		Do WriteLog("<th onclick=""sortTable('databaseTable',5,1)"">Resource</th>",6)
-		Do WriteLog("<th onclick=""sortTable('databaseTable',6,1)"">Encrypted</th>",6)
-		Do WriteLog("<th onclick=""sortTable('databaseTable',7,1)"">Journal</th>",6)	
-		Do WriteLog("</tr>",4)
+		Do WriteLog("<br>",2)
+		Do WriteLog("<table id=""databaseTable"" border=""0"" cellpadding=""7"" cellspacing=""3"" class=""zebraStriped"">",2)
+		Do WriteLog("<tbody>",4)
+		Do WriteLog("<tr>",6)		
+		Do WriteLog("<th onclick=""sortTable('databaseTable',0,1)"">Database</th>",8)
+		Do WriteLog("<th onclick=""sortTable('databaseTable',1,1)"">Directory</th>",8)
+		Do WriteLog("<th onclick=""sortTable('databaseTable',2,0)"">Size [MB]</th>",8)
+		Do WriteLog("<th onclick=""sortTable('databaseTable',3,0)"">Block Size [KB]</th>",8)
+		Do WriteLog("<th onclick=""sortTable('databaseTable',4,1)"">Status</th>",8)
+		Do WriteLog("<th onclick=""sortTable('databaseTable',5,1)"">Resource</th>",8)
+		Do WriteLog("<th onclick=""sortTable('databaseTable',6,1)"">Encrypted</th>",8)
+		Do WriteLog("<th onclick=""sortTable('databaseTable',7,1)"">Journal</th>",8)	
+		Do WriteLog("</tr>",6)
 		Set Maj=##class(%SYSTEM.Version).GetMajor()
 		If Maj<2009 {
 			Set result=##class(%Library.ResultSet).%New("Config.DataStorage:LocalDatabaseList")
@@ -2087,62 +2123,65 @@ LogDataBases
 			Do WriteLog("</tr>",6)
 		}
 		If ('sc) Do DisplayError^%apiOBJ(sc)
-		Do WriteLog("</tbody>",2)
-		Do WriteLog("</table>")
+		Do WriteLog("</tbody>",4)
+		Do WriteLog("</table>",2)
 	} Catch(ex) {
 		Set tSC = ex.AsStatus()
-		Do WriteLog("<p>An error occurred</p>")
+		Do WriteLog("<p>An error occurred</p>",2)
 	}
+	Do WriteLog("</div>")
 	Quit $$$OK
 
 LogTasks
 	Try {
 		Do WriteUpdate("Getting background tasks information..")
+		Do WriteLog("<div id=""TaskscheduleDiv"" onmouseover=""highlightLink(this,1)"" onmouseout=""highlightLink(this,0)"">")
 		Do WriteParagraph("Taskschedule","Task schedule")
 		Use LogFile
-		ZN namespace
 		ZN "%SYS"
 		Set rs = ##class(%ResultSet).%New("%SYS.Task:TaskListFilter")
 		Set:(rs="") rs = ##class(%ResultSet).%New("%SYS.Task:TaskList") //Old versions
 		Do rs.Execute()
-		Do WriteLog("<table id=""tasksTable"" border=""0"" cellpadding=""7"" cellspacing=""3"" class=""zebraStriped"">")
-		Do WriteLog("<tbody>",2)
-		Do WriteLog("<tr>",4)
-		Do WriteLog("<th onclick=""sortTable('tasksTable',0,1)"">Task Name</th>",6)
-		Do WriteLog("<th onclick=""sortTable('tasksTable',1,1)"">Task Type</th>",6)
-		Do WriteLog("<th onclick=""sortTable('tasksTable',2,1)"">Namespace</th>",6)
-		Do WriteLog("<th onclick=""sortTable('tasksTable',3,1)"">Description</th>",6)
-		Do WriteLog("<th onclick=""sortTable('tasksTable',4,0)"">ID</th>",6)
-		Do WriteLog("<th onclick=""sortTable('tasksTable',5,1)"">Suspended</th>",6)
-		Do WriteLog("<th onclick=""sortTable('tasksTable',6,1)"">Last Finished</th>",6)
-		Do WriteLog("<th onclick=""sortTable('tasksTable',7,1)"">NextScheduled</th>",6)
-		Do WriteLog("</tr>",4)
+		Do WriteLog("<table id=""tasksTable"" border=""0"" cellpadding=""7"" cellspacing=""3"" class=""zebraStriped"">",2)
+		Do WriteLog("<tbody>",4)
+		Do WriteLog("<tr>",6)
+		Do WriteLog("<th onclick=""sortTable('tasksTable',0,1)"">Task Name</th>",8)
+		Do WriteLog("<th onclick=""sortTable('tasksTable',1,1)"">Task Type</th>",8)
+		Do WriteLog("<th onclick=""sortTable('tasksTable',2,1)"">Namespace</th>",8)
+		Do WriteLog("<th onclick=""sortTable('tasksTable',3,1)"">Description</th>",8)
+		Do WriteLog("<th onclick=""sortTable('tasksTable',4,0)"">ID</th>",8)
+		Do WriteLog("<th onclick=""sortTable('tasksTable',5,1)"">Suspended</th>",8)
+		Do WriteLog("<th onclick=""sortTable('tasksTable',6,1)"">Last Finished</th>",8)
+		Do WriteLog("<th onclick=""sortTable('tasksTable',7,1)"">NextScheduled</th>",8)
+		Do WriteLog("</tr>",6)
 		While (rs.Next()) {
-			Do WriteLog("<tr>",4)
-			Do WriteLog("<td>"_rs.%Get("Task Name")_"</td>",6)
-			Do WriteLog("<td>"_rs.%Get("Task Type")_"</td>",6)
-			Do WriteLog("<td>"_rs.%Get("Namespace")_"</td>",6)
-			Do WriteLog("<td>"_rs.%Get("Description")_"</td>",6)
-			Do WriteLog("<td>"_rs.%Get("ID")_"</td>",6)
-			Do WriteLog("<td>"_rs.%Get("Suspended")_"</td>",6)
-			Do WriteLog("<td>"_rs.%Get("Last Finished")_"</td>",6)
-			Do WriteLog("<td>"_rs.%Get("Next Scheduled")_"</td>",6)
+			Do WriteLog("<tr>",6)
+			Do WriteLog("<td>"_rs.%Get("Task Name")_"</td>",8)
+			Do WriteLog("<td>"_rs.%Get("Task Type")_"</td>",8)
+			Do WriteLog("<td>"_rs.%Get("Namespace")_"</td>",8)
+			Do WriteLog("<td>"_rs.%Get("Description")_"</td>",8)
+			Do WriteLog("<td>"_rs.%Get("ID")_"</td>",8)
+			Do WriteLog("<td>"_rs.%Get("Suspended")_"</td>",8)
+			Do WriteLog("<td>"_rs.%Get("Last Finished")_"</td>",8)
+			Do WriteLog("<td>"_rs.%Get("Next Scheduled")_"</td>",8)
 			
 			//Get frequency Set task = ##class(%SYS.Task).%OpenId(rs.%Get("ID"),0,.status)
  
-			Do WriteLog("</tr>",4)
+			Do WriteLog("</tr>",6)
 		}
 	} Catch {
 		//Do WriteLog("</table>")
-		Do WriteLog("<p>An error occurred</p>")
+		Do WriteLog("<p>An error occurred</p>",2)
 	}
-	Do WriteLog("</tbody>",2)
-	Do WriteLog("</table>",0)
+	Do WriteLog("</tbody>",4)
+	Do WriteLog("</table>",2)
+	Do WriteLog("</div>")
 	Quit
 
 LogJournal
 	Do WriteUpdate("Getting journaling information..")
-	Do WriteParagraph("Journaling","Journaling")
+	Do WriteLog("<div id=""JournalingDiv"" onmouseover=""highlightLink(this,1)"" onmouseout=""highlightLink(this,0)"">")
+	Do WriteParagraph("Journaling","Journaling",2)
 	ZN "%SYS"
 	Try{
 		Set pdir = ##class(%SYS.Journal.System).GetPrimaryDirectory(.st)
@@ -2163,81 +2202,84 @@ LogJournal
 		}
 		ZN namespace
 		Use LogFile
-		Do WriteLog("<table id=""journalinfoTable"" cellpadding=""7"" cellspacing=""3"" class=""tableWithBorders tableTabbed"">")
-  		Do WriteLog("<tbody>",2)
-    	Do WriteLog("<tr>",4)
-    	Do WriteLog("<td>",6)
-		Do WriteHeader4("Primary Directory",8)
-		Do WriteLog("<p>"_pdir_"</p>",8)
-		Do WriteLog("</td>",6)
- 		Do WriteLog("</tr>",4)
- 		Do WriteLog("<tr>",4)
-    	Do WriteLog("<td>",6)
-		Do WriteHeader4("Alternative Directory",8)
-		Do WriteLog("<p>"_altdir_"</p>",8)
-		Do WriteLog("</td>",6)
- 		Do WriteLog("</tr>",4)
- 		Do WriteLog("<tr>",4)
-    	Do WriteLog("<td>",6)
-		Do WriteHeader4("Free Space",8)
-		Do WriteLog("<p>"_$FNUMBER(freesp/1024/1024,",",0)_" MB </p>",8)
-		Do WriteLog("</td>",6)
- 		Do WriteLog("</tr>",4)
- 		Do WriteLog("<tr>",4)
-    	Do WriteLog("<td>",6)
-		Do WriteHeader4("State",8)
-		Do WriteLog("<p>"_stateString_"</p>",8)
-		Do WriteLog("</td>",6)
- 		Do WriteLog("</tr>",4)
- 		Do WriteLog("</tbody>",2)
-    	Do WriteLog("</table>")
+		Do WriteLog("<table id=""journalinfoTable"" cellpadding=""7"" cellspacing=""3"" class=""tableWithBorders tableTabbed"">",2)
+  		Do WriteLog("<tbody>",4)
+    	Do WriteLog("<tr>",6)
+    	Do WriteLog("<td>",8)
+		Do WriteHeader4("Primary Directory",10)
+		Do WriteLog("<p>"_pdir_"</p>",10)
+		Do WriteLog("</td>",8)
+ 		Do WriteLog("</tr>",6)
+ 		Do WriteLog("<tr>",6)
+    	Do WriteLog("<td>",8)
+		Do WriteHeader4("Alternative Directory",10)
+		Do WriteLog("<p>"_altdir_"</p>",10)
+		Do WriteLog("</td>",8)
+ 		Do WriteLog("</tr>",6)
+ 		Do WriteLog("<tr>",6)
+    	Do WriteLog("<td>",8)
+		Do WriteHeader4("Free Space",10)
+		Do WriteLog("<p>"_$FNUMBER(freesp/1024/1024,",",0)_" MB </p>",10)
+		Do WriteLog("</td>",8)
+ 		Do WriteLog("</tr>",6)
+ 		Do WriteLog("<tr>",6)
+    	Do WriteLog("<td>",8)
+		Do WriteHeader4("State",10)
+		Do WriteLog("<p>"_stateString_"</p>",10)
+		Do WriteLog("</td>",8)
+ 		Do WriteLog("</tr>",6)
+ 		Do WriteLog("</tbody>",4)
+    	Do WriteLog("</table>",2)
 		If $D(Row(1)) {
-			Do WriteHeader4("Journal Files")
-			Do WriteLog("<table id=""journalTable"" border=""0"" cellpadding=""7"" cellspacing=""3"" class=""zebraStriped"">")
-			Do WriteLog("<tbody>",2)
-			Do WriteLog("<tr>",4)
-			Do WriteLog("<th onclick=""sortTable('journalTable',0,1)"">Name</th>",6)
-			Do WriteLog("<th onclick=""sortTable('journalTable',1,0)"">Size in KB</th>",6)
-			Do WriteLog("<th onclick=""sortTable('journalTable',2,1)"">Creation Time</th>",6)
-			Do WriteLog("<th onclick=""sortTable('journalTable',3,1)"">Reason</th>",6)
-			Do WriteLog("</tr>",4)
+			Do WriteHeader4("Journal Files",2)
+			Do WriteLog("<table id=""journalTable"" border=""0"" cellpadding=""7"" cellspacing=""3"" class=""zebraStriped"">",2)
+			Do WriteLog("<tbody>",4)
+			Do WriteLog("<tr>",6)
+			Do WriteLog("<th onclick=""sortTable('journalTable',0,1)"">Name</th>",8)
+			Do WriteLog("<th onclick=""sortTable('journalTable',1,0)"">Size in KB</th>",8)
+			Do WriteLog("<th onclick=""sortTable('journalTable',2,1)"">Creation Time</th>",8)
+			Do WriteLog("<th onclick=""sortTable('journalTable',3,1)"">Reason</th>",8)
+			Do WriteLog("</tr>",6)
 			Set filen=1
 			While $D(Row(filen)) {			
-				Do WriteLog("<tr>",4)
-				Do WriteLog("<td>"_$LG(Row(filen),1)_"</td>",6)
-				Do WriteLog("<td style=""text-align:right"">"_$FNUMBER($LG(Row(filen),2)/1024,",",0)_"</td>",6)
-				Do WriteLog("<td>"_$LG(Row(filen),3)_"</td>",6)
-				Set a=$LG(Row(filen),4)
+				Do WriteLog("<tr>",6)
+				Do WriteLog("<td>"_$LG(Row(filen),1)_"</td>",8)
+				Do WriteLog("<td style=""text-align:right"">"_$FNUMBER($LG(Row(filen),2)/1024,",",0)_"</td>",8)
+				Do WriteLog("<td>"_$LG(Row(filen),3)_"</td>",8)
+				Set a=$LG(Row(filen),6)
 				Set reas=$S(a=-1:"<STARTUP>",a=0:"unspecified",a=1:"by user",a=2:"file size limit reached",a=3:"to retry failed I/O",a=4:"by backup",a=5:"by restore",a=6:"by task manager",a=7:"to activate journal changes",a=8:"to reenable journaling",a=9:"by mirror startup",a=10:"by mirror shutdown",a=11:"mirror database removed",1:"Unknown")
-				Do WriteLog("<td>"_reas_"</td>",6)
-				Do WriteLog("</tr>",4)
+				Do WriteLog("<td>"_reas_"</td>",8)
+				Do WriteLog("</tr>",6)
 				Set filen=filen+1
 			}
-			Do WriteLog("</tbody>",2)
-			Do WriteLog("</table>")
+			Do WriteLog("</tbody>",4)
+			Do WriteLog("</table>",2)
 		}
 	} Catch {
-		Do WriteLog("<p>An error occurred</p>")
+		Do WriteLog("<p>An error occurred</p>",2)
 	}
+	Do WriteLog("</div>")
 	Quit
 
 LogAlerts
 	Try {
+		Do WriteLog("<div id=""AlertsDiv"" onmouseover=""highlightLink(this,1)"" onmouseout=""highlightLink(this,0)"">")
 		Do WriteParagraph("Alerts","Alerts")
 		If $D(alerts)>9 { 	//alerts is an array
-			Do WriteLog("<p>The following alerts were raised on this system. Please find more details above</p>")
+			Do WriteLog("<p>The following alerts were raised on this system. Please find more details above</p>",2)
 			Set i = $O(alerts(""))
 			While (i'="") {
-				Do WriteLog("<p class=""red"""_alerts(i)_"</p>")
+				Do WriteLog("<p class=""red"""_alerts(i)_"</p>",2)
 				Set i = $O(alerts(i))
 			}		
 		} Else {
-			Do WriteLog("<p>No alerts"_"</p>")
+			Do WriteLog("<p>No alerts"_"</p>",2)
 		}
 	} Catch(ex) {
 		Set tSC = ex.AsStatus()
-		Do WriteLog("<p>Error: "_tSC_"</p>")
+		Do WriteLog("<p>Error: "_tSC_"</p>",2)
 	}
+	Do WriteLog("</div>")
 	Quit
 
 LogTrailer
@@ -2251,39 +2293,39 @@ LogTrailer
 LogSidePanel(cubeList,getLogs,numalerts)
 	Do WriteLog("<div id=""mySidenav"" class=""sidenav"">")
 	Do WriteLog("<a href=""javascript:void(0)"" class=""closebtn"" onclick=""closeNav()"">&times;</a>",2)
-	Do WriteLog("<a href=""#top"" title=""General setting relevant for DeepSee"">DeepSee Setup</a>",2)
+	Do WriteLog("<a id=""lDSSetupDiv"" href=""#top"" title=""General setting relevant for DeepSee"">DeepSee Setup</a>",2)
 	If (isInsight || isTrak) {
 		//Set nOverrides=$$CountNodes(namespace,"^DeepSee.Overrides")
 		Do:(nOverrides>=10) WriteLog("<a href=""#overrides"">DeepSee Overrides</a>",2)
 	}	
-	Do WriteLog("<a href=""#serverdetails"" title=""Information on the hosting machine"">Server Details</a>",2)
-	Do WriteLog("<a href=""#cubelist"" title=""Information on all cubes in the namespace"">Cubes</a>",2)
-	Do WriteLog("<a href=""#buildsynchlist"" title=""Information on cube build and synchronization"">Build/Synch</a>",2)
-	Do WriteLog("<a href=""#cuberegistry"" title=""Cube registry defined by Cube Manager"">Cube Registry</a>",2)
+	Do WriteLog("<a id=""lServerDetailsDiv"" href=""#serverdetails"" title=""Information on the hosting machine"">Server Details</a>",2)
+	Do WriteLog("<a id=""lCubesDiv"" href=""#cubelist"" title=""Information on all cubes in the namespace"">Cubes</a>",2)
+	Do WriteLog("<a id=""lBuildSynchDiv"" href=""#buildsynchlist"" title=""Information on cube build and synchronization"">Build/Synch</a>",2)
+	Do WriteLog("<a id=""lRegistryMapDiv"" href=""#cuberegistry"" title=""Cube registry defined by Cube Manager"">Cube Registry</a>",2)
 	If (($D(cubeList)'=0) && (cubeList'="")) {
-		Do WriteLog("<a href=""#cubeinfo"" title=""Detailed information on cubes"">Cube Info</a>",2)
+		Do WriteLog("<a id=""lCubeInfoDiv"" href=""#cubeinfo"" title=""Detailed information on cubes"">Cube Info</a>",2)
 		Set cubeListLength=$ll(cubeList)
  		For i=1:1:cubeListLength{
 			Set cube=$LG(cubeList,i)
-			Do:cube'="" WriteLog("<a class=""cubelinks"" href=""#cubeinfo"_cube_""">"_cube_"</a>",2)
+			Do:cube'="" WriteLog("<a id=""lCubeInfoDiv"_cube_""" class=""cubelinks"" href=""#cubeinfo"_cube_""">"_cube_"</a>",2)
 		}		
 	}
 	If getLogs{
-		Do WriteLog("<a href=""#querylog"" onclick=""javascript:toggle('querylogdiv','querylogtoggle');"""_
+		Do WriteLog("<a id=""lqueryLogMainDiv"" href=""#querylog"" onclick=""javascript:toggle('querylogdiv','querylogtoggle');"""_
 		" title=""Last 5 MDX queries run by each users in the system"">Query Log</a>",2)
-		Do WriteLog("<a href=""#dslog"" onclick=""javascript:toggle('dslogdiv','dslogtoggle');"""_
+		Do WriteLog("<a id=""lDSLogMainDiv"" href=""#dslog"" onclick=""javascript:toggle('dslogdiv','dslogtoggle');"""_
 		"title=""A log file with cube builds and errors occurred in the system"">DeepSee Logs</a>",2)
 	}
-	Do WriteLog("<a href=""#cpf"" onclick=""javascript:toggle('cpfdiv','cpftoggle');"""_
-	"title=""The Caché Parameter File containing recording the Caché configuration"">cache.cpf</a>",2)
-	Do:getLogs WriteLog("<a href=""#cconsole"" onclick=""javascript:toggle('cconsolediv','cconsoletoggle');"""_
-	"title=""cconsole.log file containing general messages and errors"">cconsole.log</a>",2)
-  	Do WriteLog("<a href=""#Mappings"" title=""Global mapppings defined for the "_namespace_" namespace"">Mappings</a>",2)
-  	Do WriteLog("<a href=""#LocalDB"" title=""Local databases defined in the instance"">Local Databases</a>",2)  	
-  	Do WriteLog("<a href=""#Taskschedule"" title=""Information on background tasks"">Task Schedule</a>",2)
-  	Do WriteLog("<a href=""#Journaling"" title=""Information on database journaling for the instance"">Journaling</a>",2)
+	Do WriteLog("<a id=""lcpfMainDiv"" href=""#cpf"" onclick=""javascript:toggle('cpfdiv','cpftoggle');"""_
+	            "title=""The Caché Parameter File containing recording the Caché configuration"">cache.cpf</a>",2)
+	Do:getLogs WriteLog("<a id=""lcconsoleMainDiv"" href=""#cconsole"" onclick=""javascript:toggle('cconsolediv','cconsoletoggle');"""_
+	            "title=""cconsole.log file containing general messages and errors"">cconsole.log</a>",2)
+  	Do WriteLog("<a id=""lmappingsDiv"" href=""#Mappings"" title=""Global mapppings defined for the "_namespace_" namespace"">Mappings</a>",2)
+  	Do WriteLog("<a id=""lLocalDBDiv"" href=""#LocalDB"" title=""Local databases defined in the instance"">Local Databases</a>",2)  	
+  	Do WriteLog("<a id=""lTaskscheduleDiv"" href=""#Taskschedule"" title=""Information on background tasks"">Task Schedule</a>",2)
+  	Do WriteLog("<a id=""lJournalingDiv"" href=""#Journaling"" title=""Information on database journaling for the instance"">Journaling</a>",2)
   	Set colorclass=$S(numalerts: "red",1:"")
-  	Do WriteLog("<a class="""_colorclass_""" href=""#Alerts"" title=""Summary of all alerts found on the system"">Alerts ("_numalerts_")</a>",2)
+  	Do WriteLog("<a id=""lAlertsDiv"" class="""_colorclass_""" href=""#Alerts"" title=""Summary of all alerts found on the system"">Alerts ("_numalerts_")</a>",2)
   	Do WriteLog("</div>")
   	Quit
 
@@ -2697,7 +2739,6 @@ CopyToLog(InputFile,Caption,SkipSize=0)
 		}
 	} Catch(ex) {
 		Set tSC = ex.AsStatus()
-		Do WriteLog("</pre>") Use PDev
 	}
 	Close InputFile
 	Quit
@@ -2787,7 +2828,7 @@ GetRelationships(cube){
 			Quit:$LG(dimlist(nodenum,0,0),1)'="r"
 		}
 		If count=0 {
-			Write "-"
+			Write " "
 		} Else {
 			For i=1:1:count {
 				If $g(relationships(i),"null")'="null" {
@@ -3169,9 +3210,9 @@ WriteLog(string,spaces)
  
 WriteParagraph(name,title,flag)
 	If '$D(flag) Set flag = 1
-	Do:flag WriteLog("<hr noshade size=""4"" width=""auto"">")
-	Do WriteLog("<a name="""_name_"""></a>")
-	Do WriteLog("<h2>"_title_"</h2>")
+	Do:flag WriteLog("<hr noshade size=""4"" width=""auto"">",2)
+	Do WriteLog("<a name="""_name_"""></a>",2)
+	Do WriteLog("<h2>"_title_"</h2>",2)
 	Quit
 	
 WriteHeader4(header,spaces,title)
