@@ -2,12 +2,10 @@
 <Export generator="Cache" version="25">
 <Routine name="DeepSeeButtons" type="MAC" languagemode="0"><![CDATA[
 DeepSeeButtons(namespace="",cubeString="ask", getLogs="", LogFile="", proceed="")
-#include COPYRIGH
 #include %occConstant
 #include %occStatus
 #include %syDatabase
 #include %syNLS
-#include COPYRIGH
 
 	;DeepSeeButtons: routine to log system and DeepSee information
 	;Install it in the %SYS namespace and launch it as: 
@@ -1838,7 +1836,7 @@ LogQuerylog
 	Do WriteLog("<h4 id=""querylogtoggle"" onclick=""javascript:toggle('querylogdiv',this.id);"">&rtrif; Expand</h4>",2)
 	Do WriteLog("<div id=""querylogdiv"" style=""display:none;"">",2)
 	ZN namespace
-	Do:($D(^DeepSee.QueryLog)<10) WriteLog("<p>Query log global not found</p></div>",2)
+	Do:($D(^DeepSee.QueryLog)<10) WriteLog("<p>Query log global not found</p></div></div>",2)
 	Quit:($D(^DeepSee.QueryLog)<10)
 	//Get usercount in ^DeepSee.QueryLog
  	Set user=$O(^DeepSee.QueryLog(""))
