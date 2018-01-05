@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Export generator="Cache" version="25">
+<Export generator="Cache" version="25" zv="Cache for UNIX (SUSE Linux Enterprise Server for x86-64) 2017.2.1 (Build 801)" ts="2018-01-04 09:38:33">
 <Class name="%DeepSee.UI.DSButtonsViewer">
 <Description>
 DeepSee DeepSeeButtons Viewer.
@@ -7,6 +7,7 @@ Display contents of the DeepSeeButtons html file for the current namespace.
 </Description>
 <Super>%DeepSee.UI.standardPage</Super>
 <System>4</System>
+<TimeChanged>64651,60799.69251</TimeChanged>
 <TimeCreated>64636,45154.455633</TimeCreated>
 
 <Parameter name="PAGENAME">
@@ -14,6 +15,7 @@ Display contents of the DeepSeeButtons html file for the current namespace.
 </Parameter>
 
 <Parameter name="DOCBOOKID">
+<Default>D2MODEL_cube_build_errors</Default>
 </Parameter>
 
 <Property name="targetURL">
@@ -34,14 +36,14 @@ body {
 	background: rgb(140,221,174);
 }
 
-#logFile {
+#sourceFrame {
 	border: 1px solid #808080;
 	background: white;
 	overflow: auto;
 	margin-left: 20px;
 }
 
-#logFile pre {
+#sourceFrame pre {
 	color: #404040;
 	padding: 3px;
 }
@@ -65,105 +67,36 @@ This XML defines the contents of the contents pane for this page.</Description>
 <pane xmlns="http://www.intersystems.com/zen" 
 	xmlns:deepsee="http://www.intersystems.com/deepsee"
 >
-<iframe id="deepseebuttons" frameBorder="false" width="600" height="400" />
-<!--<html id="logFile" OnDrawContent="DrawDSButtons"/>-->
-
+<!--
+<html id="sourceFrame" OnDrawContent="DrawLogFile"/>
+src="DeepSeeButtons_ISC_20180103_1402.html"
+-->
+<iframe id="sourceFrame" width="100%" height="100%"
+src="DeepSeeButtons_ISC_20180103_1402.html"
+    />
 </pane>
 ]]></Data>
 </XData>
 
-<Method name="%GetDeepSeeButtonsFileName">
-<Description>
-TO BE MOVED TO %DeepSee.Utils
-Return the full name of a DeepSeeButtons file.</Description>
-<Internal>1</Internal>
-<ClassMethod>1</ClassMethod>
-<FormalSpec>pFileName:%String="DeepSeeButtons"</FormalSpec>
-<ReturnType>%String</ReturnType>
-<Implementation><![CDATA[
-	Set filename = ##class(%Library.File).NormalizeFilename($system.Util.ManagerDirectory() _ 
-	pFileName _ ".html")
-	Quit filename
-]]></Implementation>
-</Method>
-
-<Method name="%OnAfterCreatePage">
-<Description>
-Point the iframe at the URL specified in targetURL.</Description>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
-	Set tFileName = ##class(%DeepSee.UI.DSButtonsViewer).%GetDeepSeeButtonsFileName()
-	/*Set ..targetURL = filename
-	
-	// Ensure ..targetURL uses a relative path to avoid cross site scripting
-	Do ##class(%Net.URLParser).Parse(..targetURL,.tURLParts)
-	Set ..targetURL = $get(tURLParts("path"))
-	If ($get(tURLParts("query")) '= "") {
-		Set ..targetURL = ..targetURL _ "?" _ tURLParts("query")
-	}
-	If ($get(tURLParts("fragment")) '= "") {
-		Set ..targetURL = ..targetURL _ "#" _ tURLParts("fragment")
-	}
-	*/
-	Set tSourceFrame = ..%GetComponentById("sourceFrame")
-	//Set tSourceFrame.src = ..targetURL
-	//Set tSourceFrame.src = tFileName
-	Set tSourceFrame.src = "file:///home/amarin/intersystems/cache20172/mgr/DeepSeeButtons.html"
-
-	/*
-	Try {
-		Set tSourceControlClass = ##class(%Studio.SourceControl.Interface).SourceControlClassGet()
-		If (tSourceControlClass '= "") {
-			Do $classmethod(tSourceControlClass,"GetPortalPageOptions",..targetURL,.tOptions)
-			If ($get(tOptions("IECompatibility")) = 1) {
-				Set ..%UseIEEdge = 0
-			}
-			If ($get(tOptions("CSSLevel")) '= "") {
-				Set ..%CSSLevel = tOptions("CSSLevel")
-			}
-		}
-	}
-	Catch {}*/
-
-	Quit ##super()
-]]></Implementation>
-</Method>
-
-<Method name="DrawDSButtons">
-<Description>
-Draw contents of DeepSeeButtons.</Description>
-<FormalSpec>pSeed:%String</FormalSpec>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
+<UDLText name="T">
+<Content><![CDATA[
+/*
+/// Draw contents of log file pane.
+Method DrawLogFile(pSeed As %String) As %Status
+{
 	Set tSC = $$$OK
 	Try {
-		Set tFileName = ##class(%DeepSee.UI.DSButtonsViewer).%GetDeepSeeButtonsFileName()
+		Set tFileName = ##class(%DeepSee.Utils).%GetLogFileName()
 
 		If ('##class(%File).Exists(tFileName)) {
 			&html<<pre>>
-			Write $$$Text("DeepSeeButtons does not exist: "),!
+			Write $$$Text("Log file does not exist: "),!
 			Write tFileName,!
 			&html<</pre>>
 			Quit
 		}
-		/*
-		
-<page xmlns="http://www.intersystems.com/zen" title="">
-<iframe width="1000" height="800"
-    src="_DeepSee.UserPortal.DashboardViewer.zen?DASHBOARD=Patients.dashboard&amp;EMBED=1&amp;SETTINGS=FILTER:[HOMED].[H1].[ZIP].%26[32006]~[HomeD].[H1].[CITY].%26[8]" 
-    />
-</page>
-		*/
-		//&html<<iframe width="1000" height="800" src="file:///home/amarin/intersystems/cache20172/mgr/DeepSeeButtons.html">>
-		&html<<html>>
-		Set tFile = ##class(%File).%New(tFileName)
-		Set tSC = tFile.Open("RS")
-		If $$$ISERR(tSC) Quit
-		While ('tFile.AtEnd) {
-			Write $ZCVT(tFile.ReadLine(),"O","HTML"),!
-		}
-		&html<</html>>
-		/*&html<<pre>>
+		&html<<a href="#bottom" name="top" class="footerlinks">#($$$TextHTML("[Goto Bottom]"))#</a>>
+		&html<<pre>>
 		Write tFileName,!
 		Write $ZDT($ZU(188),3),!			// DTB332 - Use $ZU function which accounts for local time
 		Write "-----------------------",!
@@ -178,15 +111,15 @@ Draw contents of DeepSeeButtons.</Description>
 		Write "###",!
 		&html<</pre>>
 		&html<<a href="#top" name="bottom" class="footerlinks">#($$$TextHTML("[Goto Top]"))#</a>>
-		*/
 	}
 	Catch(ex) {
 		Set tSC = ex.AsStatus()
 	}
 
 	Quit tSC
-]]></Implementation>
-</Method>
+}*/
+]]></Content>
+</UDLText>
 
 <Method name="%OnGetTitle">
 <Description>
@@ -220,12 +153,12 @@ Get information to display in the ribbon bar.</Description>
 <Implementation><![CDATA[
 	Set pDisplay = 1
 	Set pSearchBox = 0
-	Set pRibbonTitle = $$$Text("Log Viewer")
+	Set pRibbonTitle = $$$Text("DeepSeeButtons Viewer")
 
 	// commands
 	// $LB(id,caption,help,onclick)
-	Set pCommands(1) = $LB("cmdRefresh",$$$Text("Refresh"),$$$Text("Reload DeepSeeButtons"),"zenPage.refreshLog();")
-	Set pCommands(2) = $LB("cmdDelete",$$$Text("Delete"),$$$Text("Delete DeepSeeButtons"),"zenPage.deleteLog();")
+	Set pCommands(1) = $LB("cmdRefresh",$$$Text("Refresh"),$$$Text("Reload contents of DeepSeeButtons file"),"zenPage.refreshLog();")
+	Set pCommands(2) = $LB("cmdDelete",$$$Text("Delete"),$$$Text("Delete DeepSeeButtons file"),"zenPage.deleteLog();")
 	Quit $$$OK
 ]]></Implementation>
 </Method>
@@ -240,13 +173,48 @@ This client event is fired when the a popup page launched from this page fires a
 	switch(popupName) {
 	case 'switchNamespace':
 		var homeurl = zenLink("/csp/sys/%25CSP.Portal.Home.zen");
-		var url = zenPage.GetNewURL(value,"_DeepSee.UI.LogViewer.zen");
+		var url = zenPage.GetNewURL(value,"_DeepSee.UI.DSButtonsViewer.zen");
 		if (url == "" || value == "%SYS") url = homeurl;
 		self.document.location = url;
 		break;
 	}
 ]]></Implementation>
 </Method>
+
+<UDLText name="T">
+<Content><![CDATA[
+/*
+/// Ale: I took this from %CSP.Portal.CourceControl.Dialog.Manager
+/// Code to resize the iframe based on the window size and check whether a title 
+ClientMethod initializeFrame(newSrc) [ Language = javascript ]
+{
+	var sourceFrame = zen('sourceFrame');
+	var iframe = sourceFrame.findElement('iframe');
+	// iframe.contentDocument doesn't work as expected on IE8, so use more circuitous reference.
+	if (iframe && iframe.contentWindow && iframe.contentWindow.document && (iframe.contentWindow.document.title != null)) {
+		document.title = iframe.contentWindow.document.title;
+	}
+	else if (!this._titleTimer) {
+		this._titleTimer = setInterval('zenPage.updateTitle()',10);
+	}
+	if (newSrc) this.addCompletionCheck('zenPage.checkCompletion()',10);
+	
+	var width = zenGetWindowWidth();
+	var height = zenGetWindowHeight();
+	if (zenIsHTML5 && (zenIsIE || zenIsGecko)) {
+		width -= 4;
+		height -= 4;
+	}
+	else if (zenIsIE) {
+		height -= 1;
+	}
+	
+	sourceFrame.setProperty('width',width);
+	sourceFrame.setProperty('height',height);
+}
+*/
+]]></Content>
+</UDLText>
 
 <Method name="onlayoutHandler">
 <Description>
@@ -256,6 +224,7 @@ Adjust sizes of components on the page.</Description>
 <ClientMethod>1</ClientMethod>
 <Implementation><![CDATA[
 	try {
+		//this.initializeFrame(load);
 		this.adjustSizes();
 	}
 	catch(ex) {
@@ -271,8 +240,8 @@ Adjust sizes of components on the page.</Description>
 <ClientMethod>1</ClientMethod>
 <Implementation><![CDATA[
 	try {
-		var logFile = zen('logFile');
-		var divLog = logFile.getEnclosingDiv();
+		var sourceFrame = zen('sourceFrame');
+		var divLog = sourceFrame.getEnclosingDiv();
 
 		// find size of window
 		var winHeight = zenGetWindowHeight();
@@ -291,14 +260,29 @@ Adjust sizes of components on the page.</Description>
 ]]></Implementation>
 </Method>
 
-<UDLText name="T">
-<Content><![CDATA[
-/*/// This class method callback is called just before the server-side page 
-/// object is created.
-Method %OnAfterCreatePage() As %Status
-{
+<Method name="%GetDeepSeeButtonsFileName">
+<Internal>1</Internal>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pFileName:%String="DeepSeeTasks"</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[	Quit ##class(%Library.File).NormalizeFilename($system.Util.ManagerDirectory() _ pFileName _ "_" _ $ZU(5) _ ".log")
+]]></Implementation>
+</Method>
+
+<Method name="%OnAfterCreatePage">
+<Description>
+This class method callback is called just before the server-side page 
+object is created.</Description>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
 	Set tSC = $$$OK
 	Try {
+ 		/*Set tSourceFrame = ..%GetComponentById("sourceFrame")
+ 		Set ..targetURL = "DeepSeeButtons_ISC_20180103_1402.html"
+ 		Set tFileName = ..%GetDeepSeeButtonsFileName()
+ 		
+ 		Set tSourceFrame.src = ..targetURL
+ 		*/
 		Set tSC = ##super()
 		If $$$ISERR(tSC) Quit
 	}
@@ -306,46 +290,46 @@ Method %OnAfterCreatePage() As %Status
 		Set tSC = ex.AsStatus()
 	}
 	Quit tSC
-}
-*/
-]]></Content>
-</UDLText>
+]]></Implementation>
+</Method>
 
 <Method name="refreshLog">
 <Description>
 Reload contents of file.</Description>
 <Language>javascript</Language>
 <ClientMethod>1</ClientMethod>
-<Implementation><![CDATA[	zen('logFile').refreshContents();
+<Implementation><![CDATA[	zen('sourceFrame').refreshContents();
 ]]></Implementation>
 </Method>
 
 <Method name="deleteLog">
 <Description>
-Delete DeepSeeButtons.</Description>
+Delete the log file.</Description>
 <Language>javascript</Language>
 <ClientMethod>1</ClientMethod>
 <Implementation><![CDATA[
 	if (confirm($$$Text('Do you wish to delete the DeepSeeButtons file?'))) {
+		alert("Here I should create something like %DeepSee.Utils).%KillLogFile")
 		var msg = zenPage.DeleteLogFile();
 		if ('' !== msg) {
 			alert(msg);
 		}
-		zen('logFile').refreshContents();
+		zen('sourceFrame').refreshContents();
 	}
 ]]></Implementation>
 </Method>
 
 <Method name="DeleteLogFile">
 <Description>
-Delete the DeepSeeButtons.</Description>
+Delete the log file.</Description>
 <ReturnType>%String</ReturnType>
 <ZenMethod>1</ZenMethod>
 <Implementation><![CDATA[
 	Set tSC = $$$OK
 	Set tMsg = ""
 	Try {
-		Set tSC = ##class(%DeepSee.Utils).%KillLogFile()
+		//Set tSC = ##class(%DeepSee.Utils).%KillLogFile()
+		//ALE
 		If $$$ISERR(tSC) Quit
 	}
 	Catch(ex) {
