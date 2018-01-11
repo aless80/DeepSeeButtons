@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Export generator="Cache" version="25" zv="Cache for UNIX (SUSE Linux Enterprise Server for x86-64) 2017.2.1 (Build 801)" ts="2018-01-11 16:56:11">
-<Routine name="DeepSeeButtons" type="MAC" languagemode="0" timestamp="64659,60965.244519"><![CDATA[
+<Export generator="Cache" version="25" zv="Cache for UNIX (SUSE Linux Enterprise Server for x86-64) 2017.2.1 (Build 801)" ts="2018-01-11 17:03:12">
+<Routine name="DeepSeeButtons" type="MAC" languagemode="0" timestamp="64659,61255.229014"><![CDATA[
 DeepSeeButtons(namespace="",cubeString="ask", getLogs="", LogFile="", proceed="")
 #include %occConstant
-#include %occStatus
-#include %syDatabase
-#include %syNLS
 
 	;DeepSeeButtons: routine to log system and DeepSee information
 	;Install it in the %SYS namespace and launch it as: 
@@ -77,6 +74,7 @@ DeepSeeButtons(namespace="",cubeString="ask", getLogs="", LogFile="", proceed=""
 
 StartDialog
 	New (namespace,cubeString,getLogs,LogFile,proceed)
+	Set origNS=$Namespace
 	Try {
 		Set PDev=$Principal
 		Use PDev
@@ -96,6 +94,7 @@ StartDialog
 		Use $Principal
 		Write !,$System.Status.DisplayError(tSC)
  	}
+ 	zn origNS
 	Quit
 
 GetNamespace(namespace) {
@@ -2633,7 +2632,7 @@ NLS
 		Set oLoc=##class(Config.NLS.Locales).OpenCurrent()
 		If oLoc="" Set LocCur="Unknown",LocDesc="Unknown"
 		Else  Set LocCur=oLoc.Name,LocDesc=oLoc.Description		
-		Set LocSrc=$$$LOCALEPATH
+		Set LocSrc=$$ComputeFullDBDir^%SYS.API("Locale")
 		Do WriteLog("<p>"_LocCur_" ("_LocDesc_")<p>",8)
 	} Catch(ex) {
 		Do WriteLog("<p>An error occurred</p>",8)
