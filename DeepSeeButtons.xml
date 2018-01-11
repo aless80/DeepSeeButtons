@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Export generator="Cache" version="25" zv="Cache for UNIX (SUSE Linux Enterprise Server for x86-64) 2017.2.1 (Build 801)" ts="2018-01-11 16:21:15">
-<Routine name="DeepSeeButtons" type="MAC" languagemode="0" timestamp="64659,58839.815152"><![CDATA[
+<Export generator="Cache" version="25" zv="Cache for UNIX (SUSE Linux Enterprise Server for x86-64) 2017.2.1 (Build 801)" ts="2018-01-11 16:48:52">
+<Routine name="DeepSeeButtons" type="MAC" languagemode="0" timestamp="64659,60431.548522"><![CDATA[
 DeepSeeButtons(namespace="",cubeString="ask", getLogs="", LogFile="", proceed="")
 #include %occConstant
 #include %occStatus
@@ -573,74 +573,77 @@ LogDeepSeeSetupSection
 	Do WriteLog("</tr>",4)
  	/// Important Mappings subsection
  	Open ConfigFile:"R":FileOpenTimeOut
-	If '$Test Do  Quit
-	.	Do WriteLog("<p>Error: could not open Caché Configuration File "_ConfigFile_"</p>" )
-	.	Use PDev
-	.	Quit
  	Set NsMap=""
 	Set MirCount=0
 	Set ECPCount=0
 	Set isMirror=0
 	Set isECP=0
-	For {
-		Use ConfigFile
-		Read x:FileReadTimeOut
-		If $p(x,".",1)="[Map" {				//Grab namespace we are mapping from
-			Set NsMap=x 						//Returns eg [Map.Analytics]
-			Set NsMap=$p($p(NsMap,".",2),"]",1) 	//Returns eg Analytics
-			Set MapCount=0 					//Reset counter for number of mappings within this namespace 
-		}
-		If x["Global_OBJ.DSTIME"{			//Grab OBJ.DSTIME mapping
-			Set DSTimeMapTo=$p(x,"=",2)		//Namespace it is mapped to
-			Set DSTimeMapFrom(NsMap)=DSTimeMapTo
-		}
-		If x["Global_DeepSee"{	//Create array of DeepSee.* global mappings within this namespace
-			Set MapCount=$I(MapCount)
- 			Set DeepSeeMap(NsMap,MapCount)=x			
-		}
-		If x["[Mirrors]" Set isMirror=1		//We are in mirror section
-		If isMirror=1{					
-			If x=""{
-				Set isMirror=0				//Mirror section has ended
-			} Else {						//Store mirror information
-				Set MirCount=$I(MirCount)
-				Set MirArray(MirCount)=x
-			}
-		}
-		If x["[ECPServers]" Set isECP=1		//We are in ECP section
-		If isECP=1{
-			If x=""{
-				Set isECP=0					//ECP section has ended
-			} ElseIf x'["[ECPServers]" {
-				Set ECPCount=$I(ECPCount)	//Store ECP info
-				Set ECPArray(ECPCount)=x
-			}
-		}
-		//Store important values from cpf - Config section
-		If x["[config]" Set configSect=1		//We are in Config section
-		If x["[Miscellaneous]" Kill configSect	//Config section is over
-		If $D(configSect) {
-			If x["globals" Set GlobalKSize=$P(x,"globals=",2)
-			If x["routines=" Set RoutineSize= $P(x,"routines=",2)
-			If x["bbsiz=" Set bbsiz= $P(x,"=",2)
-			}
-		Quit:x["[Miscellaneous]"				//We have passed all information we are interested in, just quit
-	}
-	Close ConfigFile
+	Set GlobalKSize=""
+	Set RoutineSize=""
+	Set bbsiz=""
 	Do WriteLog("<tr>",4)
 	Do WriteLog("<td>",6)	
 	Do WriteHeader4("Config section of cpf file",8)
-	Do WriteLog("<p>globals="_GlobalKSize_"</p>",8)
-	Do WriteLog("<p>routines="_RoutineSize_"</p>",8)
-	Do WriteLog("<p>bbsiz="_bbsiz_"</p>",8)
-	Set sc = $$alertGlobalKSize(GlobalKSize,.alerts)
-	Set sc = $$alertRoutineSize(RoutineSize,.alerts)	
+	If '$Test {
+		Do WriteLog("<p>Error: could not open Caché Configuration File "_ConfigFile_"</p>",10)
+	} Else {
+		For {
+			Use ConfigFile
+			Read x:FileReadTimeOut
+			If $p(x,".",1)="[Map" {				//Grab namespace we are mapping from
+				Set NsMap=x 						//Returns eg [Map.Analytics]
+				Set NsMap=$p($p(NsMap,".",2),"]",1) 	//Returns eg Analytics
+				Set MapCount=0 					//Reset counter for number of mappings within this namespace 
+			}
+			If x["Global_OBJ.DSTIME"{			//Grab OBJ.DSTIME mapping
+				Set DSTimeMapTo=$p(x,"=",2)		//Namespace it is mapped to
+				Set DSTimeMapFrom(NsMap)=DSTimeMapTo
+			}
+			If x["Global_DeepSee"{	//Create array of DeepSee.* global mappings within this namespace
+				Set MapCount=$I(MapCount)
+	 			Set DeepSeeMap(NsMap,MapCount)=x			
+			}
+			If x["[Mirrors]" Set isMirror=1		//We are in mirror section
+			If isMirror=1{					
+				If x=""{
+					Set isMirror=0				//Mirror section has ended
+				} Else {						//Store mirror information
+					Set MirCount=$I(MirCount)
+					Set MirArray(MirCount)=x
+				}
+			}
+			If x["[ECPServers]" Set isECP=1		//We are in ECP section
+			If isECP=1{
+				If x=""{
+					Set isECP=0					//ECP section has ended
+				} ElseIf x'["[ECPServers]" {
+					Set ECPCount=$I(ECPCount)	//Store ECP info
+					Set ECPArray(ECPCount)=x
+				}
+			}
+			//Store important values from cpf - Config section
+			If x["[config]" Set configSect=1		//We are in Config section
+			If x["[Miscellaneous]" Kill configSect	//Config section is over
+			If $D(configSect) {
+				If x["globals" Set GlobalKSize=$P(x,"globals=",2)
+				If x["routines=" Set RoutineSize= $P(x,"routines=",2)
+				If x["bbsiz=" Set bbsiz= $P(x,"=",2)
+				}
+			Quit:x["[Miscellaneous]"				//We have passed all information we are interested in, just quit
+		}
+		Close ConfigFile
+		Do WriteLog("<p>globals="_GlobalKSize_"</p>",8)
+		Do WriteLog("<p>routines="_RoutineSize_"</p>",8)
+		Do WriteLog("<p>bbsiz="_bbsiz_"</p>",8)
+		Set sc = $$alertGlobalKSize(GlobalKSize,.alerts)
+		Set sc = $$alertRoutineSize(RoutineSize,.alerts)	
+	}
 	Do WriteLog("</td>",6)
 	Do WriteLog("</tr>",4)
+	//Important mapppings
 	Do WriteLog("<tr>",4)
 	Do WriteLog("<td>",6)
-	Do WriteHeader4("Important Mappings",8)
-	
+	Do WriteHeader4("Important Mappings",8)	
 	ZN "%SYS"
 	Set status=##Class(Config.Namespaces).Get(namespace,.nsprop)
 	Do:status=1 WriteLog("<p> Default DBs for globals and routines: "_nsprop("Globals")_", "_nsprop("Routines"),8)
@@ -1418,16 +1421,6 @@ LogCubeInfo
 		Do WriteLog("</tbody>",2)
     	Do WriteLog("</table>",0)
     	Do WriteLog("<h4>Build Errors</h4>",0)
-    	/*If ($D(^DeepSee.BuildErrors(cube)) && ^DeepSee.BuildErrors(cube) <4) {
-			Do WriteLog("<div class=""scrollable"" style=""border:1px solid #D0D0D0;height:400px;"">")
-    	} Else {
-    		Do WriteLog("<div class=""scrollable"" style=""width:100%;height:400px;"">")
-    	}
-		Do WriteLog("<pre>",8)
-		Do ##class(%DeepSee.Utils).%PrintBuildErrors(cube)
-		Do WriteLog("</pre>",8)
-		Do WriteLog("</div>") 
-		*/		
 		If ($D(^DeepSee.BuildErrors(cube)) && ^DeepSee.BuildErrors(cube) <4) {
 			Do WriteLog("<div class=""scrollable"" style=""border:1px solid #D0D0D0;height:400px;"">")
     	} Else {
@@ -1946,7 +1939,9 @@ LogCPF
 		Open ConfigFile:"R":FileOpenTimeOut
 		If '$Test Do  Quit
 		.	Do WriteLog("Error: could not open Caché Configuration File "_ConfigFile)
-		.	Do WriteLog("</pre>") Use PDev
+		.	Do WriteLog("</pre>")
+		.	Do WriteLog("</div>")
+		.	Use PDev
 		.	Quit
 		//Read timeout added to prevent the case where neither <ENDOFFILE> error nor $ZEOF terminate the loop
 		Set MapCount=1 		
