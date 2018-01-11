@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Export generator="Cache" version="25">
-<Routine name="DeepSeeButtons" type="MAC" languagemode="0"><![CDATA[
+<Export generator="Cache" version="25" zv="Cache for UNIX (SUSE Linux Enterprise Server for x86-64) 2017.2.1 (Build 801)" ts="2018-01-11 16:21:15">
+<Routine name="DeepSeeButtons" type="MAC" languagemode="0" timestamp="64659,58839.815152"><![CDATA[
 DeepSeeButtons(namespace="",cubeString="ask", getLogs="", LogFile="", proceed="")
 #include %occConstant
 #include %occStatus
@@ -1908,6 +1908,7 @@ LogDeepSeelog
 		.	Use LogFile 
 		.	Do WriteLog("</pre>",4)
 		.	Do WriteLog("</div>",2)
+		.	Do WriteLog("</div>",0)
 		.	Use PDev
 		.	Quit
 		//Read timeout added to prevent the case where neither <ENDOFFILE> error nor $ZEOF terminate the loop
