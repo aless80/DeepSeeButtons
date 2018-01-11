@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Export generator="Cache" version="25" zv="Cache for UNIX (SUSE Linux Enterprise Server for x86-64) 2017.2.1 (Build 801)" ts="2018-01-11 16:48:52">
-<Routine name="DeepSeeButtons" type="MAC" languagemode="0" timestamp="64659,60431.548522"><![CDATA[
+<Export generator="Cache" version="25" zv="Cache for UNIX (SUSE Linux Enterprise Server for x86-64) 2017.2.1 (Build 801)" ts="2018-01-11 16:56:11">
+<Routine name="DeepSeeButtons" type="MAC" languagemode="0" timestamp="64659,60965.244519"><![CDATA[
 DeepSeeButtons(namespace="",cubeString="ask", getLogs="", LogFile="", proceed="")
 #include %occConstant
 #include %occStatus
@@ -572,7 +572,6 @@ LogDeepSeeSetupSection
  	Do WriteLog("</td>",6)
 	Do WriteLog("</tr>",4)
  	/// Important Mappings subsection
- 	Open ConfigFile:"R":FileOpenTimeOut
  	Set NsMap=""
 	Set MirCount=0
 	Set ECPCount=0
@@ -584,6 +583,7 @@ LogDeepSeeSetupSection
 	Do WriteLog("<tr>",4)
 	Do WriteLog("<td>",6)	
 	Do WriteHeader4("Config section of cpf file",8)
+	Open ConfigFile:"R":FileOpenTimeOut
 	If '$Test {
 		Do WriteLog("<p>Error: could not open Caché Configuration File "_ConfigFile_"</p>",10)
 	} Else {
