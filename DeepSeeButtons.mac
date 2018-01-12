@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Export generator="Cache" version="25" zv="Cache for UNIX (SUSE Linux Enterprise Server for x86-64) 2017.2.1 (Build 801)" ts="2018-01-11 17:03:12">
-<Routine name="DeepSeeButtons" type="MAC" languagemode="0" timestamp="64659,61255.229014"><![CDATA[
+ROUTINE DeepSeeButtons
 DeepSeeButtons(namespace="",cubeString="ask", getLogs="", LogFile="", proceed="")
 #include %occConstant
 
@@ -901,7 +899,7 @@ LogCubeSection
 		 	Do WriteLog("<th onclick=""sortTable('CubeTable',4,1)"" title=""Does not reflect build order"">Related Cubes</th>",6)
 		 	Do WriteLog("</tr>",4)
 		 	Set storageList=""
-			Set inheritList=""			
+			Set dataConnectorList=""			
 			Set abstractcount = 0
 			For {
 				Quit:cubenode=""				//Do the work to get info and write out the table
@@ -927,7 +925,7 @@ LogCubeSection
 			}
 		 	Do WriteLog("</tbody>",2)
 		 	Do WriteLog("</table>")		 	
-			//Write out list of abstract cubes, storageList, inheritList
+			//Write out list of abstract cubes, storageList, dataConnectorList
 			Do WriteHeader4("Abstract Cube List")
 			If abstractcount {
 				Set ind = $O(abstractList(""))
@@ -945,9 +943,9 @@ LogCubeSection
 				}
 			}			
 			Do WriteHeader4("Cubes Based on Data Connectors")
-			If $D(inheritList){	
+			If $D(dataConnectorList){	
 					Set ptr=0
-					While $LISTNEXT(inheritList,ptr,class){
+					While $LISTNEXT(dataConnectorList,ptr,class){
 						Do WriteLog("<p>"_class_"</p>")
 					}
 			}
@@ -962,7 +960,7 @@ LogCubeSection
 
 LogBuildSynchSection
 	Try {
-		Do WriteUpdate("Getting information on cube registry..")
+		Do WriteUpdate("Getting information on Build/Synch..")
 		Do WriteLog("<div id=""BuildSynchDiv"" onmouseover=""highlightLink(this,1)"" onmouseout=""highlightLink(this,0)"">")
 		Do WriteParagraph("buildsynchlist","Cube Build/Synch")
 		Use PDev
@@ -995,33 +993,48 @@ LogBuildSynchSection
 				Set lastDataUpdate = 0
 				Set dstime = ""
 				Do WriteLog("<p>Could not find DSTIME</p>",2)
-			}
+			}		 	
 		 	
-		 	
-		 	Do WriteLog("<table id=""BuildSynchTable"" border=""0"" cellpadding=""7"" cellspacing=""3"" "_
-		 	            "class=""zebraStriped"">",2)
+		 	Do WriteLog("<table id=""BuildSynchTable"" border=""0"" cellpadding=""7"" cellspacing=""3"" "_"class=""zebraStriped"">",2)
 		 	Do WriteLog("<tbody>",4)
 		 	Do WriteLog("<tr>",6)
 		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',0,1)"">Cube Name</th>",8)
-		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',1,0)"">Fact Count</th>",8)
-		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',2,0)"">Build Time [s]</th>",8)
-		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',3,0)"">Build Rate [Facts/s]</th>",8)
-		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',4,0)"">Build Errors</th>",8)
-			Do WriteLog("<th onclick=""sortTable('BuildSynchTable',5,0)"""_
+		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',1,0)"">Source Count</th>",8)
+		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',2,0)"">Fact Count</th>",8)
+		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',3,0)"">Build Time [s]</th>",8)
+		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',4,0)"">Build Rate [Facts/s]</th>",8)
+		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',5,0)"">Build Errors</th>",8)
+			Do WriteLog("<th onclick=""sortTable('BuildSynchTable',6,0)"""_
 				"title=""From ^DeepSeeUpdate (or ^OBJ.DSTIME before DTB422)"">DSTIME</th>",8)
-		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',6,1)"">Last Compile</th>",8)
-		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',7,1)"" title=""As logged in ^DeepSee.Update (or ^OBJ.DSTIME before DTB422)"">Last Build/Synch</th>",8)
-		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',8,1)"" title=""Does not reflect build order"">Related Cubes</th>",8)
+		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',7,1)"">Last Compile</th>",8)
+		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',8,1)"" title=""As logged in ^DeepSee.Update (or ^OBJ.DSTIME before DTB422)"">Last Build/Synch</th>",8)
+		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',9,1)"" title=""Does not reflect build order"">Related Cubes</th>",8)
 		 	Do WriteLog("</tr>",6)
 		 	Set storageList=""
-			Set inheritList=""			
+			Set dataConnectorList=""			
 			Set abstractcount = 0
 			For {
-				QUIT:cubenode=""		//Do the work to get info and write out the table
+				Quit:cubenode=""		//Do the work to get info and write out the table
 				Set cubename=$list(plist(cubenode),1)
 				If (cubename'="" && '##class(%DeepSee.Utils).%IsCubeAbstract(cubenode)) {		//if cube is not abstract
 					Do WriteLog("<tr>",6)
 					Do WriteLog("<td>"_cubename_"</td>",8)					//cubename
+
+
+ 					Set countstar = ""
+					Set type=$LG(plist(cubenode),4)							//subject area or cube?
+					Set sourceClass = $$GetSourceClass(cubenode,type)
+					Set sqlclass = ##class(%DeepSee.Utils).%GetSQLTableName(sourceClass)
+					//Check the following for abstract cubes and data connectors
+					If (sqlclass="Not available")||('##class(%SYSTEM.SQL).TableExists(sqlclass)) {
+						Do WriteLog("<td></td>",8)
+					} Else {
+ 						Set countstar=$$GetSourceFactCount(sqlclass)
+						Do WriteLog("<td>"_$FNUMBER(countstar,"O,")_"</td>",8)
+					}
+  			
+					
+					
 					Set lastmod=$zdt($LG(plist(cubenode),3),3)				//last cube compile
 					Set facts=##class(%DeepSee.Utils).%GetCubeFactCount(cubename)	//number of facts
   					//DTB422 moved ^DeepSee.Cubes to ^DeepSee.Update
@@ -1299,6 +1312,18 @@ LogCubeInfo
     Do WriteLog("<td>",6)
 	Do WriteLog("<h4>Fact Class</h4>",8)
 	Do WriteLog("<p>"_factclass_"</p>",8)
+	Do WriteLog("</td>",6)
+    Do WriteLog("</tr>",4)
+    Do WriteLog("<tr>",4)
+    Do WriteLog("<td>",6)
+    Do WriteLog("<h4>Source Count</h4>",8)
+    //Check the following for abstract cubes and data connectors
+    If (sqlclass="Not available")||('##class(%SYSTEM.SQL).TableExists(sqlclass)) {
+		Do WriteLog("<p>Not available</p>",8)
+    } Else {
+	    Set SourceFactCount=$$GetSourceFactCount(sqlclass)
+	    Do WriteLog("<p>"_$FNUMBER(SourceFactCount,"O,")_"</p>",8)
+    }
     Do WriteLog("</td>",6)
     Do WriteLog("</tr>",4)
     Do WriteLog("<tr>",4)
@@ -2834,7 +2859,7 @@ GetRelationships(cube){
 	Quit
 }
 	
-GetSourceClass(cube,type)[storageList, inheritList]{
+GetSourceClass(cube,type)[storageList, dataConnectorList]{
 	Try {
 		Set sourceClass=""
 		If type="cube" {
@@ -2856,7 +2881,7 @@ GetSourceClass(cube,type)[storageList, inheritList]{
 				Set $LIST(storageList,*+1)=cube
 			}
 			If super["%DeepSee.DataConnector"{
-				Set $LIST(inheritList,*+1)=cube
+				Set $LIST(dataConnectorList,*+1)=cube
 			}
 		} ElseIf type="subjectArea" {
 			Set basecube=##class(%DeepSee.Utils).%GetBaseCube(cube)
@@ -2870,6 +2895,30 @@ GetSourceClass(cube,type)[storageList, inheritList]{
 		Set sourceClass = "Not available"
 	}
 	Quit sourceClass
+}
+
+GetSourceFactCount(sqlclass){
+	Try {
+		Set FactCount=""
+		Set SQLQuery="SELECT COUNT(*) As FactCount FROM "_sqlclass
+		Set tStatement = ##class(%SQL.Statement).%New()
+		Set st = tStatement.%Prepare(SQLQuery)
+		If 'st {
+			Set FactCount = $System.Status.DisplayError(st)
+			Quit
+		}
+		Set rset = tStatement.%Execute()
+		If (rset.%SQLCODE < 0) {
+			Set FactCount = rset.%Message
+			Quit
+		}
+		Do rset.%Next()
+		Set FactCount = rset.FactCount
+	} Catch(ex) {
+		Set FactCount = ex.AsStatus()
+		W $System.Status.DisplayError(tSC)
+	}
+	Quit FactCount
 }
 
 GetDeepSeeAuditCode
@@ -3377,5 +3426,3 @@ ExitCmdNoFile
 	Set $ZError=""
 	Quit
 
-]]></Routine>
-</Export>
