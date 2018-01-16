@@ -1,5 +1,5 @@
 ROUTINE DeepSeeButtons
-DeepSeeButtons(namespace="",cubeString="ask", getLogs="", LogFile="", proceed="")
+DeepSeeButtons(namespace="ask",cubeString="ask", getLogs="", LogFile="", proceed="")
 #include %occConstant
 
 	;DeepSeeButtons: routine to log system and DeepSee information
@@ -7,9 +7,9 @@ DeepSeeButtons(namespace="",cubeString="ask", getLogs="", LogFile="", proceed=""
 	;%SYS> Do ^DeepSeeButtons
 	;
 	;You can use the following optional arguments:
-	;namespace:		namespace where this routine will run, e.g. "SAMPLES"
+	;namespace:		namespace where this routine will run, e.g. "SAMPLES". If "" the current namespace will be chosen
 	;cubeString: 	comma separated list of cubes, e.g. "patients,holefoods", "ALL", or "" for no cubes at all
-	;getLogs:		""/0/1 to ask to/do not/do  include cconsole.log, Query Log, and DeepSee logs, respectively
+	;getLogs:		""/0/1 to ask  to/do not/do  include cconsole.log, Query Log, and DeepSee logs, respectively
 	;LogFile:		output file. By default the output file will be stored in the /mgr directory
 	;proceed:		1 to skip the last prompt before launching DeepSeeButtons
 	;
@@ -96,11 +96,18 @@ StartDialog
 	Quit
 
 GetNamespace(namespace) {
+	//If namespace is "" choose the current namespace
+	If namespace="" {
+		Set namespace = $Namespace
+		Write !,"Running in namespace: "_namespace
+	}
+	//Ask user if the namespace variable is not given
+	Set:namespace="ask" namespace=""
 	Set namespace=$$ValidateNamespace(namespace)	//Make sure input namespace exists
 	While namespace="" {		//User didn't enter a namespace when calling routine
-		Write !!,"Type namespace or press enter to exit: "
+		Write !!,"Type namespace ["_$Namespace_"]"
 		Read namespace
-		Quit:namespace=""
+		Set:namespace="" namespace = $Namespace
 		Set namespace=$$ValidateNamespace(namespace)
 	}
 	Quit namespace
@@ -501,228 +508,227 @@ LogOpenMainDiv()
 LogDeepSeeSetupSection
 	//Begin body tag
 	Try {
-	Do WriteLog("<body bgcolor=""#FFFFFF"" text=""#000000"">")
-	Do WriteLog("<div class=""trapezoid"">")
-	Do WriteLog("<span onclick=""openNav()""> &#9776; </span>",2)
-	Do WriteLog("</div>")
-	Do WriteUpdate("Getting system information..")
-	Do WriteLog("<div id=""DSSetupDiv"" onmouseover=""highlightLink(this,1)"" onmouseout=""highlightLink(this,0)"">")
-	Do WriteParagraph("deepseesetup","DeepSee Setup in "_namespace,0)
- 	//Agent Count
- 	ZN namespace
- 	Set count=##class(%DeepSee.Utils).%GetAgentCount()
- 	If count=""{
-	 	Set tCPU=##class(%SYSTEM.CPU).%New()
-	 	Set cores = tCPU.nCores
-	 	Set counthigh=cores*4
-	 	Set defaultagents="Default agent count"
-	 	Set countstring=cores_" cores x 8 = "_(counthigh*2)_" agents  ("_counthigh_" high- and "_counthigh_" low-priority agents)"
- 	} Else {
-	 	Set defaultagents="Non-default agent count"
-	 	Set countstring=(count*2)_" agents  ("_count_" high- and "_count_" low-priority agents)"
+		Do WriteLog("<body bgcolor=""#FFFFFF"" text=""#000000"">")
+		Do WriteLog("<div class=""trapezoid"">")
+		Do WriteLog("<span onclick=""openNav()""> &#9776; </span>",2)
+		Do WriteLog("</div>")
+		Do WriteUpdate("Getting system information..")
+		Do WriteLog("<div id=""DSSetupDiv"" onmouseover=""highlightLink(this,1)"" onmouseout=""highlightLink(this,0)"">")
+		Do WriteParagraph("deepseesetup","DeepSee Setup in "_namespace,0)
+ 		//Agent Count
+ 		ZN namespace
+	 	Set count=##class(%DeepSee.Utils).%GetAgentCount()
+	 	If count=""{
+	 		Set tCPU=##class(%SYSTEM.CPU).%New()
+	 		Set cores = tCPU.nCores
+	 		Set counthigh=cores*4
+	 		Set defaultagents="Default agent count"
+	 		Set countstring=cores_" cores x 8 = "_(counthigh*2)_" agents  ("_counthigh_" high- and "_counthigh_" low-priority agents)"
+ 		} Else {
+		 	Set defaultagents="Non-default agent count"
+	 		Set countstring=(count*2)_" agents  ("_count_" high- and "_count_" low-priority agents)"
 	 	}
- 	ZN "%SYS"
- 	Use LogFile
- 	Do WriteLog("<table id=""DSSetupTable"" cellpadding=""7"" cellspacing=""3"" "_
+ 		ZN "%SYS"
+ 		Use LogFile
+ 		Do WriteLog("<table id=""DSSetupTable"" cellpadding=""7"" cellspacing=""3"" "_
  	            "class=""tableWithBorders tableTabbed"">")
  	            
-  	Do WriteLog("<tbody>",2)
-    Do WriteLog("<tr>",4)
-    Do WriteLog("<td>",6)
- 	Do WriteHeader4("Agent Count",8)
- 	Do WriteLog("<p>"_defaultagents_"</p>",8)
- 	Do WriteLog("<p>"_countstring_"</p>",8) 	
- 	Do WriteLog("</td>",6)
- 	Do WriteLog("</tr>",4)
- 	Do WriteLog("<tr>",4)
-	Do WriteLog("<td>",6)
-	//Audit section
- 	Do GetDeepSeeAuditCode
- 	Do WriteLog("</td>",6)
-	Do WriteLog("</tr>",4)
- 	Do WriteLog("<tr>",4)
-	Do WriteLog("<td>",6)
- 	Do WriteHeader4("Most Recent Activity in Cube Manager",8)
- 	ZN namespace
- 	Set msgbuild=$$GetLastBuild("Build")						//Get last build, synch, and update info
- 	Set msgsynch=$$GetLastBuild("Synch")
- 	Set msgupdate=$$GetLastBuild("Update")
- 	Set msgrepair=$$GetLastBuild("Repair")
- 	Do WriteLog("<p>Build event:  "_msgbuild_"</p>",8)
- 	Do WriteLog("<p>Synch event:  "_msgsynch_"</p>",8)
- 	Do WriteLog("<p>Registry Update event: "_msgupdate_"</p>",8)
- 	Do WriteLog("<p>Repair event: "_msgrepair_"</p>",8)
- 	//Cycle through all enabled cubes in cube manager and alert if ther are no build or repair events
- 	Set rs=##class(%ResultSet).%New("%DeepSee.CubeManager.RegistryMap:RegistryMapTableView")
-	Set registered = ""
-	Set state = ""
-	Do rs.Execute()
-	While (rs.Next()) {
-		Set cube=rs.Get("CubeKey")
-		If ((rs.Get("IsRegistered")="Yes") && (rs.Get("Disabled")="No")) {
-			Set msgbuild=$$GetLastBuild("Build",cube)	//Get last build
-			Set msgrepair=$$GetLastBuild("Repair",cube)	//Get last repair
-			Do alertInitialBuildCubeManager(cube,msgrepair,msgbuild,.alerts)
-		}
-	}
- 	ZN "%SYS"
- 	Do WriteLog("</td>",6)
-	Do WriteLog("</tr>",4)
- 	/// Important Mappings subsection
- 	Set NsMap=""
-	Set MirCount=0
-	Set ECPCount=0
-	Set isMirror=0
-	Set isECP=0
-	Set GlobalKSize=""
-	Set RoutineSize=""
-	Set bbsiz=""
-	Do WriteLog("<tr>",4)
-	Do WriteLog("<td>",6)	
-	Do WriteHeader4("Config section of cpf file",8)
-	Open ConfigFile:"R":FileOpenTimeOut
-	If '$Test {
-		Do WriteLog("<p>Error: could not open Caché Configuration File "_ConfigFile_"</p>",10)
-	} Else {
-		For {
-			Use ConfigFile
-			Read x:FileReadTimeOut
-			If $p(x,".",1)="[Map" {				//Grab namespace we are mapping from
-				Set NsMap=x 						//Returns eg [Map.Analytics]
-				Set NsMap=$p($p(NsMap,".",2),"]",1) 	//Returns eg Analytics
-				Set MapCount=0 					//Reset counter for number of mappings within this namespace 
-			}
-			If x["Global_OBJ.DSTIME"{			//Grab OBJ.DSTIME mapping
-				Set DSTimeMapTo=$p(x,"=",2)		//Namespace it is mapped to
-				Set DSTimeMapFrom(NsMap)=DSTimeMapTo
-			}
-			If x["Global_DeepSee"{	//Create array of DeepSee.* global mappings within this namespace
-				Set MapCount=$I(MapCount)
-	 			Set DeepSeeMap(NsMap,MapCount)=x			
-			}
-			If x["[Mirrors]" Set isMirror=1		//We are in mirror section
-			If isMirror=1{					
-				If x=""{
-					Set isMirror=0				//Mirror section has ended
-				} Else {						//Store mirror information
-					Set MirCount=$I(MirCount)
-					Set MirArray(MirCount)=x
-				}
-			}
-			If x["[ECPServers]" Set isECP=1		//We are in ECP section
-			If isECP=1{
-				If x=""{
-					Set isECP=0					//ECP section has ended
-				} ElseIf x'["[ECPServers]" {
-					Set ECPCount=$I(ECPCount)	//Store ECP info
-					Set ECPArray(ECPCount)=x
-				}
-			}
-			//Store important values from cpf - Config section
-			If x["[config]" Set configSect=1		//We are in Config section
-			If x["[Miscellaneous]" Kill configSect	//Config section is over
-			If $D(configSect) {
-				If x["globals" Set GlobalKSize=$P(x,"globals=",2)
-				If x["routines=" Set RoutineSize= $P(x,"routines=",2)
-				If x["bbsiz=" Set bbsiz= $P(x,"=",2)
-				}
-			Quit:x["[Miscellaneous]"				//We have passed all information we are interested in, just quit
-		}
-		Close ConfigFile
-		Do WriteLog("<p>globals="_GlobalKSize_"</p>",8)
-		Do WriteLog("<p>routines="_RoutineSize_"</p>",8)
-		Do WriteLog("<p>bbsiz="_bbsiz_"</p>",8)
-		Set sc = $$alertGlobalKSize(GlobalKSize,.alerts)
-		Set sc = $$alertRoutineSize(RoutineSize,.alerts)	
-	}
-	Do WriteLog("</td>",6)
-	Do WriteLog("</tr>",4)
-	//Important mapppings
-	Do WriteLog("<tr>",4)
-	Do WriteLog("<td>",6)
-	Do WriteHeader4("Important Mappings",8)	
-	ZN "%SYS"
-	Set status=##Class(Config.Namespaces).Get(namespace,.nsprop)
-	Do:status=1 WriteLog("<p> Default DBs for globals and routines: "_nsprop("Globals")_", "_nsprop("Routines"),8)
-	
-	If '$D(DSTimeMapFrom(namespace)){
-		Do WriteLog("<p>^OBJ.DSTIME: no mappings defined</p>",8)
-	} Else{
-		Do WriteLog("<p>^OBJ.DSTIME: mapped to "_DSTimeMapFrom((namespace))_"</p>",8)
-	}
-	//DeepSeeMap is structured as follows: DeepSeeMap(namespace,mapping number)
- 	If NsMap'="" {
-		If $D(DeepSeeMap(namespace,1)){
-			Set NumMaps=$O(DeepSeeMap(namespace,""))
-			While NumMaps {					
-				Do WriteLog("<p>"_DeepSeeMap(namespace,NumMaps)_"</p>",8)
-				Set NumMaps=$O(DeepSeeMap(namespace,NumMaps))
-			}
-		}
-		Set sc = $$alertCacheMappings(namespace,.alerts)
-		//Set sc = $$alertCacheMappingsOLD(namespace,.DeepSeeMap,.alerts)
-		If $D(DSTimeMapFrom(namespace)){
-			Set sc = $$alertDStimeRW(DSTimeMapFrom(namespace),.alerts)
-		}
-	}	
-	Do WriteLog("</td>",6)
-	Do WriteLog("</tr>",4)
-	If ECPCount'=0{
-		Do WriteLog("<tr>",4)
+  		Do WriteLog("<tbody>",2)
+    	Do WriteLog("<tr>",4)
+    	Do WriteLog("<td>",6)
+ 		Do WriteHeader4("Agent Count",8)
+ 		Do WriteLog("<p>"_defaultagents_"</p>",8)
+ 		Do WriteLog("<p>"_countstring_"</p>",8) 	
+ 		Do WriteLog("</td>",6)
+ 		Do WriteLog("</tr>",4)
+ 		Do WriteLog("<tr>",4)
 		Do WriteLog("<td>",6)
-		Do WriteHeader4("ECP Servers",8)
-		Do WriteLog("<p>",8)
-		For i=1:1:ECPCount{
-			Write ECPArray(i),!
-		}
-		Do WriteLog("</p>",8)
-		Do WriteLog("</td>",6)
-		Do WriteLog("</tr>",4)		
-	}
-	If MirCount'=0{
-		Do WriteLog("<tr>",4)
+		//Audit section
+ 		Do GetDeepSeeAuditCode
+ 		Do WriteLog("</td>",6)
+		Do WriteLog("</tr>",4)
+ 		Do WriteLog("<tr>",4)
 		Do WriteLog("<td>",6)
-		Do WriteHeader4("Mirroring Info",8)
-		Do WriteLog("<p>",8)
-		For i=1:1:MirCount{
-			Write MirArray(i),!
+ 		Do WriteHeader4("Most Recent Activity in Cube Manager",8)
+ 		ZN namespace
+ 		Set msgbuild=$$GetLastBuild("Build")						//Get last build, synch, and update info
+ 		Set msgsynch=$$GetLastBuild("Synch")
+ 		Set msgupdate=$$GetLastBuild("Update")
+ 		Set msgrepair=$$GetLastBuild("Repair")
+ 		Do WriteLog("<p>Build event:  "_msgbuild_"</p>",8)
+ 		Do WriteLog("<p>Synch event:  "_msgsynch_"</p>",8)
+ 		Do WriteLog("<p>Registry Update event: "_msgupdate_"</p>",8)
+ 		Do WriteLog("<p>Repair event: "_msgrepair_"</p>",8)
+ 		//Cycle through all enabled cubes in cube manager and alert if ther are no build or repair events
+ 		Set rs=##class(%ResultSet).%New("%DeepSee.CubeManager.RegistryMap:RegistryMapTableView")
+		Set registered = ""
+		Set state = ""
+		Do rs.Execute()
+		While (rs.Next()) {
+			Set cube=rs.Get("CubeKey")
+			If ((rs.Get("IsRegistered")="Yes") && (rs.Get("Disabled")="No")) {
+				Set msgbuild=$$GetLastBuild("Build",cube)	//Get last build
+				Set msgrepair=$$GetLastBuild("Repair",cube)	//Get last repair
+				Do alertInitialBuildCubeManager(cube,msgrepair,msgbuild,.alerts)
+			}
 		}
-		Do WriteLog("</p>")
+	 	ZN "%SYS"
+	 	Do WriteLog("</td>",6)
+		Do WriteLog("</tr>",4)
+	 	/// Important Mappings subsection
+	 	Set NsMap=""
+		Set MirCount=0
+		Set ECPCount=0
+		Set isMirror=0
+		Set isECP=0
+		Set GlobalKSize=""
+		Set RoutineSize=""
+		Set bbsiz=""
+			Do WriteLog("<tr>",4)
+			Do WriteLog("<td>",6)	
+			Do WriteHeader4("Config section of cpf file",8)
+			Open ConfigFile:"R":FileOpenTimeOut
+			If '$Test {
+				Do WriteLog("<p>Error: could not open Caché Configuration File "_ConfigFile_"</p>",10)
+			} Else {
+				For {
+					Use ConfigFile
+					Read x:FileReadTimeOut
+					If $p(x,".",1)="[Map" {				//Grab namespace we are mapping from
+						Set NsMap=x 						//Returns eg [Map.Analytics]
+						Set NsMap=$p($p(NsMap,".",2),"]",1) 	//Returns eg Analytics
+						Set MapCount=0 					//Reset counter for number of mappings within this namespace 
+					}
+					If x["Global_OBJ.DSTIME"{			//Grab OBJ.DSTIME mapping
+						Set DSTimeMapTo=$p(x,"=",2)		//Namespace it is mapped to
+						Set DSTimeMapFrom(NsMap)=DSTimeMapTo
+					}
+					If x["Global_DeepSee"{	//Create array of DeepSee.* global mappings within this namespace
+						Set MapCount=$I(MapCount)
+		 				Set DeepSeeMap(NsMap,MapCount)=x			
+					}
+					If x["[Mirrors]" Set isMirror=1		//We are in mirror section
+					If isMirror=1{					
+					If x=""{
+						Set isMirror=0				//Mirror section has ended
+					} Else {						//Store mirror information
+						Set MirCount=$I(MirCount)
+						Set MirArray(MirCount)=x
+					}
+				}
+				If x["[ECPServers]" Set isECP=1		//We are in ECP section
+				If isECP=1{
+					If x=""{
+						Set isECP=0					//ECP section has ended
+					} ElseIf x'["[ECPServers]" {
+						Set ECPCount=$I(ECPCount)	//Store ECP info
+						Set ECPArray(ECPCount)=x
+					}
+				}
+				//Store important values from cpf - Config section
+				If x["[config]" Set configSect=1		//We are in Config section
+				If x["[Miscellaneous]" Kill configSect	//Config section is over
+				If $D(configSect) {
+					If x["globals" Set GlobalKSize=$P(x,"globals=",2)
+					If x["routines=" Set RoutineSize= $P(x,"routines=",2)
+					If x["bbsiz=" Set bbsiz= $P(x,"=",2)
+					}
+				Quit:x["[Miscellaneous]"				//We have passed all information we are interested in, just quit
+			}
+			Close ConfigFile
+			Do WriteLog("<p>globals="_GlobalKSize_"</p>",8)
+			Do WriteLog("<p>routines="_RoutineSize_"</p>",8)
+			Do WriteLog("<p>bbsiz="_bbsiz_"</p>",8)
+			Set sc = $$alertGlobalKSize(GlobalKSize,.alerts)
+			Set sc = $$alertRoutineSize(RoutineSize,.alerts)	
+		}
 		Do WriteLog("</td>",6)
 		Do WriteLog("</tr>",4)
-	}
+		//Important mapppings
+		Do WriteLog("<tr>",4)
+		Do WriteLog("<td>",6)
+		Do WriteHeader4("Important Mappings",8)	
+		ZN "%SYS"
+		Set status=##Class(Config.Namespaces).Get(namespace,.nsprop)
+		Do:status=1 WriteLog("<p> Default DBs for globals and routines: "_nsprop("Globals")_", "_nsprop("Routines"),8)
 	
-	//Initialization code
-	Do WriteLog("<tr>",4)
-	Do WriteLog("<td>",6)
-	Do WriteHeader4("Server Initialization Code",8,"Defined in the ^DeepSee.InitCode global")
-	Try {
-		If $D(^[namespace]DeepSee.InitCode){
-			Set initcode=$g(^[namespace]DeepSee.InitCode)
-			Do WriteLog("<p>^DeepSee.InitCode: "_initcode_"</p>",8)
+		If '$D(DSTimeMapFrom(namespace)){
+			Do WriteLog("<p>^OBJ.DSTIME: no mappings defined</p>",8)
 		} Else{
-			Do WriteLog("<p>^DeepSee.InitCode is undefined"_initcode_"</p>",8)
+			Do WriteLog("<p>^OBJ.DSTIME: mapped to "_DSTimeMapFrom((namespace))_"</p>",8)
 		}
-	} Catch {
-		Do WriteLog("<p>Not Available",8)
-	}
-	Do WriteLog("</td>",6)
-	Do WriteLog("</tr>",4)
-	
-	//Webapps that are deepsee enabled
-	Do WriteLog("<tr>",4)
-	Do WriteLog("<td>",6)
-	Do WriteHeader4("DeepSee-enabled namespaces",8)
-	Do ##class(%CSP.Portal.Utils).%GetNamespaceList(.nsList)
-	SET ns=$o(nsList(""))
-	While ns'="" {
-		If ##class(%DeepSee.Utils).%IsDeepSeeEnabled(ns) {
-			Do WriteLog("<p>"_ns_" with default webapp: "_$system.CSP.GetDefaultApp(ns)_"</p>",8)
+		//DeepSeeMap is structured as follows: DeepSeeMap(namespace,mapping number)
+ 		If NsMap'="" {
+			If $D(DeepSeeMap(namespace,1)){
+				Set NumMaps=$O(DeepSeeMap(namespace,""))
+				While NumMaps {					
+					Do WriteLog("<p>"_DeepSeeMap(namespace,NumMaps)_"</p>",8)
+					Set NumMaps=$O(DeepSeeMap(namespace,NumMaps))
+				}
+			}
+			Set sc = $$alertCacheMappings(namespace,.alerts)
+			//Set sc = $$alertCacheMappingsOLD(namespace,.DeepSeeMap,.alerts)
+			If $D(DSTimeMapFrom(namespace)){
+				Set sc = $$alertDStimeRW(DSTimeMapFrom(namespace),.alerts)
+			}
+		}	
+		Do WriteLog("</td>",6)
+		Do WriteLog("</tr>",4)
+		If ECPCount'=0{
+			Do WriteLog("<tr>",4)
+			Do WriteLog("<td>",6)
+			Do WriteHeader4("ECP Servers",8)
+			Do WriteLog("<p>",8)
+			For i=1:1:ECPCount{
+				Write ECPArray(i),!
+			}
+			Do WriteLog("</p>",8)
+			Do WriteLog("</td>",6)
+			Do WriteLog("</tr>",4)		
 		}
-		Set ns=$O(nsList(ns))
-	}
-	Do WriteLog("</td>",6)
-	Do WriteLog("</tr>",4)	
+		If MirCount'=0{
+			Do WriteLog("<tr>",4)
+			Do WriteLog("<td>",6)
+			Do WriteHeader4("Mirroring Info",8)
+			Do WriteLog("<p>",8)
+			For i=1:1:MirCount{
+				Write MirArray(i),!
+			}
+			Do WriteLog("</p>")
+			Do WriteLog("</td>",6)
+			Do WriteLog("</tr>",4)
+		}
+		//Initialization code
+		Do WriteLog("<tr>",4)
+		Do WriteLog("<td>",6)
+		Do WriteHeader4("Server Initialization Code",8,"Defined in the ^DeepSee.InitCode global")
+		Try {
+			If $D(^[namespace]DeepSee.InitCode){
+				Set initcode=$g(^[namespace]DeepSee.InitCode)
+				Do WriteLog("<p>^DeepSee.InitCode: "_initcode_"</p>",8)
+			} Else{
+				Do WriteLog("<p>^DeepSee.InitCode is undefined"_initcode_"</p>",8)
+			}
+		} Catch {
+			Do WriteLog("<p>Not Available",8)
+		}
+		Do WriteLog("</td>",6)
+		Do WriteLog("</tr>",4)
+		
+		//Webapps that are deepsee enabled
+		Do WriteLog("<tr>",4)
+		Do WriteLog("<td>",6)
+		Do WriteHeader4("DeepSee-enabled namespaces",8)
+		Do ##class(%CSP.Portal.Utils).%GetNamespaceList(.nsList)
+		SET ns=$o(nsList(""))
+		While ns'="" {
+			If ##class(%DeepSee.Utils).%IsDeepSeeEnabled(ns) {
+				Do WriteLog("<p>"_ns_" with default webapp: "_$system.CSP.GetDefaultApp(ns)_"</p>",8)
+			}
+			Set ns=$O(nsList(ns))
+		}
+		Do WriteLog("</td>",6)
+		Do WriteLog("</tr>",4)
 	
 	
 	/*
@@ -749,32 +755,32 @@ LogDeepSeeSetupSection
 	*/
 	
 	
-	//DeepSee overrides
-	If (isInsight || isTrak) {
-		If (nOverrides<10) {
-			Do WriteLog("<tr>",4)
-			Do WriteLog("<td>",6)
-			Do WriteHeader4("DeepSee Overrides",8)
-			Do PrintGlobal(namespace,"^DeepSee.Overrides",8)
-			Do WriteLog("</td>",6)
-			Do WriteLog("</tr>",4)	
-			Do WriteLog("</tbody>",2)
- 			Do WriteLog("</table>",0)
+		//DeepSee overrides
+		If (isInsight || isTrak) {
+			If (nOverrides<10) {
+				Do WriteLog("<tr>",4)
+				Do WriteLog("<td>",6)
+				Do WriteHeader4("DeepSee Overrides",8)
+				Do PrintGlobal(namespace,"^DeepSee.Overrides",8)
+				Do WriteLog("</td>",6)
+				Do WriteLog("</tr>",4)	
+				Do WriteLog("</tbody>",2)
+	 			Do WriteLog("</table>",0)
+			} Else {
+				//If there are many overrides place them in a scrollable div
+				Do WriteLog("</tbody>",2)
+ 				Do WriteLog("</table>",0)
+		 		Do WriteLog("<hr noshade size=""4"" width=""auto"">")
+				Do WriteLog("<a name=""overrides""</a>")
+				Do WriteLog("<h2>DeepSee Overrides</h2>")
+				Do WriteLog("<div class=""scrollable"" style=""width:100%;height:400px;"">")
+				Do PrintGlobal(namespace,"^DeepSee.Overrides",2)
+				Do WriteLog("</div>")
+ 			}	
 		} Else {
-			//If there are many overrides place them in a scrollable div
 			Do WriteLog("</tbody>",2)
  			Do WriteLog("</table>",0)
-		 	Do WriteLog("<hr noshade size=""4"" width=""auto"">")
-			Do WriteLog("<a name=""overrides""</a>")
-			Do WriteLog("<h2>DeepSee Overrides</h2>")
-			Do WriteLog("<div class=""scrollable"" style=""width:100%;height:400px;"">")
-			Do PrintGlobal(namespace,"^DeepSee.Overrides",2)
-			Do WriteLog("</div>")
- 		}	
-	} Else {
-		Do WriteLog("</tbody>",2)
- 		Do WriteLog("</table>",0)
-	}
+		}
 	} Catch(ex) {
 		Set tSC = ex.AsStatus()
 		Do WriteLog("Error in LogDeepSeeSetupSection: "_tSC,0)
@@ -999,16 +1005,16 @@ LogBuildSynchSection
 		 	Do WriteLog("<tbody>",4)
 		 	Do WriteLog("<tr>",6)
 		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',0,1)"">Cube Name</th>",8)
-		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',1,0)"">Source Count</th>",8)
-		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',2,0)"">Fact Count</th>",8)
-		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',3,0)"">Build Time [s]</th>",8)
-		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',4,0)"">Build Rate [Facts/s]</th>",8)
-		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',5,0)"">Build Errors</th>",8)
-			Do WriteLog("<th onclick=""sortTable('BuildSynchTable',6,0)"""_
+		 	//Do WriteLog("<th onclick=""sortTable('BuildSynchTable',1,0)"">Source Count</th>",8)
+		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',1,0)"">Fact Count</th>",8)
+		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',2,0)"">Build Time [s]</th>",8)
+		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',3,0)"">Build Rate [Facts/s]</th>",8)
+		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',4,0)"">Build Errors</th>",8)
+			Do WriteLog("<th onclick=""sortTable('BuildSynchTable',5,0)"""_
 				"title=""From ^DeepSeeUpdate (or ^OBJ.DSTIME before DTB422)"">DSTIME</th>",8)
-		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',7,1)"">Last Compile</th>",8)
-		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',8,1)"" title=""As logged in ^DeepSee.Update (or ^OBJ.DSTIME before DTB422)"">Last Build/Synch</th>",8)
-		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',9,1)"" title=""Does not reflect build order"">Related Cubes</th>",8)
+		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',6,1)"">Last Compile</th>",8)
+		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',7,1)"" title=""As logged in ^DeepSee.Update (or ^OBJ.DSTIME before DTB422)"">Last Build/Synch</th>",8)
+		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',8,1)"" title=""Does not reflect build order"">Related Cubes</th>",8)
 		 	Do WriteLog("</tr>",6)
 		 	Set storageList=""
 			Set dataConnectorList=""			
@@ -1020,7 +1026,7 @@ LogBuildSynchSection
 					Do WriteLog("<tr>",6)
 					Do WriteLog("<td>"_cubename_"</td>",8)					//cubename
 
-
+					/* //COUNT(*)
  					Set countstar = ""
 					Set type=$LG(plist(cubenode),4)							//subject area or cube?
 					Set sourceClass = $$GetSourceClass(cubenode,type)
@@ -1032,8 +1038,7 @@ LogBuildSynchSection
  						Set countstar=$$GetSourceFactCount(sqlclass)
 						Do WriteLog("<td>"_$FNUMBER(countstar,"O,")_"</td>",8)
 					}
-  			
-					
+  					*/					
 					
 					Set lastmod=$zdt($LG(plist(cubenode),3),3)				//last cube compile
 					Set facts=##class(%DeepSee.Utils).%GetCubeFactCount(cubename)	//number of facts
@@ -1316,6 +1321,7 @@ LogCubeInfo
     Do WriteLog("</tr>",4)
     Do WriteLog("<tr>",4)
     Do WriteLog("<td>",6)
+    //Row count on source. It might take some time (even 150 seconds on 100M facts)
     Do WriteLog("<h4>Source Count</h4>",8)
     //Check the following for abstract cubes and data connectors
     If (sqlclass="Not available")||('##class(%SYSTEM.SQL).TableExists(sqlclass)) {
@@ -2681,7 +2687,7 @@ OSVer
 		}
 	} Catch(ex) {
 		Set tSC = ex.AsStatus()
-		Do WriteLog(tSC,8)
+		Do WriteLog($System.Status.DisplayError(tSC),8)
 	}
 	Do WriteLog("</p>",8)
 	Quit
@@ -3124,8 +3130,9 @@ alertRoutineSize(RoutineSize,alerts) {
 			Do WriteLog("<p class=""red"" "_pre_alert_"</p>",8)
 		}
 		Set tSC = 1
-	} Catch (exc) {
-		Set tSC = exc.AsStatus()
+	} Catch (ex) {
+		Set tSC = ex.AsStatus()
+		Set tSC = $System.Status.DisplayError(tSC)
 	}
 	Quit tSC
 }
@@ -3139,8 +3146,9 @@ alertGlobalKSize(GlobalKSize,alerts) {
 			Do WriteLog("<p class=""red"" "_pre_alert_"</p>",8)
 		}
 		Set tSC = 1
-	} Catch (exc) {
-		Set tSC = exc.AsStatus()
+	} Catch (ex) {
+		Set tSC = ex.AsStatus()
+		Set tSC = $System.Status.DisplayError(tSC)
 	}
 	Quit tSC
 }
@@ -3160,8 +3168,9 @@ alertDStimeRW(DSTimeMapFrom,alerts) {
 			Do WriteLog("<p class=""red"" "_pre_alert_"</p>",8)
 		}
 		Set tSC = 1
-	} Catch (exc) {
-		Set tSC = exc.AsStatus()
+	} Catch (ex) {
+		Set tSC = ex.AsStatus()
+		Set tSC = $System.Status.DisplayError(tSC)
 	}
 	Quit tSC
 }
@@ -3188,7 +3197,7 @@ alertCacheMappings(ns,alerts) {
 				Quit
 			}	
 		}
-	} Catch (exc) {
+	} Catch (ex) {
 		Set tSC = ex.AsStatus()
 		Do WriteLog("<p class=""red"" "_tSC_"</p>",8)
 	}
@@ -3216,7 +3225,7 @@ alertCacheMappingsOLD(ns,DeepSeeMap,alerts) {
 			Set mapcount=$O(DeepSeeMap(ns,mapcount))
 		}
 		Set tSC = $$$OK
-	} Catch (exc) {
+	} Catch (ex) {
 		Set tSC = ex.AsStatus()
 	}
 	Quit tSC
@@ -3233,10 +3242,10 @@ alertInitialBuildCubeManager(cube,msgrepair,msgbuild,alerts) {
 		Set tSC = 1
 	} Catch(ex) {
 		Set pre="<p class=""red"" title=""Before you synchronize cubes from the Cube Manager, it is necessary to build the cubes at least once from the Cube Manager."">"
-		Set alert = Ext
+		Set tSC = ex.AsStatus()
+		Set alert = tSC
 		Set alerts($I(alerts)) = alert
 		Do WriteLog(pre_alert_"</p>",8)
-		Set tSC = ex.AsStatus()
 	}
 }
 
