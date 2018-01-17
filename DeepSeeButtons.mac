@@ -2496,7 +2496,7 @@ DialogCubes(namespace) {
 			}
 		}
 	}
-	Set cubeString=$p(cubeString,",",2,*)		//Eliminate leading comma
+	Set:$E(cubeString,0,1)="," cubeString=$p(cubeString,",",2,*)	//Eliminate leading comma
 	Set cubeSelection=$LFS(cubeString,",")		//Create list
 	ZN "%SYS"
 	Quit cubeSelection
