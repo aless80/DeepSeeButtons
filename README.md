@@ -1,7 +1,7 @@
 # DeepSeeButtons
 Script used by the DeepSee support group at InterSystems to gather system information. 
 
-Import DeepSeeButtons.mac (I suggest to the %SYS namespace) and launch it from terminal as:
+Import DeepSeeButtons.mac to the %SYS namespace. However, if your Caché version does not support the new UDL formatting (it should be Caché 2016.1 and below) import DeepSeeButtons.xml. Launch DeepSeeButtons from terminal as:
 
 `%SYS>Do ^DeepSeeButtons`
 
