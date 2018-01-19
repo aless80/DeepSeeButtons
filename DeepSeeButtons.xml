@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Export generator="Cache" version="25" zv="Cache for UNIX (SUSE Linux Enterprise Server for x86-64) 2017.2.1 (Build 801)" ts="2018-01-19 17:08:25">
-<Routine name="DeepSeeButtons" type="MAC" languagemode="0" timestamp="64667,61695.227624"><![CDATA[
+<Export generator="Cache" version="25" zv="Cache for UNIX (SUSE Linux Enterprise Server for x86-64) 2017.2.1 (Build 801)" ts="2018-01-19 17:13:54">
+<Routine name="DeepSeeButtons" type="MAC" languagemode="0" timestamp="64667,61920.554679"><![CDATA[
 DeepSeeButtons(namespace="ask",cubeString="ask", getLogs="", LogFile="", proceed="")
 #include %occConstant
 
@@ -3234,10 +3234,10 @@ alertTimeLevels(timeLevels,alerts) {
 		Set DimNo=$O(timeLevels(""),-1)
 		For {
 			Quit:DimNo=""
-			Set week = ""
 			Set HierNo=$O(timeLevels(DimNo,""),-1)
 			For {
 				Quit:HierNo=""
+				Set week = ""
 				Set LevelNo=$O(timeLevels(DimNo,HierNo,""),-1)
 				For {
 					Quit:LevelNo=""

@@ -3232,10 +3232,10 @@ alertTimeLevels(timeLevels,alerts) {
 		Set DimNo=$O(timeLevels(""),-1)
 		For {
 			Quit:DimNo=""
-			Set week = ""
 			Set HierNo=$O(timeLevels(DimNo,""),-1)
 			For {
 				Quit:HierNo=""
+				Set week = ""
 				Set LevelNo=$O(timeLevels(DimNo,HierNo,""),-1)
 				For {
 					Quit:LevelNo=""
