@@ -1514,7 +1514,7 @@ LogCubeDimensions
 	Do WriteLog("</tr>",4)
 	Set DimNo=$O(dimensionlist(-1)) //skip Calculated Dimensions
 	Set oldHierNo=0
- 	Set timeLevels=""
+ 	Kill timeLevels
 	For {
 		Quit:DimNo=""
 		Set HierNo=$O(dimensionlist(DimNo,""))

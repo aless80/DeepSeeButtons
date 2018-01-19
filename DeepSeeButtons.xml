@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Export generator="Cache" version="25" zv="Cache for UNIX (SUSE Linux Enterprise Server for x86-64) 2017.2.1 (Build 801)" ts="2018-01-19 16:56:36">
-<Routine name="DeepSeeButtons" type="MAC" languagemode="0" timestamp="64667,60989.41643"><![CDATA[
+<Export generator="Cache" version="25" zv="Cache for UNIX (SUSE Linux Enterprise Server for x86-64) 2017.2.1 (Build 801)" ts="2018-01-19 17:08:25">
+<Routine name="DeepSeeButtons" type="MAC" languagemode="0" timestamp="64667,61695.227624"><![CDATA[
 DeepSeeButtons(namespace="ask",cubeString="ask", getLogs="", LogFile="", proceed="")
 #include %occConstant
 
@@ -1516,7 +1516,7 @@ LogCubeDimensions
 	Do WriteLog("</tr>",4)
 	Set DimNo=$O(dimensionlist(-1)) //skip Calculated Dimensions
 	Set oldHierNo=0
- 	Set timeLevels=""
+ 	Kill timeLevels
 	For {
 		Quit:DimNo=""
 		Set HierNo=$O(dimensionlist(DimNo,""))
