@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Export generator="Cache" version="25" zv="Cache for UNIX (SUSE Linux Enterprise Server for x86-64) 2017.2.1 (Build 801)" ts="2018-01-18 09:49:59">
-<Routine name="DeepSeeButtons" type="MAC" languagemode="0" timestamp="64665,34993.030952"><![CDATA[
+<Export generator="Cache" version="25" zv="Cache for UNIX (SUSE Linux Enterprise Server for x86-64) 2017.2.1 (Build 801)" ts="2018-01-19 16:43:49">
+<Routine name="DeepSeeButtons" type="MAC" languagemode="0" timestamp="64667,59917.234966"><![CDATA[
 DeepSeeButtons(namespace="ask",cubeString="ask", getLogs="", LogFile="", proceed="")
 #include %occConstant
 
@@ -669,7 +669,6 @@ LogDeepSeeSetupSection
 				}
 			}
 			Set sc = $$alertCacheMappings(namespace,.alerts)
-			//Set sc = $$alertCacheMappingsOLD(namespace,.DeepSeeMap,.alerts)
 			If $D(DSTimeMapFrom(namespace)){
 				Set sc = $$alertDStimeRW(DSTimeMapFrom(namespace),.alerts)
 			}
@@ -1506,72 +1505,87 @@ LogCubeDimensions
 		Quit
 	}	
 	Do WriteLog("<h4>Dimension List</h4>")
-	Set dimensionstatus=##class(%DeepSee.Utils).%GetDimensionList(cube,.dimensionlist,1)
-		Do WriteLog("<table id=""DimensionTable"" border=""0"" class=""tableWithBorders"" cellpadding=""3"" cellspacing=""3"">")
-		Do WriteLog("<tbody>",2)
-		Do WriteLog("<tr>",4)
-		Do WriteLog("<th>Dimension</th>",6)
-		Do WriteLog("<th>Hierarchy </th>",6)
-		Do WriteLog("<th>Level</th>",6)
-		Do WriteLog("<th>Type</th>",6)
-		Do WriteLog("</tr>",4)
-		Set DimNo=$O(dimensionlist(-1)) //skip Calculated Dimensions
-		Set oldHierNo=0
+	Set st=##class(%DeepSee.Utils).%GetDimensionList(cube,.dimensionlist,1)
+	Do WriteLog("<table id=""DimensionTable"" border=""0"" class=""tableWithBorders"" cellpadding=""3"" cellspacing=""3"">")
+	Do WriteLog("<tbody>",2)
+	Do WriteLog("<tr>",4)
+	Do WriteLog("<th>Dimension</th>",6)
+	Do WriteLog("<th>Hierarchy </th>",6)
+	Do WriteLog("<th>Level</th>",6)
+	Do WriteLog("<th>Type</th>",6)
+	Do WriteLog("</tr>",4)
+	Set DimNo=$O(dimensionlist(-1)) //skip Calculated Dimensions
+	Set oldHierNo=0
+	
+ 	Set timeLevels=""
+	
+	For {
+		Quit:DimNo=""
+		Set HierNo=$O(dimensionlist(DimNo,""))
 		For {
-			QUIT:DimNo=""
-			Set HierNo=$O(dimensionlist(DimNo,""))
-			For{
-				If HierNo="" {
-					Set oldHierNo=0
-					Quit
-				}
-				Set LevelNo=$O(dimensionlist(DimNo,HierNo,""))
-				For{
-					QUIT:LevelNo=""
-					Set type=$LG(dimensionlist(DimNo,HierNo,LevelNo),1)
-					If (HierNo=0) {  //Dimension. 
-						//In this case 4th item "type" is actually the caption for all level
+			If HierNo="" {
+				Set oldHierNo=0
+				Quit
+			}
+			Set LevelNo=$O(dimensionlist(DimNo,HierNo,""))
+			For {
+				Quit:LevelNo=""
+				Set type=$LG(dimensionlist(DimNo,HierNo,LevelNo),1)
+				If (HierNo=0) {  //Dimension. 
+					//In this case 4th item "type" is actually the caption for all level
+					Do WriteLog("<tr>",4)
+					Do WriteLog("<td>"_$LG(dimensionlist(DimNo,HierNo,LevelNo),2)_"</td>",6) 	//DimName
+					If ($LG(dimensionlist(DimNo,HierNo,LevelNo),1)="r") { //relationships
+						Do WriteLog("<td></td>",6)
+						Do WriteLog("<td></td>",6)
+						Do WriteLog("<td></td>",6)
+					}
+					
+					If ((type="d") && ($LG(dimensionlist(DimNo,HierNo,LevelNo),4)'="")) {
+						Do WriteLog("<td></td>",6)
+						Do WriteLog("<td>"_$LG(dimensionlist(DimNo,HierNo,LevelNo),4)_"</td>",6)
+						Do WriteLog("<td>[All level]</td>",6)
+						Do WriteLog("</tr>",4)
 						Do WriteLog("<tr>",4)
-						Do WriteLog("<td>"_$LG(dimensionlist(DimNo,HierNo,LevelNo),2)_"</td>",6) 	//DimName
-						If ($LG(dimensionlist(DimNo,HierNo,LevelNo),1)="r") { //relationships
-							Do WriteLog("<td></td>",6)
-							Do WriteLog("<td></td>",6)
-							Do WriteLog("<td></td>",6)
-						}
-						
-						If ((type="d") && ($LG(dimensionlist(DimNo,HierNo,LevelNo),4)'="")) {
-							Do WriteLog("<td></td>",6)
-							Do WriteLog("<td>"_$LG(dimensionlist(DimNo,HierNo,LevelNo),4)_"</td>",6)
-							Do WriteLog("<td>[All level]</td>",6)
+						Do WriteLog("<td></td>",6) 	//Skip DimName column
+					}
+				} 
+				If (HierNo'=0){
+					If type="all" {
+						//Skip the all level because it was already shown next to the dimension
+					} ElseIf ((LevelNo=0) && (DimNo'=0)) {
+						Set newHier=0
+						If (oldHierNo && (HierNo'=oldHierNo)) { //Maybe the logic could be simpler but this works
 							Do WriteLog("</tr>",4)
 							Do WriteLog("<tr>",4)
-							Do WriteLog("<td></td>",6) 	//Skip DimName column
+							Do WriteLog("<td></td>",6)
 						}
-					} 
-					If (HierNo'=0){
-						If type="all" {
-							//Skip the all level because it was already shown next to the dimension
-						} ElseIf ((LevelNo=0) && (DimNo'=0)) {
-							Set newHier=0
-							If (oldHierNo && (HierNo'=oldHierNo)) { //Maybe the logic could be simpler but this works
-								Do WriteLog("</tr>",4)
-								Do WriteLog("<tr>",4)
-								Do WriteLog("<td></td>",6)
-							}
-							Do WriteLog("<td>"_$LG(dimensionlist(DimNo,HierNo,LevelNo),3)_"</td>",6)	//HierName
-						} ElseIf ((LevelNo=0) && (DimNo=0)){ //Measures section
-							If HierNo>1 {
- 								Do WriteLog("</tr>",4)
-								Do WriteLog("<tr>",4)
-								Do WriteLog("<td></td>",6)
-							} 
-							Do WriteLog("<td>"_$LG(dimensionlist(DimNo,HierNo,LevelNo),3)_"</td>",6)	//MeasName
+						Do WriteLog("<td>"_$LG(dimensionlist(DimNo,HierNo,LevelNo),3)_"</td>",6)	//HierName
+					} ElseIf ((LevelNo=0) && (DimNo=0)){ //Measures section
+						If HierNo>1 {
+ 							Do WriteLog("</tr>",4)
+							Do WriteLog("<tr>",4)
 							Do WriteLog("<td></td>",6)
-							Do WriteLog("<td></td>",6)
-						} ElseIf (DimNo'=0) {
-							If newHier {
-								Do WriteLog("</tr>",4)
-								Do WriteLog("<tr>",4)
+						} 
+						Do WriteLog("<td>"_$LG(dimensionlist(DimNo,HierNo,LevelNo),3)_"</td>",6)	//MeasName
+						Do WriteLog("<td></td>",6)
+						Do WriteLog("<td></td>",6)
+					} ElseIf (DimNo'=0) {
+						
+						
+						
+				
+
+ s a=^DeepSee.Cubes("cubes",cube,"mbr#",DimNo,HierNo,LevelNo)				
+ If $E($LG(a,6),0,14)="%DeepSee.Time." {
+	 S timeLevels(DimNo,HierNo,LevelNo)=$LB($LG(a,6),cube,$LG(a,2),$LG(a,3),$LG(a,4))
+ }
+
+						
+						
+						If newHier {
+							Do WriteLog("</tr>",4)
+							Do WriteLog("<tr>",4)
 								Do WriteLog("<td></td>",6)
 								Do WriteLog("<td></td>",6)
 							}
@@ -1580,17 +1594,30 @@ LogCubeDimensions
 							Do WriteLog("<td>"_type_"</td>",6) 		//type
 							Set newHier=1
 						}
-					}
-					Set LevelNo=$O(dimensionlist(DimNo,HierNo,LevelNo))						
 				}
-				Set oldHierNo=HierNo
-				Set HierNo=$O(dimensionlist(DimNo,HierNo))
+				Set LevelNo=$O(dimensionlist(DimNo,HierNo,LevelNo))						
 			}
-			Set DimNo=$O(dimensionlist(DimNo))
- 			Do WriteLog("</tr>",4)
+			Set oldHierNo=HierNo
+			Set HierNo=$O(dimensionlist(DimNo,HierNo))
 		}
+		Set DimNo=$O(dimensionlist(DimNo))
+ 		Do WriteLog("</tr>",4)
+	}
 	Do WriteLog("</tbody>",2)
 	Do WriteLog("</table>")
+	
+	
+	
+	
+	
+	//Alert if incompatible time levels are found
+ 	Set sc = $$alertTimeLevels(.timeLevels,.alerts) //pass timeLevels
+	
+	
+	
+	
+	
+	
 	//Show calculated members in ^DeepSee.CalcMbrs
 	Do WriteLog("<h4>Calculated Members</h4>")
 	If $D(^DeepSee.CalcMbrs(cube)) {
@@ -1655,7 +1682,6 @@ LogCubeDimensions
 	ZN "%SYS"
 	Quit
 	
-
 LogOtherCubeElements
 	Do WriteUpdate("Getting detailed cube information for "_cube_": other cube elements")
 	ZN namespace
@@ -3206,33 +3232,6 @@ alertCacheMappings(ns,alerts) {
 	Quit tSC
 }
 
-alertCacheMappingsOLD(ns,DeepSeeMap,alerts) {
-	Try {
-		//Parse Map.namespace in cpf file
-		Set mapcount=$O(DeepSeeMap(ns,""))
- 		While mapcount'="" {
- 			Set global=$P($P(DeepSeeMap(ns,mapcount),"_",2,*),"=",1)
-			Set DB=$P($P(DeepSeeMap(ns,mapcount),"_",2,*),"=",2,*)
-			If ((global="DeepSee.Cache.*") || (global="DeepSee.Cache*")) {
-				//Check if DB is journaled
-				Set sc = ##class(Config.Databases).Get(DB, .prop)
-				Set db=##Class(SYS.Database).%OpenId(prop("Directory"))
-				If (db.GlobalJournalState = 3) {
-					Set pre="title=""Journaling the DeepSee cache leads to problems with disk size and query performance"">"
-					Set alert = "Alert: The DeepSee cache stored in the "_DB_" database is journaled"
-					Set alerts($I(alerts)) = pre_alert
-					Do WriteLog("<p class=""red"" "_pre_alert_"</p>",8)
-				}
-			}
-			Set mapcount=$O(DeepSeeMap(ns,mapcount))
-		}
-		Set tSC = $$$OK
-	} Catch (ex) {
-		Set tSC = ex.AsStatus()
-	}
-	Quit tSC
-}
-
 alertInitialBuildCubeManager(cube,msgrepair,msgbuild,alerts) {
 	Try {
 		If ((msgrepair="Not found") && (msgbuild="Not found")) {
@@ -3249,6 +3248,44 @@ alertInitialBuildCubeManager(cube,msgrepair,msgbuild,alerts) {
 		Set alerts($I(alerts)) = alert
 		Do WriteLog(pre_alert_"</p>",8)
 	}
+}
+
+alertTimeLevels(timeLevels,alerts) {
+	Try {
+		Set DimNo=$O(timeLevels(""),-1)
+		For {
+			Quit:DimNo=""
+			Set week = ""
+			Set HierNo=$O(timeLevels(DimNo,""),-1)
+			For {
+				Quit:HierNo=""
+				Set LevelNo=$O(timeLevels(DimNo,HierNo,""),-1)
+				For {
+					Quit:LevelNo=""
+					Set levelType = $LG(timeLevels(DimNo,HierNo,LevelNo),1)
+ 					If week'="" {
+	 					Set pre="title=""Placing certain time levels such as Year of Month in the same hierarchy as a week level will lead to unexpected results"">"
+	 					Set alert = "The "_$LG(week,3)_"."_$LG(week,4)_"."_$LG(week,5)_" level in the "_$LG(week,2)_
+	 						" cube using the "_$LG(week,1)_" time function is incompatible with other time levels in the same hierarchy"
+	 					Set alerts($I(alerts)) = pre_alert
+						Do WriteLog("<p class=""red"" "_pre_alert_"</p>",0)
+	 					Quit
+ 					}
+ 					If levelType="%DeepSee.Time.WeekNumber" {
+						Set week = timeLevels(DimNo,HierNo,LevelNo)
+					}
+ 					Set LevelNo=$O(timeLevels(DimNo,HierNo,LevelNo),-1)
+				}
+				Set HierNo=$O(timeLevels(DimNo,HierNo),-1)
+			}
+			Set DimNo=$O(timeLevels(DimNo),-1)
+		}
+		Set tSC = 1
+	} Catch (ex) {
+		Set tSC = ex.AsStatus()
+		Set tSC = $System.Status.DisplayError(tSC)
+	}
+	Quit tSC
 }
 
 
