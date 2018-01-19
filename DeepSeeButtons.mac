@@ -1514,9 +1514,7 @@ LogCubeDimensions
 	Do WriteLog("</tr>",4)
 	Set DimNo=$O(dimensionlist(-1)) //skip Calculated Dimensions
 	Set oldHierNo=0
-	
  	Set timeLevels=""
-	
 	For {
 		Quit:DimNo=""
 		Set HierNo=$O(dimensionlist(DimNo,""))
@@ -1569,18 +1567,10 @@ LogCubeDimensions
 						Do WriteLog("<td></td>",6)
 						Do WriteLog("<td></td>",6)
 					} ElseIf (DimNo'=0) {
-						
-						
-						
-				
-
- s a=^DeepSee.Cubes("cubes",cube,"mbr#",DimNo,HierNo,LevelNo)				
- If $E($LG(a,6),0,14)="%DeepSee.Time." {
-	 S timeLevels(DimNo,HierNo,LevelNo)=$LB($LG(a,6),cube,$LG(a,2),$LG(a,3),$LG(a,4))
- }
-
-						
-						
+ 						If $E($LG(^DeepSee.Cubes("cubes",cube,"mbr#",DimNo,HierNo,LevelNo),6),0,14)="%DeepSee.Time." {
+	 						Set temp=^DeepSee.Cubes("cubes",cube,"mbr#",DimNo,HierNo,LevelNo)
+	 						Set timeLevels(DimNo,HierNo,LevelNo)=$LB($LG(temp,6),cube,$LG(temp,2),$LG(temp,3),$LG(temp,4))
+ 						}
 						If newHier {
 							Do WriteLog("</tr>",4)
 							Do WriteLog("<tr>",4)
@@ -1603,19 +1593,8 @@ LogCubeDimensions
 	}
 	Do WriteLog("</tbody>",2)
 	Do WriteLog("</table>")
-	
-	
-	
-	
-	
 	//Alert if incompatible time levels are found
- 	Set sc = $$alertTimeLevels(.timeLevels,.alerts) //pass timeLevels
-	
-	
-	
-	
-	
-	
+ 	Set sc = $$alertTimeLevels(.timeLevels,.alerts)
 	//Show calculated members in ^DeepSee.CalcMbrs
 	Do WriteLog("<h4>Calculated Members</h4>")
 	If $D(^DeepSee.CalcMbrs(cube)) {
