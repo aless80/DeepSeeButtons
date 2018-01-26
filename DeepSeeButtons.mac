@@ -1594,7 +1594,7 @@ LogCubeDimensions
 	Do WriteLog("</tbody>",2)
 	Do WriteLog("</table>")
 	//Alert if incompatible time levels are found
- 	Set sc = $$alertTimeLevelsNew(.timeLevels,.alerts)
+ 	Set sc = $$alertTimeLevels(.timeLevels,.alerts)
 	//Show calculated members in ^DeepSee.CalcMbrs
 	Do WriteLog("<h4>Calculated Members</h4>")
 	If $D(^DeepSee.CalcMbrs(cube)) {
@@ -3227,7 +3227,7 @@ alertInitialBuildCubeManager(cube,msgrepair,msgbuild,alerts) {
 	}
 }
 
-alertTimeLevelsNew(timeLevels,alerts) {
+alertTimeLevels(timeLevels,alerts) {
 	Try {
 		Set throwalert=0
 		Set DimNo=$O(timeLevels(""))
@@ -3316,45 +3316,6 @@ alertTimeLevelsNew(timeLevels,alerts) {
 				Set HierNo=$O(timeLevels(DimNo,HierNo))
 			}
 			Set DimNo=$O(timeLevels(DimNo))
-		}
-		Set tSC = 1
-	} Catch (ex) {
-		Set tSC = ex.AsStatus()
-		Set tSC = $System.Status.DisplayError(tSC)
-	}
-	Quit tSC
-}
-
-
-alertTimeLevels(timeLevels,alerts) {
-	Try {
-		Set DimNo=$O(timeLevels(""),-1)
-		For {
-			Quit:DimNo=""
-			Set HierNo=$O(timeLevels(DimNo,""),-1)
-			For {
-				Quit:HierNo=""
-				Set week = ""
-				Set LevelNo=$O(timeLevels(DimNo,HierNo,""),-1)
-				For {
-					Quit:LevelNo=""
-					Set levelType = $LG(timeLevels(DimNo,HierNo,LevelNo),1)
- 					If week'="" {
-	 					Set pre="title=""Placing certain time levels such as Year of Month in the same hierarchy as a week level will lead to unexpected results"">"
-	 					Set alert = "The "_$LG(week,3)_"."_$LG(week,4)_"."_$LG(week,5)_" level in the "_$LG(week,2)_
-	 						" cube using the "_$LG(week,1)_" time function is incompatible with other time levels in the same hierarchy"
-	 					Set alerts($I(alerts)) = pre_alert
-						Do WriteLog("<p class=""red"" "_pre_alert_"</p>",0)
-	 					Quit
- 					}
- 					If levelType="%DeepSee.Time.WeekNumber" {
-						Set week = timeLevels(DimNo,HierNo,LevelNo)
-					}
- 					Set LevelNo=$O(timeLevels(DimNo,HierNo,LevelNo),-1)
-				}
-				Set HierNo=$O(timeLevels(DimNo,HierNo),-1)
-			}
-			Set DimNo=$O(timeLevels(DimNo),-1)
 		}
 		Set tSC = 1
 	} Catch (ex) {
