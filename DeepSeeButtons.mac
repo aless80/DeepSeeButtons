@@ -1594,7 +1594,7 @@ LogCubeDimensions
 	Do WriteLog("</tbody>",2)
 	Do WriteLog("</table>")
 	//Alert if incompatible time levels are found
- 	Set sc = $$alertTimeLevels(.timeLevels,.alerts)
+ 	Set sc = $$alertTimeLevelsNew(.timeLevels,.alerts)
 	//Show calculated members in ^DeepSee.CalcMbrs
 	Do WriteLog("<h4>Calculated Members</h4>")
 	If $D(^DeepSee.CalcMbrs(cube)) {
@@ -3226,6 +3226,105 @@ alertInitialBuildCubeManager(cube,msgrepair,msgbuild,alerts) {
 		Do WriteLog(pre_alert_"</p>",8)
 	}
 }
+
+alertTimeLevelsNew(timeLevels,alerts) {
+	Try {
+		Set throwalert=0
+		Set DimNo=$O(timeLevels(""))
+		For {
+			Quit:DimNo=""
+			Set HierNo=$O(timeLevels(DimNo,""))
+			For {
+				Quit:HierNo=""
+				
+				Set typeparent = ""
+				Set levelparent = ""	
+			
+				Set LevelNo=$O(timeLevels(DimNo,HierNo,""))
+				For {
+					Quit:LevelNo=""
+					Set levelType = $LG(timeLevels(DimNo,HierNo,LevelNo),1)
+					
+					Set type = $S(levelType="%DeepSee.Time.Decade":"normal",
+						levelType="%DeepSee.Time.Year":"normal",
+						levelType="%DeepSee.Time.QuarterYear":"normal",
+						levelType="%DeepSee.Time.MonthYear":"normal",
+						levelType="%DeepSee.Time.DayMonthYear":"normal",
+						levelType="%DeepSee.Time.WeekYear":"normal",
+						levelType="%DeepSee.Time.WeekNumber":"week",		
+						levelType="%DeepSee.Time.QuarterNumber":"normal",
+						levelType="%DeepSee.Time.MonthNumber":"normal",
+						levelType="%DeepSee.Time.DayNumber":"normal",
+						levelType="%DeepSee.Time.DayOfWeek":"normal",
+						levelType="%DeepSee.Time.HourNumber":"time",
+						levelType="%DeepSee.Time.MinuteNumber":"time",
+						1:"custom")
+					Set level = $S(levelType="%DeepSee.Time.Decade":9,
+						levelType="%DeepSee.Time.Year":8,
+						levelType="%DeepSee.Time.QuarterYear":7,
+						levelType="%DeepSee.Time.MonthYear":6,
+						levelType="%DeepSee.Time.DayMonthYear":3,
+						levelType="%DeepSee.Time.WeekYear":5,
+						levelType="%DeepSee.Time.WeekNumber":4,
+						levelType="%DeepSee.Time.QuarterNumber":7,
+						levelType="%DeepSee.Time.MonthNumber":6,
+						levelType="%DeepSee.Time.DayNumber":3,
+						levelType="%DeepSee.Time.DayOfWeek":3,
+						levelType="%DeepSee.Time.HourNumber":2,
+						levelType="%DeepSee.Time.MinuteNumber":1,
+						1:"custom")
+					
+					//Start by excluding the custom time dimensions. 
+					If (type="custom") || (typeparent="custom") {
+						//Custom time levels. Good to go
+					} ElseIf (typeparent = "") || (levelparent="") {
+						//Top level. Good to go
+					} ElseIf (level>levelparent) {
+						Set throwalert = 1
+					} ElseIf (type'=typeparent) {
+						//Check when mixing different types. The previous check took care of several wrong cases
+						//Hours and Minutes are incompatible with anything else
+						If (type="time") || (typeparent="time") {
+							Set throwalert = 1
+						} ElseIf (typeparent="normal") && (type="week") { 
+							//WeekNumber is under a "normal" level such as Year. WeekYear is ok
+							If (level'=4) {
+								Set throwalert = 1
+							}
+						} ElseIf (typeparent="week") {
+							//This is fine because type="time" bigger level numbers were caught before. Days are fine
+						} ElseIf (typeparent="other") {
+							//I assume abstract/custom time functions are ok
+						}
+					}
+ 					If throwalert=1 {
+	 					Set tl = timeLevels(DimNo,HierNo,LevelNo)
+	 					Set pre="title=""Placing certain time levels such as Year of Month in the same hierarchy as a week level will lead to unexpected results"">"
+	 					Set alert = "The "_$LG(tl,3)_"."_$LG(tl,4)_"."_$LG(tl,5)_" level in the "_$LG(tl,2)_
+	 						" cube using the "_$LG(tl,1)_" time function is incompatible with other time levels in the same hierarchy"
+	 					Set alerts($I(alerts)) = pre_alert
+						Do WriteLog("<p class=""red"" "_pre_alert_"</p>",0)
+						Set throwalert=0
+	 					//Advance to next hierarchy, right?
+	 					Quit
+ 					}
+ 					 					
+ 					Set typeparent = type
+ 					Set levelparent = level
+ 					Set LevelNo=$O(timeLevels(DimNo,HierNo,LevelNo))
+				}
+				Set HierNo=$O(timeLevels(DimNo,HierNo))
+			}
+			Set DimNo=$O(timeLevels(DimNo))
+		}
+		Set tSC = 1
+	} Catch (ex) {
+		Set tSC = ex.AsStatus()
+		Set tSC = $System.Status.DisplayError(tSC)
+	}
+	Quit tSC
+}
+
 
 alertTimeLevels(timeLevels,alerts) {
 	Try {
