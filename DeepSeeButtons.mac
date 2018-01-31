@@ -1361,7 +1361,7 @@ LogCubeInfo
 	    //NB $zobjclassmethod(cubeclass,"%GetFilterSpec") would also return the result from %OnGetFilterSpec
 	    Set filterspec = $G(^DeepSee.Cubes("cubes",cube,"filterSpec"))
 	    Set:(filterspec="") filterspec = "filterspec property not defined"
-	    Do WriteLog("<p>"_filterspec_"</p>",8)
+	    Do WriteLog("<p>filterSpec: "_filterspec_"</p>",8)
     }
     Set method = ##class(%Dictionary.CompiledMethod).%OpenId(cubeclass_"||%OnProcessFact")
     If ((method="")||(method.Origin="%DeepSee.CubeDefinition")) {
@@ -2076,7 +2076,7 @@ LogCConsole
 
 LogMappings
 	Do WriteLog("<div id=""mappingsDiv"" onmouseover=""highlightLink(this,1)"" onmouseout=""highlightLink(this,0)"">")
-	Do WriteParagraph("mappings","Mappings")
+	Do WriteParagraph("Mappings","Mappings")
 	ZN "%SYS"
 	Try {
 		Set rs=##class(%ResultSet).%New("Config.MapGlobals:List")
