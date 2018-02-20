@@ -420,7 +420,7 @@ LogHead(cubeList,getLogs)
 	Do WriteLog("}",4)
 	Do WriteLog(".trapezoid span:hover, .offcanvas a:focus{",4)
 	Do WriteLog("color: rgb(104,30,30);",6)
-	Do WriteLog("opacity: 1.0;",6)
+	Do WriteLog("opacity: 0.1;",6)
 	Do WriteLog("}",4)
     Do WriteLog(".zebraStriped tbody tr:nth-child(odd) {",4)
     Do WriteLog("background-color: #ccc;",6)
@@ -502,7 +502,7 @@ LogHead(cubeList,getLogs)
 LogOpenMainDiv()
 	Do WriteLog("<div id=""main"">")
 	Do WriteLog("<a name=""top""></a>")
-	Do WriteLog("<h1>DeepSeeButtons: DeepSee Diagnostic for the "_namespace_" Namespace</h1>")
+	Do WriteLog("<h1 title=""Version 0.1"">DeepSeeButtons</h1>")
 	Quit
 
 LogDeepSeeSetupSection
@@ -667,6 +667,7 @@ LogDeepSeeSetupSection
 				}
 			}
 			Set sc = $$alertCacheMappings(namespace,.alerts)
+			Set sc = $$alertJoinIndexMappings(namespace,.alerts)
 			If $D(DSTimeMapFrom(namespace)){
 				Set sc = $$alertDStimeRW(DSTimeMapFrom(namespace),.alerts)
 			}
@@ -1630,7 +1631,7 @@ LogCubeDimensions
 			Do WriteLog("Do ##class(%DeepSee.Utils).%Analyze("""_cube_""","""_flag_""",0)")
 			Do ##class(%DeepSee.Utils).%Analyze(cube,flag,0)
 		} Else {
-			Do WriteLog("%Analyze was skipped because of the size fact or indices global. If important run the following command:")
+			Do WriteLog("%Analyze was skipped because of the sizes of ^DeepSee.Fact or ^DeepSee.Index global ("_sizefacts_" and "_sizeindex_", respectively). If important run the following command:")
 			Do WriteLog("Do ##class(%DeepSee.Utils).%Analyze("""_cube_""",""fci"",0)")
 		}
 		Do WriteLog("")
@@ -1744,7 +1745,6 @@ LogOtherCubeElements
 	//Listings
 	Do WriteLog("<h4>Listings</h4>")
 	If $D(listings){
-		Set listing=$O(listings(""))		//Initialize
 		Do WriteLog("<table id=""ListingTable"" cellpadding=""5"" cellspacing=""5"" class=""tableWithBorders"">")
 		Do WriteLog("<tbody>",2)
 		Do WriteLog("<tr>",4)
@@ -1753,7 +1753,14 @@ LogOtherCubeElements
 		Do WriteLog("<th>Source</th>",6)
 		Do WriteLog("<th>Resource</th>",6)
 		Do WriteLog("</tr>",6)
-		Do {										//Write fields of listing nicely
+		//Write fields of listing nicely
+		Set listing=$O(listings(""))
+		While listing'="" {
+			//$$$CUSTOM just marks there are listing fields			
+			If listing="$$$CUSTOM" {
+				Set listing=$O(listings(listing))
+				Continue
+			}
  			Do WriteLog("<td>"_listing_$S((listing=defaultListingName):" (default)",1:"")_"</td>",8)
 			Set fieldString=$LG(listings(listing),2)
  			Set listingSource=$LG(listings(listing),5) 			//Listing source
@@ -1845,7 +1852,7 @@ LogOtherCubeElements
 				}
 			}
 			Set listing=$O(listings(listing))
-		} while listing'=""		
+		}		
 		Do WriteLog("</tbody>",2)
 	 	Do WriteLog("</table>")
 	} Else{
@@ -3125,6 +3132,7 @@ encode(string) {
 	//Set out = $REPLACE(out,"&","&amp;")
 	Quit out
 }
+
 /// Alerts
 alertRoutineSize(RoutineSize,alerts) {
 	Try {
@@ -3158,19 +3166,21 @@ alertGlobalKSize(GlobalKSize,alerts) {
 	Quit tSC
 }
 
-
 alertDStimeRW(DSTimeMapFrom,alerts) {
 	Try {
 		ZN "%SYS"
 		//Check if DB is Read-Write
 		Set sc = ##class(Config.Databases).Get(DSTimeMapFrom, .prop)
-		Set db=##Class(SYS.Database).%OpenId(prop("Directory"))
-		Set readonly = db.ReadOnly
-		If readonly {
-			Set pre="title=""In Caché versions including DevChange DTB422 ^OBJ.DSTIME and ^DeepSee.Update should be mapped to a Read-Write database"">"
-			Set alert = "Alert: ^OBJ.DSTIME and/or ^DeepSee.Update are stored in the "_DSTimeMapFrom_" database, which should be Read-Write"
-			Set alerts($I(alerts)) = pre_alert
-			Do WriteLog("<p class=""red"" "_pre_alert_"</p>",8)
+		//If a remote DB is used we do not know
+		If prop("Server")'="" {
+			Set db=##Class(SYS.Database).%OpenId(prop("Directory"))
+			Set readonly = db.ReadOnly
+			If readonly {
+				Set pre="title=""In Caché versions including DevChange DTB422 ^OBJ.DSTIME and ^DeepSee.Update should be mapped to a Read-Write database"">"
+				Set alert = "Alert: ^OBJ.DSTIME and/or ^DeepSee.Update are stored in the "_DSTimeMapFrom_" database, which should be Read-Write"
+				Set alerts($I(alerts)) = pre_alert
+				Do WriteLog("<p class=""red"" "_pre_alert_"</p>",8)
+			}
 		}
 		Set tSC = 1
 	} Catch (ex) {
@@ -3202,6 +3212,32 @@ alertCacheMappings(ns,alerts) {
 				Quit
 			}	
 		}
+	} Catch (ex) {
+		Set tSC = ex.AsStatus()
+		Do WriteLog("<p class=""red"" "_tSC_"</p>",8)
+	}
+	Quit tSC
+}
+
+alertJoinIndexMappings(ns,alerts) {
+	Try {
+		//Check if ^DeepSee.JoinIndex ends up in a journaled DB. 
+		//It should go with the cache but it is less bad than journaling ^DeepSee.Cache* globals. 
+		//For this reason I keep this alert separate from alertCacheMappings
+		ZN "%SYS"		
+		Set tSC = $$$OK
+		Set cacheGlob = "DeepSee.JoinIndex"
+		Set sysdir=##class(%SYS.Namespace).GetGlobalDest(ns,cacheGlob)
+		//sysdir is system^directory, but only the directory is needed for the following call
+		Set DB=##class(SYS.Database).%OpenId($P(sysdir,"^",2))
+		If (DB.GlobalJournalState = 3) {
+			Do ##Class(Config.Databases).DatabasesByDirectory($P(sysdir,"^",1),$P(sysdir,"^",2),.listDB)
+			Set DBname=$LISTTOSTRING(listDB,",") //In general I would expect one DB but there could be more
+			Set pre="title=""We suggest mapping the ^DeepSee.JoinIndex global together with the DeepSee cache to an unjournaled database"">"
+			Set alert = "Alert: The ^DeepSee.JoinIndex global stored in the "_DBname_" database is journaled"
+			Set alerts($I(alerts)) = pre_alert
+			Do WriteLog("<p class=""red"" "_pre_alert_"</p>",8)
+		}	
 	} Catch (ex) {
 		Set tSC = ex.AsStatus()
 		Do WriteLog("<p class=""red"" "_tSC_"</p>",8)
