@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Export generator="Cache" version="25" zv="IRIS for UNIX (SUSE Linux Enterprise Server for x86-64) 2018.2 (Build 264U)" ts="2018-03-16 16:54:52">
+<Export generator="Cache" version="25" zv="IRIS for UNIX (SUSE Linux Enterprise Server for x86-64) 2018.2 (Build 264U)" ts="2018-03-20 17:03:05">
 <Class name="%DeepSee.UI.DSButtons">
 <Description>
 DeepSeeButtons page
@@ -7,7 +7,7 @@ This page lets you run DeepSeeButtons</Description>
 <IncludeCode>%DeepSee</IncludeCode>
 <Super>%DeepSee.UI.standardPage</Super>
 <System>4</System>
-<TimeChanged>64723,55123.195251</TimeChanged>
+<TimeChanged>64726,42073.062954</TimeChanged>
 <TimeCreated>64723,43831.94931</TimeCreated>
 
 <Parameter name="PAGENAME">
@@ -391,7 +391,7 @@ Create a new cube.</Description>
 			MODE:"models",
 	};
 	
-	zenLaunchPopupWindow('_DeepSee.UI.Dialog.DSButtons2.cls','DSButtons','status,resizable=yes,width=900,height=700',parms);
+	zenLaunchPopupWindow('_DeepSee.UI.Dialog.DSButtons.cls','DSButtons','status,resizable=yes,width=900,height=700',parms);
 ]]></Implementation>
 </Method>
 
@@ -530,7 +530,7 @@ ClassMethod GetPivotList(Output pList, pHidden As %Boolean = 0, pDSBName As %Str
 <Query name="GetDeepSeeButtonsReports">
 <Type>%Query</Type>
 <SqlProc>1</SqlProc>
-<Parameter name="ROWSPEC" value="DSBName,Analyzer,Architect,Dashboard,ScoreCard,Info,Application"/>
+<Parameter name="ROWSPEC" value="DSBName, TODO"/>
 </Query>
 
 <Method name="GetDeepSeeButtonsReportsExecute">
@@ -589,13 +589,355 @@ ClassMethod GetPivotList(Output pList, pHidden As %Boolean = 0, pDSBName As %Str
 
 
 <Class name="%DeepSee.UI.Dialog.DSButtons">
+<Copyright>/* Copyright (c) 2018 by InterSystems Corporation.
+   Cambridge, Massachusetts, U.S.A.  All rights reserved.
+   Confidential property of InterSystems Corporation. */</Copyright>
+<Description>
+This dialog builds facts and indices for a DeepSee cube and displays the output.
+!!! % complete, view log file, show errors, make non-modal!!!</Description>
+<Super>%DeepSee.UI.Dialog.standardDialog</Super>
+<System>4</System>
+<TimeChanged>64726,48238.308079</TimeChanged>
+<TimeCreated>64723,43934.943794</TimeCreated>
+
+<Parameter name="APPLYBUTTON">
+<Default>0</Default>
+</Parameter>
+
+<Property name="cubeClass">
+<Description>
+Cube class name.</Description>
+<Type>%ZEN.Datatype.string</Type>
+<Parameter name="ZENURL" value="CLASS"/>
+</Property>
+
+<Property name="nameSpace">
+<Type>%ZEN.Datatype.string</Type>
+</Property>
+
+<Property name="Cubes">
+<Description>
+
+Cube name.
+Property cubeName As %ZEN.Datatype.string(ZENURL = "CUBE");
+
+The maximum number of records for be built defined for the selected cube
+Property maxFacts As %ZEN.Datatype.string(ZENURL = "maxFacts");
+
+The maximum number of records to be built for the the selected cube in this session (overrides maxFacts)
+Property TempMaxFacts As %ZEN.Datatype.string;
+
+Id used to track progress.
+Property trackingId As %ZEN.Datatype.string;</Description>
+<Type>%ZEN.Datatype.string</Type>
+</Property>
+
+<Property name="trackingId">
+<Description>
+Id used to track progress.</Description>
+<Type>%ZEN.Datatype.string</Type>
+</Property>
+
+<XData name="Style">
+<Data><![CDATA[
+<style type="text/css">
+#status .statusTable {
+	background: white;
+	border: 1px solid #404040;
+	width: 500px;
+}
+
+#status .statusTable td {
+	padding: 2px;
+	padding-right: 5px;
+	padding-left: 5px;
+	border-right: 1px solid #808080;
+	border-bottom: 1px solid #808080;
+}
+
+</style>
+]]></Data>
+</XData>
+
+<XData name="dialogBody">
+<Description>
+Contents of the dialog body.</Description>
+<XMLNamespace>http://www.intersystems.com/zen</XMLNamespace>
+<Data><![CDATA[
+<pane xmlns="http://www.intersystems.com/zen" cellStyle="padding-bottom:8px;">
+<vgroup cellStyle="padding-bottom: 4px;">
+
+<label label="Cubes for detail information" labelClass=""/>
+<hgroup label="Property" cellVAlign="top">
+<text id="Cubes" label="" value="#(%page.Cubes)#" size="50" 
+hint="List cubes. ALL for all cubes (might take some time)"/>
+<image src="deepsee/ds2_magnify_44.png" width="16" height="16" onclick="zenPage.editItem('GetCubeList');"/>
+</hgroup>
+
+</vgroup>
+<html id="status"/>
+<timer id="timer" ontimeout="zenPage.updateStatus();"/>
+</pane>
+]]></Data>
+</XData>
+
+<Method name="editItem">
+<Description>
+Invoke dialog to edit certain items: RangeExpression, FormatString, SourceProperty, SourceExpression, CubeResource, ListingResource, ListingField.</Description>
+<FormalSpec>what</FormalSpec>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	//var selectedItem = this.getSelectedItem();
+	var uiclass = "_DeepSee.UI.Dialog.GetProperties.cls";
+	var spec = "status,scrollbars,resizable=yes,width=640,height=680";
+	switch(what) {
+	case 'ListingFieldList':
+		//var value = zen("detailMeasureSource").getValue();
+		//var element = zen('detailMeasureName').getValue();
+		var uiclass = "_DeepSee.UI.Dialog.FieldList.cls";
+		break;
+	case 'GetCubeList':
+		var uiclass = "_DeepSee.UI.Dialog.GetCubeList.cls";
+		break;
+	}
+	var parms = {
+		CUBE:"PATIENTS", //this.cubeName,
+		//ELEMENT:element,
+		//DATASOURCE:this.dataSource,
+		//SELECTEDCLASS:selectedItem._class,
+		//VALUE:value,
+		WHAT:what
+	};
+	console.log(parms)
+	zenLaunchPopupWindow(uiclass,what,spec,parms);
+]]></Implementation>
+</Method>
+
+<Method name="%OnGetTitle">
+<Description>
+Get the (localized) title string for the dialog.
+This should be implemented in a subclass.</Description>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[	Quit $$$TextHTML("Run DeepSeeButtons")
+]]></Implementation>
+</Method>
+
+<Method name="%OnGetSubtitle">
+<Description>
+Get the (localized) subtitle string for the dialog.
+This should be implemented in a subclass.</Description>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[	Quit $$$TextHTML("Run DeepSeeButtons on this namespace for some cubes")
+]]></Implementation>
+</Method>
+
+<Method name="getDialogValue">
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[	return '';
+]]></Implementation>
+</Method>
+
+<Method name="ondialogFinish">
+<Description><![CDATA[
+This callback, if defined, is called when the user presses the OK or Apply action buttons.
+If this returns false, then the action is cancelled.<br>]]></Description>
+<FormalSpec>action</FormalSpec>
+<Language>javascript</Language>
+<ReturnType>%Boolean</ReturnType>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	try {
+		this.startBuild();
+	}
+	catch(ex) {
+		zenExceptionHandler(ex,arguments);
+	}
+	return false;
+]]></Implementation>
+</Method>
+
+<Method name="ondialogStart">
+<Description>
+This callback, if defined, is called when the dialog page is loaded.</Description>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	zen("btnOK").focus();
+	zen("btnOK").setProperty("caption",$$$Text("Run"));
+]]></Implementation>
+</Method>
+
+<Method name="%OnAfterCreatePage">
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	Set ..nameSpace = $Namespace
+ //S ^Ale($I(^Ale),"cubeClass")=..cubeClass //""
+ 
+	Set tSC = $$$OK
+	/*Try {
+		Set ..Cubes = $G(%session.Data($Username,"Cubes"))
+		If ..maxFacts '= "" {
+			#; if user defined maxFacts for the cube definition then change the hint
+			Set ..%GetComponentById("Cubes").hint = $$$TextHTML("If blank or zero, DeepSee builds all the records.")_" (maxFacts = "_$ZCVT(..maxFacts,"O","HTML") _")"
+			If ..Cubes = "" Set ..Cubes = ..maxFacts
+		}
+	}
+	Catch(ex) {
+		Set tSC = ex.AsStatus()
+	}*/
+	Quit tSC
+]]></Implementation>
+</Method>
+
+<Method name="startBuild">
+<Description>
+Start the index build.</Description>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	var option = zen('buildOption').getValue();
+	switch(option) {
+	case 'all':
+		zen('btnOK').setDisabled(true);
+		//this.trackingId = this.BuildCube(this.cubeName,zen("Cubes").getValue());
+		this.trackingId = this.RunDeepSeeButtons(this.nameSpace,zen("Cubes").getValue())
+console.log("startBuild this.trackingId:"+this.trackingId) //this is good
+		if (this.trackingId!='') {
+			zen('timer').timeout = 100; //500
+			zen('timer').startTimer();
+		} else {
+			zen('btnOK').setDisabled(false);
+		}
+		break;
+	case 'incremental':
+		break;
+	}
+	return;
+]]></Implementation>
+</Method>
+
+<Method name="RunDeepSeeButtons">
+<Description>
+Start the build cube process in the background.
+Return the tracking id.</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pNameSpace:%String,pCubes:%String</FormalSpec>
+<ReturnType>%String</ReturnType>
+<ZenMethod>1</ZenMethod>
+<Implementation><![CDATA[
+ //S ^Ale($I(^Ale),"RunDeepSeeButtons - pCubes")=pCubes //""
+	Set tTrackingId = ""
+	Set tJobTimeOut = 10
+	Set %session.Data($Username,"Cubes") = pCubes
+	Set htmlfile="/home/amarin/Desktop/a.html" //$ZUtil(12)
+	Set pGetLogs=1
+	Set pProceed=1
+	Set pTracking=1
+	Job ^DeepSeeButtons(pNameSpace,pCubes,pGetLogs,htmlfile,pProceed,pTracking)::tJobTimeOut
+	If '$Test {
+		&js<alert('Unable to start background job.');>
+		Set tTrackingId = ""
+	} Else {
+		Set tTrackingId = $ZChild
+	}
+	Quit tTrackingId
+]]></Implementation>
+</Method>
+
+<Method name="updateStatus">
+<Description>
+Update the status area.</Description>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+ console.log("updateStatus this.trackingId:"+this.trackingId)
+	var status = this.CheckStatus(this.trackingId);
+	var html = zen('status');
+	if (status != '') {
+		html.setContent(status);
+		zen('timer').timeout = 250;
+		zen('timer').startTimer();
+	} else {
+		this.trackingId = '';
+		zen('btnOK').setDisabled(false);
+		// when build finished, set focus on OK button so [Enter] key will exit easily.
+		zen("btnCancel").setProperty("caption",$$$Text("Done"));
+		zen("btnCancel").focus();
+	}
+	return;
+]]></Implementation>
+</Method>
+
+<Method name="CheckStatus">
+<Description>
+Get the current status of the background task.</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pTrackingId:%String</FormalSpec>
+<ReturnType>%String</ReturnType>
+<ZenMethod>1</ZenMethod>
+<Implementation><![CDATA[
+	Set tOutput = ""
+	Set tIsComplete = 0
+	// status is ($J,step) = $LB(phase,count,pct,errors)
+	//Set tStep = $O(^CacheTemp.DeepSeeTracking(pTrackingId,""),1,info)
+	Set tStep = $O(^CacheTemp.DeepSeeButtonsTrack(pTrackingId,""),1,info)
+	While (tStep'="") {
+		//Set:tPhase="complete"!(tPhase="error") tIsComplete = 1
+		Set:info="Done" tIsComplete = 1
+		//Set tIsActive = $O(^CacheTemp.DeepSeeButtonsTrack(pTrackingId,tStep))=""
+		/*Set tPhase = $LG(info,1)
+		Set:tPhase="complete"!(tPhase="error") tIsComplete = 1
+		Set tMsg = $Case(tPhase,"delete":$$$Text("Deleting facts"),"facts":$$$Text("Building facts"),"indices":$$$Text("Building indices"),"aggs":$$$Text("Computing aggregates"),"iknow":$$$Text("Processing iKnow measures"),"error":$$$Text("Error"),:$$$Text("Complete"))
+		Set tCount = $LG(info,2)
+		Set tPct = $LG(info,3)
+		Set tErr = $LG(info,4)
+		If (tCount="") {
+			Set tCount = "&nbsp;"
+		} Else {
+			Set tCount = $FN(tCount,",") _ " " _ $$$Text("fact(s)")
+		}
+		If (tPct="") {
+			Set tPct = "&nbsp;"
+		} Else {
+			Set tPct = $FN(tPct,",",2) _ "%"
+		}
+		Set tOutput = tOutput _ "<tr style="""_$S(tErr'="":"color:#da4848;",tIsActive:"font-weight:bold;",1:"background:#E0E0F0;")_""">"
+		Set tOutput = tOutput _ "<td>"_tMsg_"</td>"
+		*/
+		Set tOutput = tOutput _ "<tr>"
+		Set tOutput = tOutput _ "<td>"_info_"</td>"
+		/*If tErr = "" {
+			Set tOutput = tOutput _ "<td align=""right"">"_tCount_"</td>"
+			Set tOutput = tOutput _ "<td align=""right"">"_tPct_"</td>"
+			Set tOutput = tOutput _ "<td>"_$S(tIsActive:"&nbsp;",1:$$$Text("Complete"))_"</td>"
+			Set tOutput = tOutput _ "<td>&nbsp;</td>"
+		} Else {
+			/// Write out errors
+			Set tOutput = tOutput _ "<td colspan=""4"">"_$ZCVT(tErr,"O","HTML")_"</td>"
+		}*/
+		Set tOutput = tOutput _ "</tr>"
+		Set tStep = $O(^CacheTemp.DeepSeeButtonsTrack(pTrackingId,tStep),1,info)
+	}
+	
+	
+	Set:(tOutput'="") tOutput = "<div>"_$$$Text("Status")_ "</div><table class=""statusTable"" cellspacing=""0"" width=""100%"">" _ tOutput _ "</table>"
+	Kill:tIsComplete ^CacheTemp.DeepSeeButtonsTrack(pTrackingId)
+	Quit tOutput
+]]></Implementation>
+</Method>
+</Class>
+
+
+<Class name="%DeepSee.UI.Dialog.DSButtons2">
 <Description>
 Created using the page template: Default
 TODO replace doImportJSON</Description>
 <Super>%CSP.UI.Portal.Dialog.WizardTemplate</Super>
 <System>4</System>
-<TimeChanged>64723,54642.64619</TimeChanged>
-<TimeCreated>64723,43934.943794</TimeCreated>
+<TimeChanged>64726,41746.336982</TimeChanged>
+<TimeCreated>64723,55285.92247</TimeCreated>
 
 <Property name="LOCALFILENAME">
 <Description>
@@ -2815,73 +3157,45 @@ This client event, if present, is fired when the page is resized.</Description>
 </Class>
 
 
-<Class name="%DeepSee.UI.Dialog.DSButtons2">
+<Class name="%DeepSee.UI.Dialog.GetCubeList">
 <Copyright>/* Copyright (c) 2018 by InterSystems Corporation.
    Cambridge, Massachusetts, U.S.A.  All rights reserved.
    Confidential property of InterSystems Corporation. */</Copyright>
-<Description>
-This dialog builds facts and indices for a DeepSee cube and displays the output.
-!!! % complete, view log file, show errors, make non-modal!!!</Description>
+<Description><![CDATA[
+This dialog lets the user add or edit the Field List for a Listing.<br>
+An existing list (delimited by comma) may be passed in.]]></Description>
 <Super>%DeepSee.UI.Dialog.standardDialog</Super>
 <System>4</System>
-<TimeChanged>64723,59411.986931</TimeChanged>
-<TimeCreated>64723,55285.92247</TimeCreated>
+<TimeChanged>64727,50737.491469</TimeChanged>
+<TimeCreated>64726,47199.986843</TimeCreated>
 
 <Parameter name="APPLYBUTTON">
 <Default>0</Default>
 </Parameter>
 
-<Property name="cubeClass">
+<Property name="domain">
 <Description>
-Cube class name.</Description>
-<Type>%ZEN.Datatype.string</Type>
-<Parameter name="ZENURL" value="CLASS"/>
-</Property>
-
-<Property name="nameSpace">
-<Type>%ZEN.Datatype.string</Type>
-</Property>
-
-<Property name="Cubes">
-<Description>
-
 Cube name.
 Property cubeName As %ZEN.Datatype.string(ZENURL = "CUBE");
-
-The maximum number of records for be built defined for the selected cube
-Property maxFacts As %ZEN.Datatype.string(ZENURL = "maxFacts");
-
-The maximum number of records to be built for the the selected cube in this session (overrides maxFacts)
-Property TempMaxFacts As %ZEN.Datatype.string;
-
-Id used to track progress.
-Property trackingId As %ZEN.Datatype.string;</Description>
-<Type>%ZEN.Datatype.string</Type>
-</Property>
-
-<Property name="trackingId">
-<Description>
-Id used to track progress.</Description>
+Property ELEMENT As %ZEN.Datatype.string(ZENURL = "ELEMENT");
+Property Expression As %ZEN.Datatype.string(ZENURL = "VALUE");
+Property WHAT As %ZEN.Datatype.string(ZENURL = "WHAT");
+Property dataSource As %ZEN.Datatype.string(ZENURL = "DATASOURCE");
+Property CONTEXT As %ZEN.Datatype.string(ZENURL = "CONTEXT");
+Translation domain of the cube</Description>
 <Type>%ZEN.Datatype.string</Type>
 </Property>
 
 <XData name="Style">
 <Data><![CDATA[
 <style type="text/css">
-#status .statusTable {
-	background: white;
-	border: 1px solid #404040;
-	width: 500px;
+#dataSourceViewbox {
+	display:inline-block; 
+	height:400px; 
+	max-height:400px; 
+	overflow:auto;
+	max-width:200px;
 }
-
-#status .statusTable td {
-	padding: 2px;
-	padding-right: 5px;
-	padding-left: 5px;
-	border-right: 1px solid #808080;
-	border-bottom: 1px solid #808080;
-}
-
 </style>
 ]]></Data>
 </XData>
@@ -2892,14 +3206,44 @@ Contents of the dialog body.</Description>
 <XMLNamespace>http://www.intersystems.com/zen</XMLNamespace>
 <Data><![CDATA[
 <pane xmlns="http://www.intersystems.com/zen" cellStyle="padding-bottom:8px;">
-<vgroup cellStyle="padding-bottom: 4px;">
-<!--<label id="cubeName" label="Cube Name" value="#(%page.cubeName)#" controlClass="labelValue"/>-->
-<text id="Cubes" label="Cubes for detail information" value="#(%page.Cubes)#" size="50" 
-hint="List cubes. ALL for all cubes (might take some time)"/>
-<radioSet id="buildOption" label="Build Option" value="all" valueList="all,incremental" displayList="Build Everything,Incremental Update" hidden="true"/>
+<vgroup labelPosition="left">
+<!--<label id="cubeName" label="Cube name:" enclosingClass="zenLabel"/>
+<label id="ELEMENT" label="Element name:" enclosingClass="zenLabel"/>-->
 </vgroup>
-<html id="status"/>
-<timer id="timer" ontimeout="zenPage.updateStatus();"/>
+<label id="titleText" label="Use the form below to list cubes for detail information. Select a field by double clicking a property from the tree." enclosingStyle="padding:2px;"/>
+<hgroup cellStyle="padding:4px;" cellVAlign="top">
+<group id="dataSourceViewbox" layout="none" >  
+<dynaTree id="dataSource"  label="Source Class"
+ imageContracted="images/disclosure-contracted.gif"
+ imageExpanded="images/disclosure-expanded.gif"
+ imageNode="images/spacer.gif"
+ childIndent="10"
+ ondblclick="zenPage.selectProperty(zenThis);" dragEnabled="false"
+	showLines="false" showFolders="false"
+	OnGetTreeInfo="GetDataSourceInfo">
+<!--<parameter id="sourceP1" paramName="dataSource" value="#(%page.dataSource)#" />-->
+</dynaTree>
+</group>
+<spacer width="5px"/>
+<vgroup>
+<listBox id="lstFields" label="Field List" width="350px" listHeight="200px" 
+onchange="zenPage.selectedRow(zenThis);"/>
+<spacer height="1"/>
+<!--<textarea id="txtField" label="Edit Field:" rows="2" cols="47"
+dropEnabled="false" onkeyup="zenPage.doEdit(zenThis);"/>
+<text id="headerField" label="Edit Header:" hidden="false" size="46" onkeyup="zenPage.doEdit(zenThis);"/>
+<button id="btnUpdate" caption="Update" disabled="true" title="Button is enabled when field is modified." onclick="zenPage.doUpdate();"/>
+-->
+</vgroup>
+
+<vgroup id="idGroupButtons">
+<image src="/csp/broker/images/spacer.gif" width="16" height="16"/>
+<image src="deepsee/close_a_16.png" width="16" height="16" title="Remove the selected field" onclick="zenPage.doRemove();"/>
+<image src="/csp/broker/images/spacer.gif" width="16" height="16"/>
+<image src="deepsee/up_16.png" width="16" height="16" title="Move the selected field up" onclick="zenPage.moveItem('up');"/>
+<image src="deepsee/down_16.png" width="16" height="16" title="Move the selected field down" onclick="zenPage.moveItem('dn');"/>
+</vgroup>
+</hgroup>
 </pane>
 ]]></Data>
 </XData>
@@ -2909,7 +3253,7 @@ hint="List cubes. ALL for all cubes (might take some time)"/>
 Get the (localized) title string for the dialog.
 This should be implemented in a subclass.</Description>
 <ReturnType>%String</ReturnType>
-<Implementation><![CDATA[	Quit $$$TextHTML("Build Cube")
+<Implementation><![CDATA[	Quit $$$TextHTML("Cube Selector")
 ]]></Implementation>
 </Method>
 
@@ -2918,236 +3262,503 @@ This should be implemented in a subclass.</Description>
 Get the (localized) subtitle string for the dialog.
 This should be implemented in a subclass.</Description>
 <ReturnType>%String</ReturnType>
-<Implementation><![CDATA[	Quit $$$TextHTML("Build the fact table and indices for this cube.")
+<Implementation><![CDATA[	Quit $$$TextHTML("Cube Selector")
 ]]></Implementation>
 </Method>
 
 <Method name="getDialogValue">
 <Language>javascript</Language>
 <ClientMethod>1</ClientMethod>
-<Implementation><![CDATA[	return '';
-]]></Implementation>
-</Method>
-
-<Method name="ondialogFinish">
-<Description><![CDATA[
-This callback, if defined, is called when the user presses the OK or Apply action buttons.
-If this returns false, then the action is cancelled.<br>]]></Description>
-<FormalSpec>action</FormalSpec>
-<Language>javascript</Language>
-<ReturnType>%Boolean</ReturnType>
-<ClientMethod>1</ClientMethod>
 <Implementation><![CDATA[
 	try {
-		this.startBuild();
-	}
+		var values = "";
+		var fieldObj = zen('lstFields');
+		var len = fieldObj.getOptionCount();
+		if (len > 0) values = fieldObj.getOptionValue(0);
+		for (var i=1; i<len; i++) {
+			values = values + "," + fieldObj.getOptionValue(i);
+		}
+		return encodeURIComponent(values);
+		}
 	catch(ex) {
 		zenExceptionHandler(ex,arguments);
 	}
-	return false;
+	return '';
 ]]></Implementation>
 </Method>
 
-<Method name="ondialogStart">
+<Method name="doEdit">
 <Description>
-This callback, if defined, is called when the dialog page is loaded.</Description>
+User edited a field. Change background color and enable Update button.</Description>
+<FormalSpec>editObj</FormalSpec>
 <Language>javascript</Language>
 <ClientMethod>1</ClientMethod>
 <Implementation><![CDATA[
-	zen("btnOK").focus();
-	zen("btnOK").setProperty("caption",$$$Text("Do it"));
-]]></Implementation>
-</Method>
-
-<Method name="%OnAfterCreatePage">
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
-	Set ..nameSpace = $Namespace
- S ^Ale($I(^Ale),"cubeClass")=..cubeClass //""
- 
-	Set tSC = $$$OK
-	/*Try {
-		Set ..Cubes = $G(%session.Data($Username,"Cubes"))
-		If ..maxFacts '= "" {
-			#; if user defined maxFacts for the cube definition then change the hint
-			Set ..%GetComponentById("Cubes").hint = $$$TextHTML("If blank or zero, DeepSee builds all the records.")_" (maxFacts = "_$ZCVT(..maxFacts,"O","HTML") _")"
-			If ..Cubes = "" Set ..Cubes = ..maxFacts
-		}
+	if (zen('lstFields').getValue() != editObj.getValue()) {
+		zen('btnUpdate').setDisabled(false);
+		editObj.setProperty('controlStyle','background:rgb(255,243,190);');
 	}
-	Catch(ex) {
-		Set tSC = ex.AsStatus()
-	}*/
-	Quit tSC
 ]]></Implementation>
 </Method>
 
-<Method name="startBuild">
+<Method name="doRemove">
 <Description>
-Start the index build.</Description>
+User clicked the Remove image. Remove the field from Field List box.</Description>
 <Language>javascript</Language>
 <ClientMethod>1</ClientMethod>
 <Implementation><![CDATA[
-	var option = zen('buildOption').getValue();
-	switch(option) {
-	case 'all':
-		zen('btnOK').setDisabled(true);
-		//this.trackingId = this.BuildCube(this.cubeName,zen("Cubes").getValue());
-		this.trackingId = this.RunDeepSeeButtons(this.nameSpace,zen("Cubes").getValue())
-		if (this.trackingId!='') {
-			zen('timer').timeout = 100; //500
-			zen('timer').startTimer();
-		}
-		else {
-			zen('btnOK').setDisabled(false);
-		}
-		break;
-	case 'incremental':
-		break;
+	var fieldObj = zen('lstFields');
+	var len = fieldObj.getOptionCount();
+	if (len == 0) return;
+	var idx = fieldObj.getProperty("selectedIndex");
+	if (idx < 0) {
+		alert($$$Text("Please select the field you want to remove and try again."));
+		return;
 	}
-	return;
-]]></Implementation>
-</Method>
-
-<Method name="RunDeepSeeButtons">
-<Description>
-Start the build cube process in the background.
-Return the tracking id.</Description>
-<ClassMethod>1</ClassMethod>
-<FormalSpec>pNameSpace:%String,pCubes:%String</FormalSpec>
-<ReturnType>%String</ReturnType>
-<ZenMethod>1</ZenMethod>
-<Implementation><![CDATA[
- //S ^Ale($I(^Ale),"RunDeepSeeButtons - pCubes")=pCubes
-	Set tTrackingId = ""
-	Set tJobTimeOut = 10
-	Set %session.Data($Username,"Cubes") = pCubes
-	//Job ##class(%DeepSee.Utils).%BuildCube(pCubeName,1,0,0,tCubes,1)::tJobTimeOut
-	Set htmlfile="/home/amarin/Desktop/a.html"
-	Set cconsoleetc=1
-	Job ^DeepSeeButtons(pNameSpace,pCubes,cconsoleetc,htmlfile,1)::tJobTimeOut
-	If '$Test {
-		&js<alert('Unable to start background job.');>
-		Set tTrackingId = ""
-	}
-	Else {
-		Set tTrackingId = $ZChild
-	}
-	Quit tTrackingId
+	fieldObj.removeOption(idx);
+	//zen("txtField").setValue("");
 ]]></Implementation>
 </Method>
 
 <UDLText name="T">
 <Content><![CDATA[
 /*
-/// Start the build cube process in the background.
-/// Return the tracking id.
-ClassMethod BuildCube(pCubeName As %String, pTempMaxFacts As %Integer) As %String [ ZenMethod ]
+/// User clicked the Update button. Update the selected row with new value.
+ClientMethod doUpdate() [ Language = javascript ]
 {
-	Set tTrackingId = ""
-	Set tJobTimeOut = 10
-	#; If user entered blank then use and save it as blank. Otherwise use and save the numeric 
-	Set tTempMaxFacts = $S(pTempMaxFacts="":"",1:+pTempMaxFacts)
-	Set %session.Data($Username,"Cubes") = tTempMaxFacts
-	#; Reset text value if the numeric value differs from user's input.
-	If pTempMaxFacts '= tTempMaxFacts {
-		&js<zen("Cubes").setValue('#(tTempMaxFacts)#');>	
+	var fieldValue = this.combineSqlField(true);		// DTB538
+	var fieldObj = zen('lstFields');
+	var idx = fieldObj.getProperty("selectedIndex");
+	fieldObj.setOption(idx,fieldValue,this.combineSqlField(false));		// DTB538
+	zen('btnUpdate').setDisabled(true);
+	//zen('txtField').setProperty('controlStyle','background:white;');
+	zen('headerField').setProperty('controlStyle','background:white;');		// DTB538
+}*/
+]]></Content>
+</UDLText>
+
+<Method name="moveItem">
+<Description>
+User clicked the Move Up/Down image. Move the field up or down one level in the Field List box. dir = "up" or "dn".</Description>
+<FormalSpec>dir</FormalSpec>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	var fieldObj = zen('lstFields');
+	var len = fieldObj.getOptionCount();
+	if (len == 0) return;
+	var idx = fieldObj.getProperty("selectedIndex");
+	if (idx < 0) {
+		alert($$$Text("Please select the field you want to move and try again."));
+		return;
 	}
-	Job ##class(%DeepSee.Utils).%BuildCube(pCubeName,1,0,0,tTempMaxFacts,1)::tJobTimeOut
-	If '$Test {
-		&js<alert('Unable to start background job.');>
-		Set tTrackingId = ""
+	var row = idx;
+	if (dir == "up") {
+		row--;
+	} else {
+		row++;	
 	}
-	Else {
-		Set tTrackingId = $ZChild
+	if (row >= 0) fieldObj.moveOption(idx,row);
+]]></Implementation>
+</Method>
+
+<Method name="selectProperty">
+<Description>
+User selected a property from the tree. Get the SQLName for the selected value and put it into the Field List box.</Description>
+<FormalSpec>sourceObj</FormalSpec>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	console.log("selectProperty - sourceObj")
+	console.log(sourceObj)
+	var propFullValue = sourceObj.getNodeValue(sourceObj.getProperty("selectedIndex"));
+	//var result = this.GetSQLNames(this.dataSource,propFullValue,this.WHAT);
+	//var result = sourceObj.text
+	/*if (result.Error != "") {
+		alert(result.Error);
+		return;	
+	}*/
+	var fieldObj = zen('lstFields');
+	//if (zenPage.WHAT=='GetCubeList') {
+	fieldObj.appendOption(sourceObj.text,sourceObj.text);
+
+	//}
+	
+	/*// DTB638 - Only parse for listingField mode
+	if ('ListingFieldList'==zenPage.WHAT) {
+		var parsedSQL = this.parseSqlField(result.SQLNames);		// DTB541
+		fieldObj.appendOption(this.combineSqlField(true,parsedSQL),this.combineSqlField(false,parsedSQL));		// DTB541
 	}
-	Quit tTrackingId
+	else {
+		fieldObj.appendOption(result.SQLNames,result.SQLNames);
+	}*/
+]]></Implementation>
+</Method>
+
+<UDLText name="T">
+<Content><![CDATA[
+/*
+/// Parse an entry in the field list. Return an array with the value and the header.
+ClientMethod parseSqlField(value) [ Language = javascript ]
+{
+	// Method added by DTB538
+	var valueArray = value.split(' ');
+	
+	// +DTB552 - Look for an open parens; this indicates the presence an SQL procedure.
+	if (valueArray[0].indexOf('(')>0) {
+		var parensOpen = true;
+		var len = valueArray.length;
+		for(i = 0; i < len; i++ ) {
+			if ((0==i)||(!parensOpen)) {
+				valueArray.push(valueArray[i]);
+			}
+			else {
+				valueArray[valueArray.length-1]+= ' ' + valueArray[i];
+			}
+			
+			if (valueArray[i].indexOf(')')>0) {
+				parensOpen = false;
+			}
+		}
+		valueArray.splice(0,len);
+	}
+	// -DTB552
+	
+	var fieldEndIdx = 1
+	if ('"'==valueArray[0][0]) {
+		// DTB679 - Find the end of a quoted field name. This must be double-quoted
+		while ('"'!=valueArray[fieldEndIdx-1].slice(-1)) {
+			fieldEndIdx++;
+		}
+	}
+	
+	var field = valueArray.splice(0,fieldEndIdx).join(' ');
+	// Remove any null entries in the array - this will make all multi-spaces single-space
+	var len = valueArray.length;
+	for(i = 0; i < len; i++ ) {
+    	valueArray[i] && valueArray.push(valueArray[i]);  // copy non-empty values to the end of the array
+	}
+	valueArray.splice(0,len);
+	
+	if (valueArray[0]&&('AS'==valueArray[0].toUpperCase())) {
+		valueArray.splice(0,1);
+	}
+	
+	// Everything remaining is the Header section. Remove quotes and $$$TEXT to expose
+	// the bare header.
+	var header = valueArray.join(' ');
+	
+	if ((header)&&(('"'==header[0])&&('"'==header[header.length-1]))) {
+		header = header.substring(1,header.length-1)
+	}
+	if (header&&('$$$TEXT'==header.substring(0,7).toUpperCase())) {
+		header = header.substring(8,header.length-1)
+		
+		hArray = header.split(',')
+		header = hArray.slice(0,hArray.length-1).join(',')
+		// The remaining header may or may not be quoted
+		if ((header)&&(('"'==header[0])&&('"'==header[header.length-1]))) {
+			header = header.substring(1,header.length-1)
+		}
+	}
+
+	return [field,header];
+}
+
+/// Produce a string for the complete field entry by combining the Field and Header information into something of the form<br>
+///   Field AS "$$$TEXT["Header","DOMAIN"]"<br>
+/// If there is no Domain defined for the cube, the $$$TEXT[] will be omitted. Delimited identifiers are always assumed and the
+/// double quotes are always added to the Header portion.
+ClientMethod combineSqlField(useDomain, parsedFieldArray) [ Language = javascript ]
+{
+	// Method added by DTB538
+	if (undefined==useDomain) {
+		// Assume we want to localize
+		useDomain = true;
+	}
+
+	var domain = this.domain;
+	if (!parsedFieldArray) {
+		var fullFieldText = zen('txtField').getValue();
+		var header = zen('headerField').getValue();
+	}
+	else {
+		var fullFieldText = parsedFieldArray[0];
+		var header = parsedFieldArray[1];
+	}
+	
+	if (''!=header) {
+		fullFieldText += ' AS "' + ((useDomain&&(domain!='')) ? '$$$TEXT["'+header+'","'+domain+'"]' : header) + '"';
+	}
+
+	return fullFieldText;
 }
 */
 ]]></Content>
 </UDLText>
 
-<Method name="CheckStatus">
+<Method name="selectedRow">
 <Description>
-Get the current status of the background task.</Description>
-<ClassMethod>1</ClassMethod>
-<FormalSpec>pTrackingId:%String</FormalSpec>
-<ReturnType>%String</ReturnType>
-<ZenMethod>1</ZenMethod>
-<Implementation><![CDATA[
- S ^Ale($I(^Ale),"pTrackingId")=pTrackingId
-	Set tOutput = ""
-	Set tIsComplete = 0
-
-	// status is ($J,step) = $LB(phase,count,pct,errors)
-	Set tStep = $O(^CacheTemp.DeepSeeTracking(pTrackingId,""),1,info)
-	While (tStep'="") {
-		Set tIsActive = $O(^CacheTemp.DeepSeeTracking(pTrackingId,tStep))=""
-		Set tPhase = $LG(info,1)
-		Set:tPhase="complete"!(tPhase="error") tIsComplete = 1
-		Set tMsg = $Case(tPhase,"delete":$$$Text("Deleting facts"),"facts":$$$Text("Building facts"),"indices":$$$Text("Building indices"),"aggs":$$$Text("Computing aggregates"),"iknow":$$$Text("Processing iKnow measures"),"error":$$$Text("Error"),:$$$Text("Complete"))
-		Set tCount = $LG(info,2)
-		Set tPct = $LG(info,3)
-		Set tErr = $LG(info,4)
-		If (tCount="") {
-			Set tCount = "&nbsp;"
-		}
-		Else {
-			Set tCount = $FN(tCount,",") _ " " _ $$$Text("fact(s)")
-		}
-		If (tPct="") {
-			Set tPct = "&nbsp;"
-		}
-		Else {
-			Set tPct = $FN(tPct,",",2) _ "%"
-		}
-		Set tOutput = tOutput _ "<tr style="""_$S(tErr'="":"color:#da4848;",tIsActive:"font-weight:bold;",1:"background:#E0E0F0;")_""">"
-		Set tOutput = tOutput _ "<td>"_tMsg_"</td>"
-		If tErr = "" {
-			Set tOutput = tOutput _ "<td align=""right"">"_tCount_"</td>"
-			Set tOutput = tOutput _ "<td align=""right"">"_tPct_"</td>"
-			Set tOutput = tOutput _ "<td>"_$S(tIsActive:"&nbsp;",1:$$$Text("Complete"))_"</td>"
-			Set tOutput = tOutput _ "<td>&nbsp;</td>"
-		} Else {
-			/// Write out errors
-			Set tOutput = tOutput _ "<td colspan=""4"">"_$ZCVT(tErr,"O","HTML")_"</td>"
-		}
-		Set tOutput = tOutput _ "</tr>"
-		Set tStep = $O(^CacheTemp.DeepSeeTracking(pTrackingId,tStep),1,info)
-	}
-	If (tOutput'="") {
-		Set tOutput = "<div>"_$$$Text("Status")_ "</div><table class=""statusTable"" cellspacing=""0"" width=""100%"">" _ tOutput _ "</table>"
-	}
-
-	If (tIsComplete) {
-		Kill ^CacheTemp.DeepSeeTracking(pTrackingId)
-	}
-	Quit tOutput
-]]></Implementation>
-</Method>
-
-<Method name="updateStatus">
-<Description>
-Update the status area.</Description>
+User clicked a row from the list box. Put selected value into textarea box for editing.</Description>
+<FormalSpec>fieldObj</FormalSpec>
 <Language>javascript</Language>
 <ClientMethod>1</ClientMethod>
 <Implementation><![CDATA[
+	//var textObj = zen("txtField");
+	var headerObj = zen("headerField");		// DTB538
+	console.log("selectedRow - ")
 	
-  alert("updateStatus")
-	var status = this.CheckStatus(this.trackingId);
-	var html = zen('status');
-	if (status != '') {
-		html.setContent(status);
-		zen('timer').timeout = 250;
-		zen('timer').startTimer();
+	// DTB638 - Only parse for listingField mode
+	/*if ("ListingFieldList"==zenPage.WHAT) {
+		var parsedField = this.parseSqlField(fieldObj.getValue());		// DTB538
+		//textObj.setValue(fieldObj.getValue());
+		textObj.setValue(parsedField[0]);		// DTB538
+		headerObj.setValue(parsedField[1]);		// DTB538
+		
+		textObj.setProperty('controlStyle','background:white;');
+		headerObj.setProperty('controlStyle','background:white;');		// DTB538
 	}
-	else {
-		this.trackingId = '';
-		zen('btnOK').setDisabled(false);
-		// when build finished, set focus on OK button so [Enter] key will exit easily.
-		zen("btnCancel").setProperty("caption",$$$Text("Done"));
-		zen("btnCancel").focus();
+	else {*/
+		//textObj.setValue(fieldObj.getValue());
+		//textObj.setProperty('controlStyle','background:white;');
+	//}
+
+	//zen('btnUpdate').setDisabled(true);
+]]></Implementation>
+</Method>
+
+<Method name="%OnAfterCreatePage">
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	Set tSC = $$$OK
+	Try {
+		}
+	Catch(ex) {
+		Set tSC = ex.AsStatus()
 	}
-	return;
+	Quit tSC
+]]></Implementation>
+</Method>
+
+<UDLText name="T">
+<Content><![CDATA[
+/*
+Method %OnAfterCreatePage() As %Status
+{
+	Set tSC = $$$OK
+	Try {
+		Set ..%GetComponentById("cubeName").value = ..cubeName
+		Set ..%GetComponentById("ELEMENT").value = ..ELEMENT
+		
+		// If this was launched from the Listing Group Manager, look up the source class
+		Set tCubeNameU = $$$UPPER(..cubeName)
+		If (..CONTEXT="ListingGroupManager")&&(tCubeNameU'="") {
+			Set ..dataSource = $G(^DeepSee.Cubes("cubes",tCubeNameU,"sourceClass"))
+		}
+		If (tCubeNameU'="") {
+			Set ..domain = $PARAMETER(##class(%DeepSee.Utils).%GetCubeClass(tCubeNameU),"DOMAIN")		// DTB538
+		}
+		
+		#; Load existing fields into list
+		If ..Expression '= "" {
+			Set tCombo = ..%GetComponentById("lstFields")
+			
+			// +DTB552 - Replace in-line comma-delimited parsing with a slightly more sophisticated method
+			Set tSC=##class(%DeepSee.UI.Dialog.FieldList).%ParseSQLFieldList(..Expression,..domain,.tFieldArray)
+			If $$$ISERR(tSC) Quit
+			
+			Set tRow = $O(tFieldArray(""),1,tFieldData)
+			While (tRow) {
+				Set tOption = ##class(%ZEN.Auxiliary.option).%New()
+				Do tCombo.options.Insert(tOption)
+				Do ..%AddComponent(tOption)
+				
+				Set tOption.value = $LG(tFieldData,1)
+				Set tOption.text = $LG(tFieldData,2)
+				Set tRow = $O(tFieldArray(tRow),1,tFieldData)
+		 	}
+		 	// -DTB552
+		}
+		Set tHelp = $$$Text("Select a field by double clicking a property from the tree.")
+		If ..WHAT = "ListingOrderBy" {
+			Set ..%GetComponentById("txtField").hidden = 1
+			Set ..%GetComponentById("btnUpdate").hidden = 1
+			Set ..%GetComponentById("titleText").label = $$$Text("Use the form below to create and maintain the Order by list. ")_tHelp
+			Set ..%GetComponentById("lstFields").label = $$$Text("Order by")
+			Set ..%GetComponentById("headerField").hidden = 1		// DTB638
+		} ElseIf ..WHAT = "LevelDependsOn" {
+			Set ..%GetComponentById("dataSource").label = $$$Text("Cube Levels")
+			Set ..%GetComponentById("txtField").hidden = 1
+			Set ..%GetComponentById("btnUpdate").hidden = 1
+			Set ..%GetComponentById("titleText").label = $$$Text("Use the form below to create and maintain the Depends on. ")_tHelp
+			Set ..%GetComponentById("lstFields").label = $$$Text("Depends on")
+			Set ..%GetComponentById("headerField").hidden = 1		// DTB638
+		}
+	}
+	Catch(ex) {
+		Set tSC = ex.AsStatus()
+	}
+	Quit tSC
+}
+*/
+]]></Content>
+</UDLText>
+
+<Method name="GetDataSourceInfo">
+<Description>
+Provide contents of the data source tree.</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec><![CDATA[pRoot:%String,*pTree,&pParms]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	Set tSC = $$$OK
+	Do ##class(%DeepSee.Utils).%GetCubeList(.cubeList,,1)
+	Set cubetmp=""
+	For i=1:1 {
+		Set cubetmp=$order(cubeList(cubetmp))
+		Quit:cubetmp=""
+		Set ind=$I(pTree)
+		Set pTree(0,"ch",ind)=""
+		Set pTree(ind)=$LB(cubetmp,cubetmp,0,"",1)
+	}
+	Quit tSC
+]]></Implementation>
+</Method>
+
+<Method name="GetDependsOnInfo">
+<ClassMethod>1</ClassMethod>
+<FormalSpec><![CDATA[pRoot:%String,*pTree,&pParms]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+     #; each node supplies: $LB(caption, value, hasChildren, link, expanded, icon, tooltip, style)
+	Set tSC = $$$OK
+	Do ##class(%DeepSee.Utils).%GetCubeLevels(%page.cubeName,.p,1,1)
+	Set n = $O(p(""))
+	While n '= "" {
+		If $lg(p(n),1)="l" {
+			Set p = "["_$lg(p(n),2)_"]"_"."_"["_$lg(p(n),3)_"]"_"."_"["_$lg(p(n),4)_"]"
+			Set pTree(0,"ch",n) = ""
+			Set pTree(n) = $LB(p,p,0,"",0,,p)
+		}
+		Set n = $O(p(n)) 
+	}
+	Quit tSC
+]]></Implementation>
+</Method>
+
+<Method name="GetSQLNames">
+<Description>
+Get SQL Names from property name. Similar logic as in IsDate of Architect.</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>sourceClass:%String,fullName:%String,WHAT:%String</FormalSpec>
+<ReturnType>%ZEN.proxyObject</ReturnType>
+<ZenMethod>1</ZenMethod>
+<Implementation><![CDATA[
+	Try {
+		Set proxy = ##class(%ZEN.proxyObject).%New()
+		Set proxy.Error = ""
+		Set proxy.SQLNames = ""
+		Set cnt = 1
+		Set prop = $P(fullName,".",cnt)
+		Set tLen = $L(fullName,".")
+		Set source = sourceClass		// DTB545
+		While prop '= "" {
+			Set tStatus = ..GetPropName(source, prop, .propNames)		// DTB545 - Use the current source, not the page's source
+			If tStatus '= "" {
+				Set proxy.Error = tStatus
+				Set prop = ""
+				Quit
+			}
+			// DTB545 - Move this earlier
+			Set tLastClass = source		// DTB541
+			Set tLastProp = prop		// DTB541
+			
+			Set name = $O(propNames(""))
+			If name '[ "%Library",##class(%Dictionary.CompiledClass).%ExistsId(name) {
+				Set source = name
+			} Else {
+				Set source = sourceClass	
+			}
+			#; JMD1500 find type of class
+			Set tSourceType = "persistent"
+			If $classmethod(source,"%IsA","%Library.SerialObject") {
+				Set tSourceType = "serial"
+			}
+
+			// PFS032 - Use tLastClass instead of updated source type of this prop
+			Set tSQL = ##class(%DeepSee.Utils).%GetSQLColumnName(tLastClass,prop)
+			#; if SQL name does not exists then use property name.
+			#; JMD1500 use correct seperator
+			If (WHAT = "LevelDependsOn") {
+				Set tSep = "."
+			}
+			ElseIf (tSourceType = "serial") {
+				Set tSep = "_"
+			}
+			Else {
+				Set tSep = "->"
+			}
+			Set proxy.SQLNames = proxy.SQLNames _ $S(tSQL'="":tSQL,1:prop) _ $S(cnt<tLen:tSep,1:"")
+			Set cnt = cnt + 1
+			
+			Set prop = $P(fullName,".",cnt)
+		}
+		
+		If proxy.SQLNames = "" Set proxy.SQLNames = ##class(%DeepSee.Utils).%GetSQLColumnName(sourceClass,fullName)
+		If proxy.SQLNames = "" Set proxy.SQLNames = fullName
+		
+		// +DTB541 - See if there is a class-defined caption defined for the property at the end of the chain
+		// The $$$TEXT[] translation is not added at this stage, that is done by the client.
+		$$$comMemberArrayGetLvar(tCaption,tLastClass,$$$cCLASSproperty,tLastProp,$$$cXXXXparamvalue,"CAPTION")
+		If (tCaption'="") {
+			Set proxy.SQLNames = proxy.SQLNames _ " AS """ _ tCaption _ """"
+		}
+		// -DTB541
+	}
+	Catch(ex) {
+		Set proxy.Error = $$$Text("Error occurred in GetSQLNames: ")_$ZCVT(ex.AsStatus(),"O","JS")
+	}
+	Quit proxy
+]]></Implementation>
+</Method>
+
+<Method name="GetPropName">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>sourceClass,property,*propNames</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	Set Status = ""
+	Set property = $TR(property,"[]","")
+	Kill propNames
+	&sql(declare NNN cursor for 
+		select c.name 
+		from %Dictionary.CompiledClass c, %Dictionary.CompiledProperty p 
+		where p.parent = :sourceClass and p.name = :property and c.name = p.type
+	)
+	&sql(open NNN)
+	If SQLCODE<0 set Status = "SQLCODE: "_SQLCODE
+	For {
+		&sql(fetch NNN into :name)
+		Quit:SQLCODE
+		Set propNames(name) = ""
+	}
+	If SQLCODE<0 set Status = $S(Status'="":Status _ ", ",1:"")_SQLCODE
+	&sql(close NNN)
+	QUIT Status
+]]></Implementation>
+</Method>
+
+<Method name="%ParseSQLFieldList">
+<Description>
+Split a single fieldList string into the individual fields. This is more
+sophisticated than a simple comma-delimited split.</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pFieldString="",pDomain="",*pFieldArray</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	// Method added by DTB552
+	// DTB649 - Call into common Utils version
+	Quit ##class(%DeepSee.Utils).%ParseSQLFieldList(pFieldString,pDomain,.pFieldArray)
 ]]></Implementation>
 </Method>
 </Class>
