@@ -1,266 +1,145 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Export generator="Cache" version="25" zv="IRIS for UNIX (SUSE Linux Enterprise Server for x86-64) 2018.2 (Build 264U)" ts="2018-03-20 17:03:05">
-<Class name="%DeepSee.UI.DSButtons">
+<Export generator="Cache" version="25" zv="Cache for UNIX (SUSE Linux Enterprise Server for x86-64) 2017.2.1 (Build 801)" ts="2018-03-21 19:56:34">
+<Class name="%DeepSee.UI.DSButtonsViewer">
 <Description>
-DeepSeeButtons page
-This page lets you run DeepSeeButtons</Description>
-<IncludeCode>%DeepSee</IncludeCode>
+DeepSee DeepSeeButtons Viewer.
+Display contents of the DeepSeeButtons html file for the current namespace.
+</Description>
 <Super>%DeepSee.UI.standardPage</Super>
 <System>4</System>
-<TimeChanged>64726,42073.062954</TimeChanged>
-<TimeCreated>64723,43831.94931</TimeCreated>
+<TimeChanged>64651,60799.69251</TimeChanged>
+<TimeCreated>64636,45154.455633</TimeCreated>
 
 <Parameter name="PAGENAME">
-<Description>
-Displayed name of this page.</Description>
 <Default>DeepSeeButtons Viewer</Default>
 </Parameter>
 
-<Parameter name="DEFAULTVIEWMODE">
-<Description>
-If this page has multiple views, this is its initial display mode.</Description>
-</Parameter>
-
 <Parameter name="DOCBOOKID">
+<Default>D2MODEL_cube_build_errors</Default>
 </Parameter>
 
-<Property name="canWritePage">
-<Description>
-If true, the user has write access to the page.</Description>
-<Type>%ZEN.Datatype.boolean</Type>
-<InitialExpression>1</InitialExpression>
-</Property>
-
-<Property name="canWrite">
-<Description>
-If true, user can modify this particular listing group.</Description>
-<Type>%ZEN.Datatype.boolean</Type>
-<InitialExpression>1</InitialExpression>
+<Property name="targetURL">
+<Type>%String</Type>
+<Parameter name="MAXLEN"/>
 </Property>
 
 <XData name="Style">
-<Description>
-This Style block contains page-specific CSS style definitions.</Description>
 <Data><![CDATA[
 <style type="text/css">
 
-.ribbonTitle {
-	color: #404040;
-	background: rgb(147,191,252);
-}
-
-.dynaGridWrapper {
-	border: 1px solid #808080;
-}
-
-#command_cmdRemove {
-	background: rgb(141,53,53);
-}
-
 body {
-	background: #F8F8F8;
+	background: rgb(240,240,240);
 }
 
-.dgCellInner {
-	font-size: 12pt;
-}
-
-.zenLabel, .checkboxCaption {
-	color: #404040;
-	font-size: 10pt;
-}
-.zenLabelDisabled {
-	color: #808080;
-	font-size: 10pt;
-}
-
-.zenHint {
-	color: #606060;
-	font-size: 8pt;
-}
-
-#editGroup {
-	opacity: 0.0;
-	-webkit-transition-property: opacity;
-	-webkit-transition-duration: 0.5s;
-	-webkit-transition-timing-function: ease;
-	-moz-transition-property: opacity;
-	-moz-transition-duration: 0.5s;
-	-moz-transition-timing-function: ease;
-}
-
-#propertyGroup {
-	position: relative;
-	width: 320px;
-	opacity: 0.0;
-	-webkit-transition-property: opacity;
-	-webkit-transition-duration: 0.5s;
-	-webkit-transition-timing-function: ease;
-	-moz-transition-property: opacity;
-	-moz-transition-duration: 0.5s;
-	-moz-transition-timing-function: ease;
-
-	border-left: 1px solid #808080;
-	border-right: 1px solid #808080;
-	border-bottom: 1px solid #808080;
-	overflow: auto;
-background: #f6f8f9; /* Old browsers */
-background: -moz-linear-gradient(-45deg,  #f6f8f9 0%, #e5ebee 50%, #d7dee3 51%, #f5f7f9 100%); /* FF3.6+ */
-background: -webkit-gradient(linear, left top, right bottom, color-stop(0%,#f6f8f9), color-stop(50%,#e5ebee), color-stop(51%,#d7dee3), color-stop(100%,#f5f7f9)); /* Chrome,Safari4+ */
-background: -webkit-linear-gradient(-45deg,  #f6f8f9 0%,#e5ebee 50%,#d7dee3 51%,#f5f7f9 100%); /* Chrome10+,Safari5.1+ */
-background: -o-linear-gradient(-45deg,  #f6f8f9 0%,#e5ebee 50%,#d7dee3 51%,#f5f7f9 100%); /* Opera 11.10+ */
-background: -ms-linear-gradient(-45deg,  #f6f8f9 0%,#e5ebee 50%,#d7dee3 51%,#f5f7f9 100%); /* IE10+ */
-background: linear-gradient(-45deg,  #f6f8f9 0%,#e5ebee 50%,#d7dee3 51%,#f5f7f9 100%); /* W3C */
-filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f6f8f9', endColorstr='#f5f7f9',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
-}
-
-.gridLabel {
-	color: #808080;
-	padding: 3px;
-	font-size: 24px;
-}
-
-#help {
-	padding: 10px;
-	font-size: 12px;
-	color: #606060;
-}
-
-#termList {
-	width: 500px;
-	height: 200px;
-	border: 10px solid #E0E0E0;
-	border-radius: 5px;
-}
-
-.termItemEven {
-	width: 100%;
-	background: #F8F8F8;
-	color: #404040;
-	font-family: arial;
-	border-bottom: 1px solid #D0D0D0;
-}
-
-.termItemOdd {
-	width: 100%;
-	color: #404040;
-	font-family: arial;
-	border-bottom: 1px solid #D0D0D0;
-}
-
-.tlHeader {
-	position: relative;
-	height: 40px;
-	vertical-align: middle;
-	border-bottom: 1px solid white;
-	padding: 4px;
-	background: #808080;
-	color: #F0F0F0;
-	font-size: 10pt;
-	font-weight: bold;
-}
-
-.tlBody {
-	position: absolute;
-	top: 40px;
-	bottom: 0px;
-	left:0px;
-	right: 0px;
-	background: #D0D0D0;
-}
-
-.tlItem,
-.tlItemSelected {
-	position: relative;
-	padding: 4px;
-	height: 25px;
-	vertical-align: middle;
-	font-size: 20px;
-	color: #404040;
-	background: #F0F0F0;
-	border-bottom: 1px solid #D0D0D0;
-}
-
-.tlItemSelected {
-	color: #F0F0F0;
-	background: rgb(53,107,141);
-}
-
-.tlItem:hover {
-	background: #E8E8E8;
-}
-
-.dynaTreeNode {
-	white-space: nowrap;
-	font-size: 10pt;
-}
-
-.dynaTreeItem {
+.ribbonTitle {
 	color: rgb(71,72,67);
+	background: rgb(140,221,174);
 }
 
+#sourceFrame {
+	border: 1px solid #808080;
+	background: white;
+	overflow: auto;
+	margin-left: 20px;
+}
+
+#sourceFrame pre {
+	color: #404040;
+	padding: 3px;
+}
+
+.footerlinks {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 10px;
+	font-style: bold;
+	color: #3b84bc;
+	padding-left:4px;
+}
 </style>
 ]]></Data>
 </XData>
 
 <XData name="contentPane">
+<Description>
+This XML defines the contents of the contents pane for this page.</Description>
 <XMLNamespace>http://www.intersystems.com/zen</XMLNamespace>
 <Data><![CDATA[
-<pane xmlns="http://www.intersystems.com/zen">
-<hgroup valign="top" >
-<spacer width="20" />
-<vgroup valign="top" >
-<spacer height="20" />
-<tablePane id="table"
-    cellSpacing="2"
-	fixedHeaders="false"	
-	queryClass="%DeepSee.UI.DSButtons"
-	queryName="GetDeepSeeButtonsReports"
-	useSnapshot="true"
-	showQuery="false"
-	showZebra="true"
-	showRowNumbers="false"
-	maxRows="5000"
-	valueColumn="DSBName"
-	
-	>
-<column colName="DSBName" header="DeepSee Cube Name" />
-<column colName="Analyzer" link="#(%query.Application)#_DeepSee.UI.Analyzer.zen?CUBE=#(%query.DSBName)#"/>
-<column colName="Architect" link="#(%query.Application)#_DeepSee.UI.Architect.zen?CUBE=#(%query.DSBName)#"/>
-<column colName="Dashboard" link="#(%query.Application)#_DeepSee.UserPortal.DashboardViewer.zen?DASHBOARD=Generated/Samples%20for%20#(%query.DSBName)#.dashboard"/>
-<column colName="ScoreCard" link="#(%query.Application)#_DeepSee.UserPortal.DashboardViewer.zen?DASHBOARD=Generated/Sample%20ScoreCard%20for%20#(%query.DSBName)#.dashboard"/>
-<column colName="Info" onclick="return zenPage.showInfo('#(%query.DSBName)#');" linkCaption="Info" link="#"/>
-<column colName="Application" hidden="true"/>
-</tablePane>
-</vgroup>
-</hgroup>
+<pane xmlns="http://www.intersystems.com/zen" 
+	xmlns:deepsee="http://www.intersystems.com/deepsee"
+>
+<!--
+<html id="sourceFrame" OnDrawContent="DrawLogFile"/>
+src="DeepSeeButtons_ISC_20180103_1402.html"
+-->
+<iframe id="sourceFrame" width="100%" height="100%"
+src="DeepSeeButtons_ISC_20180103_1402.html"
+    />
 </pane>
 ]]></Data>
 </XData>
 
+<UDLText name="T">
+<Content><![CDATA[
+/*
+/// Draw contents of log file pane.
+Method DrawLogFile(pSeed As %String) As %Status
+{
+	Set tSC = $$$OK
+	Try {
+		Set tFileName = ##class(%DeepSee.Utils).%GetLogFileName()
+
+		If ('##class(%File).Exists(tFileName)) {
+			&html<<pre>>
+			Write $$$Text("Log file does not exist: "),!
+			Write tFileName,!
+			&html<</pre>>
+			Quit
+		}
+		&html<<a href="#bottom" name="top" class="footerlinks">#($$$TextHTML("[Goto Bottom]"))#</a>>
+		&html<<pre>>
+		Write tFileName,!
+		Write $ZDT($ZU(188),3),!			// DTB332 - Use $ZU function which accounts for local time
+		Write "-----------------------",!
+
+		Set tFile = ##class(%File).%New(tFileName)
+		Set tSC = tFile.Open("RS")
+		If $$$ISERR(tSC) Quit
+		While ('tFile.AtEnd) {
+			Write $ZCVT(tFile.ReadLine(),"O","HTML"),!
+		}
+
+		Write "###",!
+		&html<</pre>>
+		&html<<a href="#top" name="bottom" class="footerlinks">#($$$TextHTML("[Goto Top]"))#</a>>
+	}
+	Catch(ex) {
+		Set tSC = ex.AsStatus()
+	}
+
+	Quit tSC
+}*/
+]]></Content>
+</UDLText>
+
 <Method name="%OnGetTitle">
 <Description>
-Get the (localized) title string for the page.
-This should be implemented in a subclass.</Description>
-<Internal>1</Internal>
+Get the (localized) title string for the page.</Description>
 <ReturnType>%String</ReturnType>
-<Implementation><![CDATA[	Quit $$$Text("DeepSeeButtons Viewer","%DeepSee")
+<Implementation><![CDATA[	Quit $$$Text("DeepSeeButtons Viewer")
 ]]></Implementation>
 </Method>
 
 <Method name="%OnGetPageName">
 <Description>
-Get the (localized) name of the page.</Description>
-<Internal>1</Internal>
+Get the name for the page.</Description>
 <ReturnType>%String</ReturnType>
-<Implementation><![CDATA[	Quit $$$Text("DeepSeeButtons Viewer","%DeepSee")
+<Implementation><![CDATA[	Quit $$$Text("DeepSeeButtons Viewer")
 ]]></Implementation>
 </Method>
 
 <Method name="%OnGetProductName">
 <Description>
 Get the product name for the page.</Description>
-<Internal>1</Internal>
 <ReturnType>%String</ReturnType>
 <Implementation><![CDATA[	Quit "DeepSee"
 ]]></Implementation>
@@ -269,43 +148,24 @@ Get the product name for the page.</Description>
 <Method name="OnGetRibbonInfo">
 <Description>
 Get information to display in the ribbon bar.</Description>
-<Internal>1</Internal>
 <FormalSpec>*pDisplay:%Boolean,*pViewIcons:%List,*pSortOptions:%List,*pSearchBox:%Boolean,*pRibbonTitle:%String,*pCommands:%List</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
 	Set pDisplay = 1
 	Set pSearchBox = 0
-	Set pRibbonTitle = $$$Text("Run DeepSeeButtons")
+	Set pRibbonTitle = $$$Text("DeepSeeButtons Viewer")
 
 	// commands
 	// $LB(id,caption,help,onclick)
-	Set:(..canWrite||..canWritePage) pCommands($I(cmdIdx)) = $LB("cmdNew",$$$Text("New"),$$$Text("Run a DeepSeeButtons report"),"zenPage.newDeepSeeButtons();")
-	//Set:..canWrite pCommands($I(cmdIdx)) = $LB("cmdOpen",$$$Text("Open"),$$$Text("Open this cube"),"zenPage.openCube();")
-	Set:..canWrite pCommands($I(cmdIdx)) = $LB("cmdRemove",$$$Text("Delete"),$$$Text("Delete this DeepSeeButtons"),"zenPage.deleteDeepSeeButtons();")
-	
+	Set pCommands(1) = $LB("cmdRefresh",$$$Text("Refresh"),$$$Text("Reload contents of DeepSeeButtons file"),"zenPage.refreshLog();")
+	Set pCommands(2) = $LB("cmdDelete",$$$Text("Delete"),$$$Text("Delete DeepSeeButtons file"),"zenPage.deleteLog();")
 	Quit $$$OK
-]]></Implementation>
-</Method>
-
-<Method name="setRibbonMessage">
-<Description>
-OCnvenience utility for setting the ribbon message</Description>
-<Internal>1</Internal>
-<FormalSpec>message</FormalSpec>
-<Language>javascript</Language>
-<ClientMethod>1</ClientMethod>
-<Implementation><![CDATA[
-	if (message == undefined) {
-		message = '';
-	}
-	self.document.getElementById('ribbonMessage').innerHTML=message;
 ]]></Implementation>
 </Method>
 
 <Method name="onPopupAction">
 <Description>
-This client event is fired when a popup page launched from this page fires an action.</Description>
-<Internal>1</Internal>
+This client event is fired when the a popup page launched from this page fires an action.</Description>
 <FormalSpec>popupName,action,value</FormalSpec>
 <Language>javascript</Language>
 <ClientMethod>1</ClientMethod>
@@ -313,292 +173,185 @@ This client event is fired when a popup page launched from this page fires an ac
 	switch(popupName) {
 	case 'switchNamespace':
 		var homeurl = zenLink("/csp/sys/%25CSP.Portal.Home.zen");
-		var url = zenPage.GetNewURL(value,"_DeepSee.UI.DSButtons.zen");
+		var url = zenPage.GetNewURL(value,"_DeepSee.UI.DSButtonsViewer.zen");
 		if (url == "" || value == "%SYS") url = homeurl;
 		self.document.location = url;
 		break;
-	case 'DSButtons':
-		if (action=="okay") {
-			try {
-				self.document.location = zenLink('_DeepSee.UI.DSButtons.cls');
-			}
-			catch(ex) {
-			}
-		}
-		// TODO
-		if (action=="dash") {
-			try {
-				self.document.location=zenLink('_DeepSee.UserPortal.DashboardViewer.zen?DASHBOARD=Generated/Samples%20for%20'+value+'.dashboard')	
-			}
-			catch(ex)
-			{
-			}
-		}
-		if (action=="score") {
-			try {
-			self.document.location=zenLink('_DeepSee.UserPortal.DashboardViewer.zen?DASHBOARD=Generated/Sample%20ScoreCard%20for%20'+value+'.dashboard')	
-			}
-			catch(ex)
-			{
-			}
-		}
-
-
-		break;
-}
-]]></Implementation>
-</Method>
-
-<Method name="OnDrawRibbon">
-<Description><![CDATA[
-This is called in the middle of rendering the tool ribbon.
-Subclasses can inject their own content into the ribbon by writing it out in this method.
-This content is best wrapped within a single td element.
-It can also consist of multiple td elements.
-<p>
-To achieve a fixed position for elements within the ribbon, for a fixed width page you can 
-use a single enclosing td that contains a table and a single tr, 
-with td elements inside that single tr that contain your content for the ribbon.
-<p>
-To achieve a fixed position for elements within the ribbon, 
-for a page whose width varies depending on its contents (thereby stretching the ribbon)
-you can use multiple td elements to contain your content and then a final
-td element that is empty and has width 40% (or so) to push your contents towards the left
-and keep them in their proper locations.]]></Description>
-<Internal>1</Internal>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
-	&html<<td id="ribbonSpacer" width="5%"></td>>
-	&html<<td id="ribbonMessage" style="color:red" width="20%"></td>>
-	Quit $$$OK
-]]></Implementation>
-</Method>
-
-<Method name="newDeepSeeButtons">
-<Description>
-Create a new cube.</Description>
-<Internal>1</Internal>
-<Language>javascript</Language>
-<ClientMethod>1</ClientMethod>
-<Implementation><![CDATA[
-	//TODO
-	if (this.pageModified) {
-		if (!confirm($$$Text('There are unsaved changes, do you wish to continue?'))) {
-			return;
-		}
 	}
-	var parms = {
-			MODE:"models",
-	};
-	
-	zenLaunchPopupWindow('_DeepSee.UI.Dialog.DSButtons.cls','DSButtons','status,resizable=yes,width=900,height=700',parms);
-]]></Implementation>
-</Method>
-
-<Method name="showInfo">
-<Description>
-View info about cube.</Description>
-<FormalSpec>pDSBName</FormalSpec>
-<Language>javascript</Language>
-<ClientMethod>1</ClientMethod>
-<Implementation><![CDATA[
-	//TODO
-	if (this.pageModified) {
-		if (!confirm($$$Text('There are unsaved changes, do you wish to continue?'))) {
-			return;
-		}
-	}
-	var parms = new Object();
-	parms.DSBName=pDSBName;
-	
-	zenPage.launchPopupWindow('_DeepSee.UI.Dialog.DSButtons.showInfo.cls','DSButtons','status,resizable=yes,width=900,height=700',parms);
-
-	//d ##class(%DeepSee.UI.Dialog.DSButtons.showInfo).drawStats(pCubeName)
 ]]></Implementation>
 </Method>
 
 <UDLText name="T">
 <Content><![CDATA[
 /*
-/// Create a new cube.
-ClientMethod openCube() [ Language = javascript ]
+/// Ale: I took this from %CSP.Portal.CourceControl.Dialog.Manager
+/// Code to resize the iframe based on the window size and check whether a title 
+ClientMethod initializeFrame(newSrc) [ Language = javascript ]
 {
-	if (zenPage.getComponentById("table").getValue()!="") {
-		if (this.pageModified) {
-			if (!confirm($$$Text('There are unsaved changes, do you wish to continue?'))) {
-				return;
-			}
-		}
-		var parms = {
-				MODE:"models",
-				CUBE:zenPage.getComponentById("table").getValue(),
-		};
-		
-		zenLaunchPopupWindow('_DeepSee.UI.Dialog.DSButtonsOpen.cls','DSButtonsOpen','status,scrollbars,resizable=yes,width=900,height=700',parms);
-	} else {
-		alert("Please select a cube below");
+	var sourceFrame = zen('sourceFrame');
+	var iframe = sourceFrame.findElement('iframe');
+	// iframe.contentDocument doesn't work as expected on IE8, so use more circuitous reference.
+	if (iframe && iframe.contentWindow && iframe.contentWindow.document && (iframe.contentWindow.document.title != null)) {
+		document.title = iframe.contentWindow.document.title;
 	}
+	else if (!this._titleTimer) {
+		this._titleTimer = setInterval('zenPage.updateTitle()',10);
+	}
+	if (newSrc) this.addCompletionCheck('zenPage.checkCompletion()',10);
+	
+	var width = zenGetWindowWidth();
+	var height = zenGetWindowHeight();
+	if (zenIsHTML5 && (zenIsIE || zenIsGecko)) {
+		width -= 4;
+		height -= 4;
+	}
+	else if (zenIsIE) {
+		height -= 1;
+	}
+	
+	sourceFrame.setProperty('width',width);
+	sourceFrame.setProperty('height',height);
 }
 */
 ]]></Content>
 </UDLText>
 
-<Method name="deleteDeepSeeButtons">
+<Method name="onlayoutHandler">
 <Description>
-Delete the current cube.</Description>
+Adjust sizes of components on the page.</Description>
+<FormalSpec>load</FormalSpec>
 <Language>javascript</Language>
 <ClientMethod>1</ClientMethod>
 <Implementation><![CDATA[
-	if (zenPage.getComponentById("table").getValue()!="") {
-		if (confirm($$$Text('Do you wish to remove all dashboards, pivot tables, cubes, and classes associated with '+zenPage.getComponentById("table").getValue()))) {
-			zenPage.setRibbonMessage('Deleting '+zenPage.getComponentById("table").getValue()+'...');
-			this.Delete(zenPage.getComponentById("table").getValue())
-			try {
-				self.document.location = zenLink('_DeepSee.UI.DSButtons.cls');
-			}
-			catch(ex) {
-			}
-		}
+	try {
+		//this.initializeFrame(load);
+		this.adjustSizes();
+	}
+	catch(ex) {
+		zenExceptionHandler(ex,arguments,'Error in onlayoutHandler');
 	}
 ]]></Implementation>
 </Method>
 
-<Method name="Delete">
+<Method name="adjustSizes">
 <Description>
-Delete a term list.</Description>
-<FormalSpec>pName:%String</FormalSpec>
-<ReturnType>%String</ReturnType>
-<ZenMethod>1</ZenMethod>
+Adjust sizes of components on the page.</Description>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
 <Implementation><![CDATA[
-	//TODO
-	Set tMsg=##class(%DeepSee.Dashboard.SampleDashboard.Utils).Delete(pName)
-	
-	Quit tMsg
+	try {
+		var sourceFrame = zen('sourceFrame');
+		var divLog = sourceFrame.getEnclosingDiv();
+
+		// find size of window
+		var winHeight = zenGetWindowHeight();
+		var winWidth = zenGetWindowWidth();
+		var th = this.getTitleAreaHeight();
+		var h = winHeight - (25 + th);
+
+		if (divLog) {
+			divLog.style.width = winWidth - (25) + 'px';
+			divLog.style.height = h + 'px';
+		}
+	}
+	catch(ex) {
+		zenExceptionHandler(ex,arguments,'Error in adjustSizes');
+	}
 ]]></Implementation>
 </Method>
 
-<UDLText name="T">
-<Content><![CDATA[
-/*
-/// Return a list of all currently defined DeepSee Pivots visible to the current user.
-/// This is used by utilities.<br/>
-/// This list takes the form:<br/>
-/// pList(i)=fullName
-/// If <var>pHidden</var> is true, then include trash and local items.<br/>
-/// If <var>pDSBName</var> is provided, then only list pivots based on it.
-ClassMethod GetPivotList(Output pList, pHidden As %Boolean = 0, pDSBName As %String = "") As %Status
-{
-	Set tSC = $$$OK
-	Kill pList
-	Try {
-		set i=1
-		Set tFlag = $zu(115,8,0)
-		Set tStatement = ##class(%SQL.Statement).%New(,"DEFAULT_SCHEMA")
-		Set tSC = tStatement.%Prepare("SELECT ID FROM %DeepSee_Dashboard.Pivot")
-		If $$$ISERR(tSC) Quit
-		
-		Set pDSBName = $$$UPPER(pDSBName)
+<Method name="%GetDeepSeeButtonsFileName">
+<Internal>1</Internal>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pFileName:%String="DeepSeeTasks"</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[	Quit ##class(%Library.File).NormalizeFilename($system.Util.ManagerDirectory() _ pFileName _ "_" _ $ZU(5) _ ".log")
+]]></Implementation>
+</Method>
 
-		Set tRS = tStatement.%Execute()
-		While (tRS.%Next(.tSC)) {
-			If $$$ISERR(tSC) Quit
-			If (tRS.ID '="") {
-				Set tItem = ##class(%DeepSee.UserLibrary.FolderItem).%OpenId(tRS.ID)
-				If ($IsObject(tItem)) {			
-					Set tFullName = $P(tItem.fullName,".",1) // name without extension
-					If (pHidden || ($E(tFullName,1)'="$") || ($E(tFullName,1,3)="$$$")) {
-						If ((pDSBName="")||(pDSBName=$$$UPPER(tItem.DSBName))) {
-							If (tItem.%CheckResource()) {
-								Set pList(i) = tItem.fullName
-								set i=i+1
-							}
-						}
-					}
-				}
-			}
-		}
+<Method name="%OnAfterCreatePage">
+<Description>
+This class method callback is called just before the server-side page 
+object is created.</Description>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	Set tSC = $$$OK
+	Try {
+ 		/*Set tSourceFrame = ..%GetComponentById("sourceFrame")
+ 		Set ..targetURL = "DeepSeeButtons_ISC_20180103_1402.html"
+ 		Set tFileName = ..%GetDeepSeeButtonsFileName()
+ 		
+ 		Set tSourceFrame.src = ..targetURL
+ 		*/
+		Set tSC = ##super()
+		If $$$ISERR(tSC) Quit
 	}
 	Catch(ex) {
 		Set tSC = ex.AsStatus()
 	}
-	Set tFlag = $zu(115,8,tFlag)
 	Quit tSC
-}*/
-]]></Content>
-</UDLText>
+]]></Implementation>
+</Method>
 
-<Query name="GetDeepSeeButtonsReports">
-<Type>%Query</Type>
-<SqlProc>1</SqlProc>
-<Parameter name="ROWSPEC" value="DSBName, TODO"/>
-</Query>
+<Method name="refreshLog">
+<Description>
+Reload contents of file.</Description>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[	zen('sourceFrame').refreshContents();
+]]></Implementation>
+</Method>
 
-<Method name="GetDeepSeeButtonsReportsExecute">
-<ClassMethod>1</ClassMethod>
-<FormalSpec><![CDATA[&qHandle:%Binary]]></FormalSpec>
-<ReturnType>%Status</ReturnType>
+<Method name="deleteLog">
+<Description>
+Delete the log file.</Description>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	if (confirm($$$Text('Do you wish to delete the DeepSeeButtons file?'))) {
+		alert("Here I should create something like %DeepSee.Utils).%KillLogFile")
+		var msg = zenPage.DeleteLogFile();
+		if ('' !== msg) {
+			alert(msg);
+		}
+		zen('sourceFrame').refreshContents();
+	}
+]]></Implementation>
+</Method>
+
+<Method name="DeleteLogFile">
+<Description>
+Delete the log file.</Description>
+<ReturnType>%String</ReturnType>
+<ZenMethod>1</ZenMethod>
 <Implementation><![CDATA[
 	Set tSC = $$$OK
-	kill ^||DeepSee.DSButtonsExecute
-	set index=$o(^DeepSee.ImportCSV(""))
-	while index'="" {
-		Set DSBName=$o(^DeepSee.ImportCSV(index,""))
-		Set dashName="Generated/Samples for "_DSBName_".dashboard"
-		Set dash=##class(%DeepSee.Dashboard.Utils).%DashboardExists(dashName)
-		Set scoreCardName="Generated/Sample ScoreCard for "_DSBName_".dashboard"
-		Set scoreCard=##class(%DeepSee.Dashboard.Utils).%DashboardExists(scoreCardName)
-		set ^||DeepSee.DSButtonsExecute($i(count))=$lb(DSBName,"Analyzer","Architect",$case(dash, 0:"", 1:"Dashboard"),$case(scoreCard, 0:"", 1:"ScoreCard"),"Info",$system.CSP.GetPortalApp($NAMESPACE,$replace($this,"%","_")_".zen"),"info")
-		set index=$o(^DeepSee.ImportCSV(index))
+	Set tMsg = ""
+	Try {
+		//Set tSC = ##class(%DeepSee.Utils).%KillLogFile()
+		//ALE
+		If $$$ISERR(tSC) Quit
 	}
-    Set qHandle = $LB("")
-    Quit tSC
-]]></Implementation>
-</Method>
-
-<Method name="GetDeepSeeButtonsReportsFetch">
-<ClassMethod>1</ClassMethod>
-<FormalSpec><![CDATA[&qHandle:%Binary,&Row:%List,&AtEnd:%Integer=0]]></FormalSpec>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
-	set index=$list(qHandle,1)
-	set index=$o(^||DeepSee.DSButtonsExecute(index))
-    If index="" {
-        Set Row = ""
-        Set AtEnd = 1
-    }
-    Else {
-        Set Row = ^||DeepSee.DSButtonsExecute(index)
-    }
-    Set qHandle = $LB(index)
-    Quit $$$OK
-]]></Implementation>
-</Method>
-
-<Method name="GetDeepSeeButtonsReportsClose">
-<Internal>1</Internal>
-<ClassMethod>1</ClassMethod>
-<FormalSpec><![CDATA[&qHandle:%Binary]]></FormalSpec>
-<PlaceAfter>GetDeepSeeButtonsReportsExecute</PlaceAfter>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
-    Set qHandle = ""
-    Quit $$$OK
+	Catch(ex) {
+		Set tSC = ex.AsStatus()
+	}
+	If $$$ISERR(tSC) {
+		Set tMsg = $System.Status.GetOneErrorText(tSC)
+	}
+	Quit tMsg
 ]]></Implementation>
 </Method>
 </Class>
 
 
 <Class name="%DeepSee.UI.Dialog.DSButtons">
-<Copyright>/* Copyright (c) 2018 by InterSystems Corporation.
-   Cambridge, Massachusetts, U.S.A.  All rights reserved.
-   Confidential property of InterSystems Corporation. */</Copyright>
 <Description>
 This dialog builds facts and indices for a DeepSee cube and displays the output.
 !!! % complete, view log file, show errors, make non-modal!!!</Description>
 <Super>%DeepSee.UI.Dialog.standardDialog</Super>
 <System>4</System>
-<TimeChanged>64726,48238.308079</TimeChanged>
-<TimeCreated>64723,43934.943794</TimeCreated>
+<TimeChanged>64728,60795.1108</TimeChanged>
+<TimeCreated>64727,63568.53917</TimeCreated>
 
 <Parameter name="APPLYBUTTON">
 <Default>0</Default>
@@ -668,9 +421,9 @@ Contents of the dialog body.</Description>
 <vgroup cellStyle="padding-bottom: 4px;">
 
 <label label="Cubes for detail information" labelClass=""/>
-<hgroup label="Property" cellVAlign="top">
+<hgroup label="Cubes" cellVAlign="top">
 <text id="Cubes" label="" value="#(%page.Cubes)#" size="50" 
-hint="List cubes. ALL for all cubes (might take some time)"/>
+hint="List cubes. Type ALL for all cubes (might take some time)"/>
 <image src="deepsee/ds2_magnify_44.png" width="16" height="16" onclick="zenPage.editItem('GetCubeList');"/>
 </hgroup>
 
@@ -688,6 +441,7 @@ Invoke dialog to edit certain items: RangeExpression, FormatString, SourceProper
 <Language>javascript</Language>
 <ClientMethod>1</ClientMethod>
 <Implementation><![CDATA[
+	console.log("editItem")
 	//var selectedItem = this.getSelectedItem();
 	var uiclass = "_DeepSee.UI.Dialog.GetProperties.cls";
 	var spec = "status,scrollbars,resizable=yes,width=640,height=680";
@@ -698,6 +452,7 @@ Invoke dialog to edit certain items: RangeExpression, FormatString, SourceProper
 		var uiclass = "_DeepSee.UI.Dialog.FieldList.cls";
 		break;
 	case 'GetCubeList':
+		var value = zen("Cubes").getValue();
 		var uiclass = "_DeepSee.UI.Dialog.GetCubeList.cls";
 		break;
 	}
@@ -706,9 +461,16 @@ Invoke dialog to edit certain items: RangeExpression, FormatString, SourceProper
 		//ELEMENT:element,
 		//DATASOURCE:this.dataSource,
 		//SELECTEDCLASS:selectedItem._class,
-		//VALUE:value,
-		WHAT:what
+		VALUE: value,
+		WHAT: what //"GetCubeList"
 	};
+//CUBE: "Cities", 
+//ELEMENT: "Details", 
+//DATASOURCE: "DeepSee.Study.City", 
+//SELECTEDCLASS: "%DeepSee.Model.listing", 
+//VALUE: "Name as \"City\",Population,PostalCode as \"ZIP Code\",PrincipalExport as \"Principal Export\"", 
+//WHAT: "ListingFieldList" }
+	console.log("parms:")
 	console.log(parms)
 	zenLaunchPopupWindow(uiclass,what,spec,parms);
 ]]></Implementation>
@@ -732,12 +494,14 @@ This should be implemented in a subclass.</Description>
 ]]></Implementation>
 </Method>
 
-<Method name="getDialogValue">
-<Language>javascript</Language>
-<ClientMethod>1</ClientMethod>
-<Implementation><![CDATA[	return '';
-]]></Implementation>
-</Method>
+<UDLText name="T">
+<Content><![CDATA[
+/*ClientMethod getDialogValue() [ Language = javascript ]
+{
+	return '';
+}*/
+]]></Content>
+</UDLText>
 
 <Method name="ondialogFinish">
 <Description><![CDATA[
@@ -748,6 +512,8 @@ If this returns false, then the action is cancelled.<br>]]></Description>
 <ReturnType>%Boolean</ReturnType>
 <ClientMethod>1</ClientMethod>
 <Implementation><![CDATA[
+	alert("ondialogFinish")
+	console.log(action)
 	try {
 		this.startBuild();
 	}
@@ -766,6 +532,20 @@ This callback, if defined, is called when the dialog page is loaded.</Descriptio
 <Implementation><![CDATA[
 	zen("btnOK").focus();
 	zen("btnOK").setProperty("caption",$$$Text("Run"));
+]]></Implementation>
+</Method>
+
+<Method name="onPopupAction">
+<Description>
+This callback captures the cubes returned by the dialogs fired up from this class</Description>
+<FormalSpec>popupName,action,value</FormalSpec>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	switch(popupName) {
+	case 'GetCubeList':
+		zenSetProp("Cubes","value",value)
+	}
 ]]></Implementation>
 </Method>
 
@@ -936,8 +716,8 @@ Created using the page template: Default
 TODO replace doImportJSON</Description>
 <Super>%CSP.UI.Portal.Dialog.WizardTemplate</Super>
 <System>4</System>
-<TimeChanged>64726,41746.336982</TimeChanged>
-<TimeCreated>64723,55285.92247</TimeCreated>
+<TimeChanged>64727,63668.013072</TimeChanged>
+<TimeCreated>64727,63668.013072</TimeCreated>
 
 <Property name="LOCALFILENAME">
 <Description>
@@ -3158,28 +2938,34 @@ This client event, if present, is fired when the page is resized.</Description>
 
 
 <Class name="%DeepSee.UI.Dialog.GetCubeList">
-<Copyright>/* Copyright (c) 2018 by InterSystems Corporation.
-   Cambridge, Massachusetts, U.S.A.  All rights reserved.
-   Confidential property of InterSystems Corporation. */</Copyright>
 <Description><![CDATA[
 This dialog lets the user add or edit the Field List for a Listing.<br>
 An existing list (delimited by comma) may be passed in.]]></Description>
 <Super>%DeepSee.UI.Dialog.standardDialog</Super>
 <System>4</System>
-<TimeChanged>64727,50737.491469</TimeChanged>
-<TimeCreated>64726,47199.986843</TimeCreated>
+<TimeChanged>64728,63174.602975</TimeChanged>
+<TimeCreated>64727,63621.331352</TimeCreated>
 
 <Parameter name="APPLYBUTTON">
 <Default>0</Default>
 </Parameter>
 
-<Property name="domain">
+<Property name="Expression">
 <Description>
 Cube name.
 Property cubeName As %ZEN.Datatype.string(ZENURL = "CUBE");
-Property ELEMENT As %ZEN.Datatype.string(ZENURL = "ELEMENT");
-Property Expression As %ZEN.Datatype.string(ZENURL = "VALUE");
-Property WHAT As %ZEN.Datatype.string(ZENURL = "WHAT");
+Property ELEMENT As %ZEN.Datatype.string(ZENURL = "ELEMENT");</Description>
+<Type>%ZEN.Datatype.string</Type>
+<Parameter name="ZENURL" value="VALUE"/>
+</Property>
+
+<Property name="WHAT">
+<Type>%ZEN.Datatype.string</Type>
+<Parameter name="ZENURL" value="WHAT"/>
+</Property>
+
+<Property name="domain">
+<Description>
 Property dataSource As %ZEN.Datatype.string(ZENURL = "DATASOURCE");
 Property CONTEXT As %ZEN.Datatype.string(ZENURL = "CONTEXT");
 Translation domain of the cube</Description>
@@ -3270,6 +3056,7 @@ This should be implemented in a subclass.</Description>
 <Language>javascript</Language>
 <ClientMethod>1</ClientMethod>
 <Implementation><![CDATA[
+	console.log("getDialogValue")
 	try {
 		var values = "";
 		var fieldObj = zen('lstFields');
@@ -3278,28 +3065,31 @@ This should be implemented in a subclass.</Description>
 		for (var i=1; i<len; i++) {
 			values = values + "," + fieldObj.getOptionValue(i);
 		}
+		console.log(values)
+		console.log(encodeURIComponent(values));		
 		return encodeURIComponent(values);
 		}
 	catch(ex) {
 		zenExceptionHandler(ex,arguments);
 	}
+	console.log("getDialogValue return")
 	return '';
 ]]></Implementation>
 </Method>
 
-<Method name="doEdit">
-<Description>
-User edited a field. Change background color and enable Update button.</Description>
-<FormalSpec>editObj</FormalSpec>
-<Language>javascript</Language>
-<ClientMethod>1</ClientMethod>
-<Implementation><![CDATA[
+<UDLText name="T">
+<Content><![CDATA[
+/*/// User edited a field. Change background color and enable Update button.
+ClientMethod doEdit(editObj) [ Language = javascript ]
+{
 	if (zen('lstFields').getValue() != editObj.getValue()) {
 		zen('btnUpdate').setDisabled(false);
 		editObj.setProperty('controlStyle','background:rgb(255,243,190);');
 	}
-]]></Implementation>
-</Method>
+}
+*/
+]]></Content>
+</UDLText>
 
 <Method name="doRemove">
 <Description>
@@ -3532,8 +3322,25 @@ User clicked a row from the list box. Put selected value into textarea box for e
 <Implementation><![CDATA[
 	Set tSC = $$$OK
 	Try {
+		#; Load existing fields into list
+		If ..Expression '= "" {
+			Set tCombo = ..%GetComponentById("lstFields")
+			
+			Set cubeList = $LISTFROMSTRING(tCombo)
+			Set cubeListLength=$LISTLENGTH(cubeList)
+			For i=1:1:cubeListLength {
+				Set tRow=$LG(cubeList,i)
+				Set tOption = ##class(%ZEN.Auxiliary.option).%New()
+				Do tCombo.options.Insert(tOption)
+				Do ..%AddComponent(tOption)
+				
+				Set tOption.value = tRow //$LG(tFieldData,1)
+				Set tOption.text = tRow //$LG(tFieldData,2)
+				
+		 	}
+		 	// -DTB552
 		}
-	Catch(ex) {
+	} Catch(ex) {
 		Set tSC = ex.AsStatus()
 	}
 	Quit tSC
@@ -3625,11 +3432,10 @@ Provide contents of the data source tree.</Description>
 ]]></Implementation>
 </Method>
 
-<Method name="GetDependsOnInfo">
-<ClassMethod>1</ClassMethod>
-<FormalSpec><![CDATA[pRoot:%String,*pTree,&pParms]]></FormalSpec>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
+<UDLText name="T">
+<Content><![CDATA[
+/*ClassMethod GetDependsOnInfo(pRoot As %String, Output pTree, ByRef pParms) As %Status
+{
      #; each node supplies: $LB(caption, value, hasChildren, link, expanded, icon, tooltip, style)
 	Set tSC = $$$OK
 	Do ##class(%DeepSee.Utils).%GetCubeLevels(%page.cubeName,.p,1,1)
@@ -3643,17 +3449,11 @@ Provide contents of the data source tree.</Description>
 		Set n = $O(p(n)) 
 	}
 	Quit tSC
-]]></Implementation>
-</Method>
+}
 
-<Method name="GetSQLNames">
-<Description>
-Get SQL Names from property name. Similar logic as in IsDate of Architect.</Description>
-<ClassMethod>1</ClassMethod>
-<FormalSpec>sourceClass:%String,fullName:%String,WHAT:%String</FormalSpec>
-<ReturnType>%ZEN.proxyObject</ReturnType>
-<ZenMethod>1</ZenMethod>
-<Implementation><![CDATA[
+/// Get SQL Names from property name. Similar logic as in IsDate of Architect.
+ClassMethod GetSQLNames(sourceClass As %String, fullName As %String, WHAT As %String) As %ZEN.proxyObject [ ZenMethod ]
+{
 	Try {
 		Set proxy = ##class(%ZEN.proxyObject).%New()
 		Set proxy.Error = ""
@@ -3719,14 +3519,10 @@ Get SQL Names from property name. Similar logic as in IsDate of Architect.</Desc
 		Set proxy.Error = $$$Text("Error occurred in GetSQLNames: ")_$ZCVT(ex.AsStatus(),"O","JS")
 	}
 	Quit proxy
-]]></Implementation>
-</Method>
+}
 
-<Method name="GetPropName">
-<ClassMethod>1</ClassMethod>
-<FormalSpec>sourceClass,property,*propNames</FormalSpec>
-<ReturnType>%String</ReturnType>
-<Implementation><![CDATA[
+ClassMethod GetPropName(sourceClass, property, Output propNames) As %String
+{
 	Set Status = ""
 	Set property = $TR(property,"[]","")
 	Kill propNames
@@ -3745,21 +3541,18 @@ Get SQL Names from property name. Similar logic as in IsDate of Architect.</Desc
 	If SQLCODE<0 set Status = $S(Status'="":Status _ ", ",1:"")_SQLCODE
 	&sql(close NNN)
 	QUIT Status
-]]></Implementation>
-</Method>
+}
 
-<Method name="%ParseSQLFieldList">
-<Description>
-Split a single fieldList string into the individual fields. This is more
-sophisticated than a simple comma-delimited split.</Description>
-<ClassMethod>1</ClassMethod>
-<FormalSpec>pFieldString="",pDomain="",*pFieldArray</FormalSpec>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
+/// Split a single fieldList string into the individual fields. This is more
+/// sophisticated than a simple comma-delimited split.
+ClassMethod %ParseSQLFieldList(pFieldString = "", pDomain = "", Output pFieldArray) As %Status
+{
 	// Method added by DTB552
 	// DTB649 - Call into common Utils version
 	Quit ##class(%DeepSee.Utils).%ParseSQLFieldList(pFieldString,pDomain,.pFieldArray)
-]]></Implementation>
-</Method>
+}
+*/
+]]></Content>
+</UDLText>
 </Class>
 </Export>
