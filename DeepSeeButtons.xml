@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Export generator="Cache" version="25" zv="IRIS for UNIX (Ubuntu Server LTS for x86-64) 2018.2 (Build 238U)" ts="2018-02-20 13:53:57">
-<Routine name="DeepSeeButtons" type="MAC" languagemode="0" timestamp="64699,50030.659756"><![CDATA[
-DeepSeeButtons(namespace="ask",cubeString="ask", getLogs="", LogFile="", proceed="")
+<Export generator="Cache" version="25" zv="Cache for UNIX (SUSE Linux Enterprise Server for x86-64) 2017.2.1 (Build 801)" ts="2018-03-29 14:31:39">
+<Routine name="DeepSeeButtons" type="MAC" languagemode="0" timestamp="64736,37929.807529"><![CDATA[
+DeepSeeButtons(namespace="ask",cubeString="ask", getLogs="", LogFile="", tracking="")
 #include %occConstant
 
 	;DeepSeeButtons: routine to log system and DeepSee information
@@ -11,9 +11,9 @@ DeepSeeButtons(namespace="ask",cubeString="ask", getLogs="", LogFile="", proceed
 	;You can use the following optional arguments:
 	;namespace:		namespace where this routine will run, e.g. "SAMPLES". If "" the current namespace will be chosen
 	;cubeString: 	comma separated list of cubes, e.g. "patients,holefoods", "ALL", or "" for no cubes at all
-	;getLogs:		""/0/1 to ask  to/do not/do  include cconsole.log, Query Log, and DeepSee logs, respectively
+	;getLogs:		""/0/1/anything to  ask to/do not/do/do not  include cconsole.log, Query Log, and DeepSee logs, respectively
 	;LogFile:		output file. By default the output file will be stored in the /mgr directory
-	;proceed:		1 to skip the last prompt before launching DeepSeeButtons
+	;tracking:		Used by the UI in SMP to log into ^IRIS.Temp.DeepSeeButtonsTrack and track this routine
 	;
 	;Example using arguments:
 	;Do ^DeepSeeButtons("SAMPLES","PATIENTS",1,"/home/amarin/Desktop/DSbuttons.html",0)
@@ -73,7 +73,7 @@ DeepSeeButtons(namespace="ask",cubeString="ask", getLogs="", LogFile="", proceed
 	;	14) Alerts
 
 StartDialog
-	New (namespace,cubeString,getLogs,LogFile,proceed)
+	New (namespace,cubeString,getLogs,LogFile,tracking)
 	Set origNS=$Namespace
 	Try {
 		Set PDev=$Principal
@@ -84,11 +84,13 @@ StartDialog
 		Set namespace=$$GetNamespace(namespace)
 		Quit:namespace=""
 		Set cubeList=$$GetCubesToLog(cubeString,namespace)
-		Do GetLogsConfirm
-		Do ReadLogTypeConfirm
-		Quit:'proceed
+		//Later do not ask to confirm to proceed if anything was passed to getLogs argument
+		Set proceed=(getLogs'="")
+		Do:getLogs="" GetLogsConfirm
+		Do:'proceed ReadLogTypeConfirm
+		Quit:'proceed		
+		Kill:tracking ^IRIS.Temp.DeepSeeButtonsTrack
 		Do LaunchLogs(namespace,cubeList,getLogs)
-	
  	} Catch(ex) {
 		Set tSC = ex.AsStatus()
 		Use $Principal
@@ -133,41 +135,37 @@ GetCubesToLog(cubeString,namespace) {
 }
 
 GetLogsConfirm
-	ZN "%SYS"
+	ZN "%SYS"	
+	Write !, "Include cconsole.log, Query Log, and DeepSee Logs? [Y] "
+	Read getLogs
+	Set getLogs=$ZCONVERT(getLogs,"U")
 	If (getLogs="") {
-		Write !, "Include cconsole.log, Query Log, and DeepSee Logs? [Y] "
-		Read getLogs
-		Set getLogs=$ZCONVERT(getLogs,"U")
-		If (getLogs="") {
-			Set getLogs=1		//If the user did not make a selection, add console and query logs
-		} ElseIf (getLogs="N")||(getLogs="NO") {
-			Set getLogs=0
-		} ElseIf (getLogs="Y")||(getLogs="YES") {
-			Set getLogs=1
-		} ElseIf (getLogs=+getLogs) { 
-			//secret option: if getLogs is a number it controls the number of queries by user shown
-			//Just pass getLogs on
-		} Else { 
-			Write !,"Please enter Y or N"	
-			Set getLogs=""
-			Goto GetLogsConfirm
-		}
+		Set getLogs=1		//If the user did not make a selection, add console and query logs
+	} ElseIf (getLogs="N")||(getLogs="NO") {
+		Set getLogs=0
+	} ElseIf (getLogs="Y")||(getLogs="YES") {
+		Set getLogs=1
+	} ElseIf (getLogs=+getLogs) { 
+		//secret option: if getLogs is a number it controls the number of queries by user shown
+		//Just pass getLogs on
+	} Else { 
+		Write !,"Please enter Y or N"	
+		Set getLogs=""
+		Goto GetLogsConfirm
 	}
 	Quit
 
 ReadLogTypeConfirm
-	If (proceed'=1) {
-		Write !,"Continue? [Y] " Read LogType
-		Set LogType=$ZCONVERT(LogType,"U")
-		If ((LogType="NO")!(LogType="N")!(LogType="Q")!(LogType="QUIT")) {
-			Set proceed=0 } 
-		ElseIf ((LogType="YES")!(LogType="Y")!(LogType="")) {
-			Set proceed=1
-		} Else {
-			Write !,"Please enter Y or N" Goto ReadLogTypeConfirm
-		}
+	Write !,"Continue? [Y] " Read LogType
+	Set LogType=$ZCONVERT(LogType,"U")
+	If ((LogType="NO")!(LogType="N")!(LogType="Q")!(LogType="QUIT")) {
+		Set proceed=0 } 
+	ElseIf ((LogType="YES")!(LogType="Y")!(LogType="")) {
+		Set proceed=1
+	} Else {
+		Write !,"Please enter Y or N" Goto ReadLogTypeConfirm
 	}
-	Quit
+	Quit proceed
 
 LaunchLogs(namespace,cubeList,getLogs)
  	Try {
@@ -203,7 +201,7 @@ LaunchLogs(namespace,cubeList,getLogs)
 	Quit
 
 LogSections(cubeList,getLogs,LogFile)
-	New (LogDirectory,namespace,cubeList,getLogs,LogFile,MgrDir)
+	New (LogDirectory,namespace,cubeList,getLogs,LogFile,MgrDir,tracking)
 	Do InitVars
 	If OS?1"***".e Quit ""
 	If LogFile="" Quit ""
@@ -514,7 +512,8 @@ LogDeepSeeSetupSection
 		Do WriteLog("<div class=""trapezoid"">")
 		Do WriteLog("<span onclick=""openNav()""> &#9776; </span>",2)
 		Do WriteLog("</div>")
-		Do WriteUpdate("Getting system information..")
+		Do WriteUpdate("Getting system information")
+		Do:tracking WriteTrack("setup","Getting system information","")
 		Do WriteLog("<div id=""DSSetupDiv"" onmouseover=""highlightLink(this,1)"" onmouseout=""highlightLink(this,0)"">")
 		Do WriteParagraph("deepseesetup","DeepSee Setup in "_namespace,0)
  		//Agent Count
@@ -885,7 +884,8 @@ LogServerSetup()
 
 LogCubeSection
 	Try {
-		Do WriteUpdate("Getting cube information..")
+		Do WriteUpdate("Getting cube information")
+		Do:tracking WriteTrack("cubelog","Getting cube information","")
 		Do WriteLog("<div id=""CubesDiv"" onmouseover=""highlightLink(this,1)"" onmouseout=""highlightLink(this,0)"">")
 		Do WriteParagraph("cubelist","Cubes in "_namespace)
 		Use PDev
@@ -968,7 +968,8 @@ LogCubeSection
 
 LogBuildSynchSection
 	Try {
-		Do WriteUpdate("Getting information on Build/Synch..")
+		Do WriteUpdate("Getting information on Build/Synch")
+		Do:tracking WriteTrack("buildsynch","Getting information on Build/Synch","")
 		Do WriteLog("<div id=""BuildSynchDiv"" onmouseover=""highlightLink(this,1)"" onmouseout=""highlightLink(this,0)"">")
 		Do WriteParagraph("buildsynchlist","Cube Build/Synch")
 		Use PDev
@@ -1205,6 +1206,7 @@ LogDetailedCubeInfo
 			Do LogCubeDimensions
 			Do LogOtherCubeElements
 			Do WriteLog("</div>")
+			Do:tracking WriteTrack("cube","Detailed information",cube)
 		}
  	}
 	Quit
@@ -1212,6 +1214,7 @@ LogDetailedCubeInfo
 LogCubeInfo
 	//New (namespace,LogFile,PDev,cube)
 	Do WriteUpdate("Getting detailed cube information for "_cube)
+	Do:tracking WriteTrack("cube","Build/Synch",cube)
 	Use LogFile
 	ZN namespace	
 	Try {
@@ -1326,7 +1329,9 @@ LogCubeInfo
     //Row count on source. It might take some time (even 150 seconds on 100M facts)
     Do WriteLog("<h4>Source Count</h4>",8)
     //Check the following for abstract cubes and data connectors
-    If (sqlclass="Not available")||('##class(%SYSTEM.SQL).TableExists(sqlclass)) {
+    If isTrak { //I noticed at a Trak site that COUNT(*) is slow.
+	    Do WriteLog("<p>Not shown for Trak</p>",8)
+    } ElseIf (sqlclass="Not available")||('##class(%SYSTEM.SQL).TableExists(sqlclass)) {
 		Do WriteLog("<p>Not available</p>",8)
     } Else {
 	    Set SourceFactCount=$$GetSourceFactCount(sqlclass)
@@ -1411,6 +1416,7 @@ LogCubeInfo
     Do WriteLog("<tr>",4)
     Do WriteLog("<td>",6)
    	Do WriteUpdate("Getting detailed cube information for "_cube_": cube registry")
+   	Do:tracking WriteTrack("cube","Cube Registry",cube)
     Do WriteLog("<h4>Cube Registry</h4>",8)
     S rs = ##class(%ResultSet).%New("%DeepSee.CubeManager.RegistryMap:RegistryMapTableView")
 	Set registered = ""
@@ -1497,6 +1503,7 @@ LogCubeInfo
 
 LogCubeDimensions
 	Do WriteUpdate("Getting detailed cube information for "_cube_": get dimension list")
+	Do:tracking WriteTrack("cube","Dimension list",cube)
 	ZN namespace
 	Do WriteLog("<hr size=""4"" noshade>")
 	Do WriteLog("<a name=""dimensions"_cube_"""></a>")
@@ -1613,6 +1620,7 @@ LogCubeDimensions
 	}
 	//Detailed cube information
 	Do WriteUpdate("Getting detailed cube information for "_cube_": %Analyze")
+	Do:tracking WriteTrack("cube","%Analyze",cube)
 	Do WriteLog("<h4>Analyze</h4>")
 	Do WriteLog("<table border=""0"" cellpadding=""5"" cellspacing=""5"">")
 	Do WriteLog("<tbody>",2)
@@ -1645,12 +1653,14 @@ LogCubeDimensions
 	}
 	// Translate the filed names in %Analyze to actual specs
 	Do WriteUpdate("Getting detailed cube information for "_cube_": FieldNameToSpec")
+	Do:tracking WriteTrack("cube","FieldNameToSpec",cube)
 	Write "FieldNameToSpec("""_cube_""")",!
 	Do FieldNameToSpec(cube)
 	Do WriteLog("")
 	Do WriteLog("")
 	Do WriteLog("")
 	Do WriteUpdate("Getting detailed cube information for "_cube_": %AnalyzeMissing")
+	Do:tracking WriteTrack("cube","%AnalyzeMissing",cube)
 	Write "Do ##class(%DeepSee.Utils).%AnalyzeMissing(""",cube,""")",!
 	Do ##class(%DeepSee.Utils).%AnalyzeMissing(cube)
 	Do WriteLog("</pre>",8)
@@ -1664,6 +1674,7 @@ LogCubeDimensions
 	
 LogOtherCubeElements
 	Do WriteUpdate("Getting detailed cube information for "_cube_": other cube elements")
+	Do:tracking WriteTrack("cube","Other cube elements",cube)
 	ZN namespace
 	Do WriteLog("<hr noshade size=""4"" width=""auto"">"	)
 	Do WriteLog("<a name=""otherelements""></a>")
@@ -1867,7 +1878,8 @@ LogOtherCubeElements
 LogQuerylog
 	//Get last N queries run by each user, where N can be secretly chosen from the prompt instead of Y/N
 	
-	Do WriteUpdate("Getting Query Log, DeepSee logs, and cconsole.log..")
+	Do WriteUpdate("Getting Query Log, DeepSee logs, and cconsole.log")
+	Do:tracking WriteTrack("getlogs","Getting Query Log, DeepSee logs, and cconsole.log","")
 	Do WriteLog("<div id=""queryLogMainDiv"" onmouseover=""highlightLink(this,1)"" onmouseout=""highlightLink(this,0)"">")
 	Do WriteParagraph("querylog","Query Log")
 	Do WriteLog("<h4 id=""querylogtoggle"" onclick=""javascript:toggle('querylogdiv',this.id);"">&rtrif; Expand</h4>",2)
@@ -2122,7 +2134,8 @@ LogMappings
 
 LogDataBases
 	Try {
-		Do WriteUpdate("Getting local databases information..")
+		Do WriteUpdate("Getting local databases information")
+		Do:tracking WriteTrack("databases","Getting local databases information","")
 		//CKEY^%SYS.LICENSE
 		Do WriteLog("<div id=""LocalDBDiv"" onmouseover=""highlightLink(this,1)"" onmouseout=""highlightLink(this,0)"">")
 		Do WriteParagraph("LocalDB","Local Databases")
@@ -2172,7 +2185,8 @@ LogDataBases
 
 LogTasks
 	Try {
-		Do WriteUpdate("Getting background tasks information..")
+		Do WriteUpdate("Getting background tasks information")
+		Do:tracking WriteTrack("tasks","Getting background tasks information","")
 		Do WriteLog("<div id=""TaskscheduleDiv"" onmouseover=""highlightLink(this,1)"" onmouseout=""highlightLink(this,0)"">")
 		Do WriteParagraph("Taskschedule","Task schedule")
 		Use LogFile
@@ -2217,7 +2231,8 @@ LogTasks
 	Quit
 
 LogJournal
-	Do WriteUpdate("Getting journaling information..")
+	Do WriteUpdate("Getting journaling information")
+	Do:tracking WriteTrack("journal","Getting journaling information","")
 	Do WriteLog("<div id=""JournalingDiv"" onmouseover=""highlightLink(this,1)"" onmouseout=""highlightLink(this,0)"">")
 	Do WriteParagraph("Journaling","Journaling",2)
 	ZN "%SYS"
@@ -2370,7 +2385,12 @@ LogSidePanel(cubeList,getLogs,numalerts)
 LogCloseBody
 	Do WriteLog("</body>")
 	Do WriteLog("</html>")
-	Do WriteUpdate("")	
+	Do WriteUpdate("DeepSeeButtons report saved to "_LogFile)
+	Do:tracking WriteTrack("save","DeepSeeButtons report saved to ",LogFile)
+	Do WriteUpdate("Done")
+	Do:tracking WriteTrack("complete","Complete","")
+	
+	//Kill ^IRIS.Temp.DeepSeeButtonsTrack  //This is done from the SMP > DeepSeeButtons page
 	Quit
 
 
@@ -2438,28 +2458,26 @@ InitVars()
 	Else  If v["openvms" Set OS="VMS"
 	Else  Set OS="*** Unrecognized OS ***"
 	If OS?1"***".e Quit
-	If OS?1"Win".e Do
-	.	Set DirDelim="\"
-	.	Set NullDev="//./nul"
-	.	Do SetDirs
-	.	Set KeyFile=MgrDir_DirDelim_"Cache.key"
-	.	Set BinDir=CacheDir_DirDelim_"Bin"
-	.	Quit
-	If OS="UNIX" Do
-	.	Set DirDelim="/"
-	.	Set NullDev="/dev/null/"
-	.	Do SetDirs
-	.	Set KeyFile=MgrDir_DirDelim_"cache.key"
-	.	Set BinDir=CacheDir_DirDelim_"bin"
-	.	Quit
-	If OS="VMS" Do
-	.	Set DirDelim="."
-	.	Set NullDev="NL:"
-	.	Do SetDirs
-	.	Set KeyFile=MgrDir_"CACHE.KEY"
-	.	Set i=$Find(MgrDir,".MGR")
-	.	Set BinDir=$Extract(MgrDir,1,i-$Length(".MGR")-1)_".BIN"_$Extract(MgrDir,i,*)
-	.	Quit
+	If (OS?1"Win".e) {
+		Set DirDelim="\"
+		Set NullDev="//./nul"
+		Do SetDirs
+		Set KeyFile=MgrDir_DirDelim_"Cache.key"
+		Set BinDir=CacheDir_DirDelim_"Bin"
+	} ElseIf (OS="UNIX") {
+		Set DirDelim="/"
+		Set NullDev="/dev/null/"
+		Do SetDirs
+		Set KeyFile=MgrDir_DirDelim_"cache.key"
+		Set BinDir=CacheDir_DirDelim_"bin"
+	} ElseIf (OS="VMS") {
+		Set DirDelim="."
+		Set NullDev="NL:"
+		Do SetDirs
+		Set KeyFile=MgrDir_"CACHE.KEY"
+		Set i=$Find(MgrDir,".MGR")
+		Set BinDir=$Extract(MgrDir,1,i-$Length(".MGR")-1)_".BIN"_$Extract(MgrDir,i,*)
+	}
 	Set LogFilePrefix=""
 	If CustomerName'="" Set LogFilePrefix="DeepSeeButtons_"_$Piece(CustomerName," ",1)_"_" //e.g. CustomerName = ISC Development
 	If LogFilePrefix'="",LogFilePrefix?1a.an,$Length(LogFilePrefix)<20
@@ -3388,12 +3406,23 @@ WriteHeader4(header,spaces,title)
 	Quit
 	
 WriteUpdate(msg)
-	New (msg, PDev, LogFile)
+	New (msg, PDev, LogFile, tracking)
 	Use PDev
 	Write $C(13,27)_"[0J"_msg
+	//Set:tracking ^IRIS.Temp.DeepSeeButtonsTrack(+$J,$I(^IRIS.Temp.DeepSeeButtonsTrack)) = msg
 	Use LogFile
 	Quit
 
+WriteTrack(phase,mgs,details,errors)
+	ZN namespace
+	Set tStep = $Case(phase,"setup":1,"cubelog":2,"buildsynch":3,"cube":4,"getlogs":5,"databases":6,"tasks":7,"journal":8,"save":9,"complete":10,"error":12,:11)
+	//If phase="cube" {
+		//Set ^IRIS.Temp.DeepSeeButtonsTrack(+$J,tStep,details)=$LB(phase,mgs,details,errors)
+		//Set ^Ale(+$J,tStep,details)=$LB(phase,mgs,details,errors)
+	//}
+	//Set ^Ale(+$J,tStep)=$LB(phase,mgs,details,errors)
+	Set ^IRIS.Temp.DeepSeeButtonsTrack(+$J,tStep)=$LB(phase,mgs,details,errors)
+	
 WriteAdhocPatch
 	Try {
 		Set patchvar=$Order(^%qPatch(""))
