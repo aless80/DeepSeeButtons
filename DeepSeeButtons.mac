@@ -200,7 +200,7 @@ LaunchLogs(namespace,cubeList,getLogs)
 
 LogSections(cubeList,getLogs,LogFile)
 	New (LogDirectory,namespace,cubeList,getLogs,LogFile,MgrDir,tracking)
-	Do InitVars
+	Do Init
 	Do InitLogFile
 	If OS?1"***".e Quit ""
 	If LogFile="" Quit ""
@@ -858,7 +858,16 @@ LogServerSetup()
 	Do WriteLog("<td>",8)	
 	Do OSVer
 	Do WriteLog("</td>",8)
+	Do WriteLog("</tr>",6)	
+	/*Do WriteLog("<tr>",6)
+	Do WriteLog("<td>",8)
+	Do WriteLog("<h4>Operating System</h4>",10)	
+	Do WriteLog("<p>",10)
+	Do OSVer^Buttons
+	Do WriteLog("</p>",10)
+	Do WriteLog("</td>",8)
 	Do WriteLog("</tr>",6)
+	*/	
 	//Disk space
 	Do WriteLog("<tr>",6)
 	Do WriteLog("<td>",8)
@@ -2404,7 +2413,7 @@ ValidateNamespace(namespace) [namespace]{
 	}
 }
 
-InitVars()
+Init()
 	//Sets routine-wide variables
 	New i,LogFilePrefix,v,x
 	Set PDev=$Principal
@@ -2703,6 +2712,7 @@ NLS
 	Quit
 
 OSVer
+	//This is almost the same as the OSVer function in ^Buttons
 	Try {
 		//Add the OS version to LogFile
 		New Cmd,uname
@@ -2712,10 +2722,12 @@ OSVer
 		If OS="UNIX" Set Cmd="uname -a"
 		If OS="VMS" Set Cmd="WRITE SYS$OUTPUT ""OpenVMS "",F$GETSYI(""VERSION"")"		
 		Do ExternalCmd(Cmd)
+		//Do ExternalCmd^Buttons(Cmd)
 		If OS="UNIX" Set uname=$$uname()
 		If ($D(uname) && (uname?1"AIX".e)) {
 			Do WriteLog(" -- ",8)
 			Do ExternalCmd("lsattr -El proc0")
+			//Do ExternalCmd^Buttons("lsattr -El proc0")
 		}
 	} Catch(ex) {
 		Set tSC = ex.AsStatus()
@@ -2766,63 +2778,6 @@ DiskSpace
 		Quit:AtEnd
 	}	
 	Quit
-
-CopyToLog(InputFile,Caption,SkipSize=0)
-	//Appends a file to LogFile. Used for cconsole.log
-	//InputFile can be cconsole.log, the generated cstat output file, inuse.dmp or dumpkeys.txt
-	//SkipSize - Skip the first x number of bytes in the file to reduce size. Used by cconsole.log
-	//to keep it a reasonable size
-	New %DAT,%TIM,x
-	Do INT^%D,INT^%T
-	Do WriteLog(Caption_" on "_%DAT_" at "_%TIM_":"),WriteLog("")
-	Try {
-		Open InputFile:"R":FileOpenTimeOut
-		If '$Test Do WriteLog("File "_InputFile_" does not exist") Do WriteLog("</pre>") Use PDev Quit
-		//Read timeout added to prevent the case where neither <ENDOFFILE> error nor $ZEOF terminate the loop
-		If SkipSize>0 Do WriteLog("File "_InputFile_" is too large, skipping first "_SkipSize_" bytes"),WriteLog("")
-		Set Size=0
-		For { 
-			Use InputFile 
-			Read x:FileReadTimeOut 
-			Set ZEOF=$ZEof 
-			Use PDev 
-			Quit:'$Test!(ZEOF)  
-			Set Size=Size+$l(x) 
-			Continue:SkipSize>Size  
-			Use LogFile 
-			Write $zconvert(x,"O","HTML"),CRLF 
-			Use PDev
-		}
-	} Catch(ex) {
-		Set tSC = ex.AsStatus()
-	}
-	Close InputFile
-	Quit
- 
-CurDate()
-	//Returns Current Date as YYYYMMDD
-	New
-	Do INT^%D
-	Set %DAT=$ZConvert(%DAT,"U")
-	Set MonthName=$Extract(%DAT,1,3)
-	Set Day=+$Piece(%DAT," ",2) If Day?1n Set Day=0_Day
-	Set Year=+$Piece(%DAT," ",3) If Year?2n Set Year=2000+Year
-	Set Month=$Find("JANFEBMARAPRMAYJUNJULAUGSEPOCTNOVDEC",MonthName)\3 If Month?1n Set Month=0_Month
-	Quit Year_Month_Day
-
-CurTime()
-	//Returns Current Time as HHMM
-	New
-	Do INT^%T
-	Set %TIM=$ZConvert(%TIM,"U")    
-	For  Quit:%TIM'?1" ".e  Set %TIM=$Extract(%TIM,2,*)
-	Set Time=$Piece(%TIM," ",1),AMPM=$Piece(%TIM," ",2)
-	Set Hour=+$Piece(Time,":",1),Minutes=+$Piece(Time,":",2)
-	If AMPM="AM",Hour=12 Set Hour=0
-	If AMPM="PM",Hour'=12 Set Hour=Hour+12
-	If Hour?1n Set Hour=0_Hour
-	If Minutes?1n Set Minutes=0_Minutes
-	Quit Hour_Minutes
 
 CountNodes(namespace,g){
 	ZN namespace
@@ -3444,18 +3399,25 @@ NewFile(LogFilePrefix,LogFileSuffix)
 	//Creates a new file with Date and Time added to the filename and opens it for Reading and Writing
 	//File Name can be either "Cache" or "cstat"
 	New Date,Dir,NewFile,Time
-	If LogFileSuffix="" Set LogFileSuffix="html"
+	Set:LogFileSuffix="" LogFileSuffix="html"
 	Set Date=$$CurDate,Time=$$CurTime
-	If OS?1"Win".e Set LogFileSuffix=$ZConvert(LogFileSuffix,"l")
-	Else  If OS="UNIX" Set LogFileSuffix=$ZConvert(LogFileSuffix,"l")
-	Else  If OS="VMS" Set LogFileSuffix=$ZConvert(LogFileSuffix,"U")
+	If (OS?1"Win".e) {
+		Set LogFileSuffix=$ZConvert(LogFileSuffix,"l")
+	} ElseIf (OS="UNIX") {
+		Set LogFileSuffix=$ZConvert(LogFileSuffix,"l")
+	} ElseIf (OS="VMS") {
+		Set LogFileSuffix=$ZConvert(LogFileSuffix,"U")
+	}
 	Set Dir=MgrDir
 	Set LogDirectory=$Get(LogDirectory,"")
-	If LogDirectory'="" Set Dir=LogDirectory
-	If OS?1"Win".e Set NewFile=Dir_DirDelim_LogFilePrefix_Date_"_"_Time_"."_LogFileSuffix
-	//Else  If OS="UNIX" Set NewFile=Dir_DirDelim_$ZConvert(LogFilePrefix,"l")_Date_"-"_Time_"."_LogFileSuffix	
-	Else  If OS="UNIX" Set NewFile=Dir_DirDelim_LogFilePrefix_Date_"_"_Time_"."_LogFileSuffix	
-	Else  If OS="VMS" Set NewFile=Dir_$ZConvert(LogFilePrefix,"U")_Date_Time_"."_LogFileSuffix_";"
+	Set:LogDirectory'="" Dir=LogDirectory
+	If (OS?1"Win".e) {
+		Set NewFile=Dir_DirDelim_LogFilePrefix_Date_"_"_Time_"."_LogFileSuffix
+	} ElseIf (OS="UNIX") {
+		Set NewFile=Dir_DirDelim_LogFilePrefix_Date_"_"_Time_"."_LogFileSuffix
+	} ElseIf (OS="VMS") {
+		Set NewFile=Dir_$ZConvert(LogFilePrefix,"U")_Date_Time_"."_LogFileSuffix_";"
+	}
  	//	Open NewFile:"RWNSK\UTF8\":FileOpenTimeOut
  	//	If '$Test Quit ""
 	Quit NewFile
@@ -3486,9 +3448,11 @@ PrintGlobal(namespace,glob,spaces){
 	}
 }
 
+ /*
 Dir
 	Set $ZTrap="DirError",$ZError=""
 	Set DirInfo=$ZUtil(49,Dir)
+	
 DirError
 	Set $ZTrap=""
 	Set MountStatus=$Get(DirInfo,"")
@@ -3500,7 +3464,7 @@ DirError
 	Write !,Dir,?49,$Justify(BlockSize,4),?60,$Piece(DirInfo,",",$$$resourcepiece)
 	Write ?80,$Case($$$encrypteddbformat(DirInfo),0:0,:$Piece(DirInfo,",",$$$enckeyidpiece))
 	Quit
-	
+ */	
 ExternalCmd(Command)
 	//Executes an external program and adds its output to LogFile
 	//Requires the full specification of the Exe file
@@ -3525,7 +3489,7 @@ ExtCmdPipe
 		Close Command
 	}
 	Quit
-
+	
 ExtCmdFile
 	//Only to be executed when OS is Windows or VMS, when either pipes don't work or behave inconsistently
 	New Date,File,Time
@@ -3569,8 +3533,65 @@ ExitCmdFileEOF
 	.	Quit
 	Set x=$ZUtil(140,5,File) //Delete temporary scratch file
 	Quit
+	
 ExitCmdNoFile
 	Set $ZTrap=""
 	Set $ZError=""
 	Quit
 
+CopyToLog(InputFile,Caption,SkipSize=0)
+	//Appends a file to LogFile. Used for cconsole.log
+	//InputFile can be cconsole.log, the generated cstat output file, inuse.dmp or dumpkeys.txt
+	//SkipSize - Skip the first x number of bytes in the file to reduce size. Used by cconsole.log
+	//to keep it a reasonable size
+	New %DAT,%TIM,x
+	Do INT^%D,INT^%T
+	Do WriteLog(Caption_" on "_%DAT_" at "_%TIM_":"),WriteLog("")
+	Try {
+		Open InputFile:"R":FileOpenTimeOut
+		If '$Test Do WriteLog("File "_InputFile_" does not exist") Do WriteLog("</pre>") Use PDev Quit
+		//Read timeout added to prevent the case where neither <ENDOFFILE> error nor $ZEOF terminate the loop
+		If SkipSize>0 Do WriteLog("File "_InputFile_" is too large, skipping first "_SkipSize_" bytes"),WriteLog("")
+		Set Size=0
+		For { 
+			Use InputFile 
+			Read x:FileReadTimeOut 
+			Set ZEOF=$ZEof 
+			Use PDev 
+			Quit:'$Test!(ZEOF)  
+			Set Size=Size+$l(x) 
+			Continue:SkipSize>Size  
+			Use LogFile 
+			Write $zconvert(x,"O","HTML"),CRLF 
+			Use PDev
+		}
+	} Catch(ex) {
+		Set tSC = ex.AsStatus()
+	}
+	Close InputFile
+	Quit
+	
+CurDate()
+	//Returns Current Date as YYYYMMDD
+	New
+	Do INT^%D
+	Set %DAT=$ZConvert(%DAT,"U")
+	Set MonthName=$Extract(%DAT,1,3)
+	Set Day=+$Piece(%DAT," ",2) If Day?1n Set Day=0_Day
+	Set Year=+$Piece(%DAT," ",3) If Year?2n Set Year=2000+Year
+	Set Month=$Find("JANFEBMARAPRMAYJUNJULAUGSEPOCTNOVDEC",MonthName)\3 If Month?1n Set Month=0_Month
+	Quit Year_Month_Day
+
+CurTime()
+	//Returns Current Time as HHMM
+	New
+	Do INT^%T
+	Set %TIM=$ZConvert(%TIM,"U")    
+	For  Quit:%TIM'?1" ".e  Set %TIM=$Extract(%TIM,2,*)
+	Set Time=$Piece(%TIM," ",1),AMPM=$Piece(%TIM," ",2)
+	Set Hour=+$Piece(Time,":",1),Minutes=+$Piece(Time,":",2)
+	If AMPM="AM",Hour=12 Set Hour=0
+	If AMPM="PM",Hour'=12 Set Hour=Hour+12
+	If Hour?1n Set Hour=0_Hour
+	If Minutes?1n Set Minutes=0_Minutes
+	Quit Hour_Minutes
