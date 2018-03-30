@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Export generator="Cache" version="25" zv="Cache for UNIX (SUSE Linux Enterprise Server for x86-64) 2017.2.1 (Build 801)" ts="2018-03-29 14:31:39">
-<Routine name="DeepSeeButtons" type="MAC" languagemode="0" timestamp="64736,37929.807529"><![CDATA[
+<Export generator="Cache" version="25" zv="Cache for UNIX (SUSE Linux Enterprise Server for x86-64) 2017.2.1 (Build 801)" ts="2018-03-30 11:42:53">
+<Routine name="DeepSeeButtons" type="MAC" languagemode="0" timestamp="64737,42107.63285"><![CDATA[
 DeepSeeButtons(namespace="ask",cubeString="ask", getLogs="", LogFile="", tracking="")
 #include %occConstant
 
@@ -203,6 +203,7 @@ LaunchLogs(namespace,cubeList,getLogs)
 LogSections(cubeList,getLogs,LogFile)
 	New (LogDirectory,namespace,cubeList,getLogs,LogFile,MgrDir,tracking)
 	Do InitVars
+	Do InitLogFile
 	If OS?1"***".e Quit ""
 	If LogFile="" Quit ""
 	Do LogHead(cubeList,getLogs)
@@ -2389,8 +2390,6 @@ LogCloseBody
 	Do:tracking WriteTrack("save","DeepSeeButtons report saved to ",LogFile)
 	Do WriteUpdate("Done")
 	Do:tracking WriteTrack("complete","Complete","")
-	
-	//Kill ^IRIS.Temp.DeepSeeButtonsTrack  //This is done from the SMP > DeepSeeButtons page
 	Quit
 
 
@@ -2478,6 +2477,9 @@ InitVars()
 		Set i=$Find(MgrDir,".MGR")
 		Set BinDir=$Extract(MgrDir,1,i-$Length(".MGR")-1)_".BIN"_$Extract(MgrDir,i,*)
 	}
+	Quit
+
+InitLogFile()
 	Set LogFilePrefix=""
 	If CustomerName'="" Set LogFilePrefix="DeepSeeButtons_"_$Piece(CustomerName," ",1)_"_" //e.g. CustomerName = ISC Development
 	If LogFilePrefix'="",LogFilePrefix?1a.an,$Length(LogFilePrefix)<20
@@ -3409,19 +3411,15 @@ WriteUpdate(msg)
 	New (msg, PDev, LogFile, tracking)
 	Use PDev
 	Write $C(13,27)_"[0J"_msg
-	//Set:tracking ^IRIS.Temp.DeepSeeButtonsTrack(+$J,$I(^IRIS.Temp.DeepSeeButtonsTrack)) = msg
 	Use LogFile
 	Quit
 
 WriteTrack(phase,mgs,details,errors)
 	ZN namespace
 	Set tStep = $Case(phase,"setup":1,"cubelog":2,"buildsynch":3,"cube":4,"getlogs":5,"databases":6,"tasks":7,"journal":8,"save":9,"complete":10,"error":12,:11)
-	//If phase="cube" {
-		//Set ^IRIS.Temp.DeepSeeButtonsTrack(+$J,tStep,details)=$LB(phase,mgs,details,errors)
-		//Set ^Ale(+$J,tStep,details)=$LB(phase,mgs,details,errors)
-	//}
-	//Set ^Ale(+$J,tStep)=$LB(phase,mgs,details,errors)
 	Set ^IRIS.Temp.DeepSeeButtonsTrack(+$J,tStep)=$LB(phase,mgs,details,errors)
+	//If logging detail info on cubes, create an additional node for each cubes
+	Set:phase="cube" ^IRIS.Temp.DeepSeeButtonsTrack(+$J,tStep,details)=$LB(phase,mgs,details,errors)	
 	
 WriteAdhocPatch
 	Try {
