@@ -1,63 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Export generator="Cache" version="25" zv="Cache for UNIX (SUSE Linux Enterprise Server for x86-64) 2017.2.1 (Build 801)" ts="2018-04-03 16:05:08">
-<Class name="%DeepSee.UI.DeepSeeButtonsDownload">
-<Super>%ZEN.Component.page,%CSP.StreamServer</Super>
-<TimeChanged>64735,54438.891408</TimeChanged>
-<TimeCreated>64735,54438.891408</TimeCreated>
-<Inheritance>right</Inheritance>
-
-<Method name="OnPreHTTP">
-<Description><![CDATA[
-The <method>OnPostHTTP()</method> is called by the CSP dispatcher before the HTTP
-headers have been sent. Here, 
-then we set the appropriate content type and content length values into the %response
-object (see <class>%CSP.Request</class>), in preparation for sending the image data
-in the <method>OnPage()</method>.]]></Description>
-<ClassMethod>1</ClassMethod>
-<ReturnType>%Boolean</ReturnType>
-<Implementation><![CDATA[
-	If %request.Get("FILE")="" Quit 0
-   // Now, the OnPage() method will serve up the actual FILE data
-  	s %SavedStream = ##class(%FileBinaryStream).%New()
-	s %SavedStream.Filename=%request.Get("FILE")
-	
-  If (%SavedStream '= $$$NULLOREF) {
-        //Set %response.ContentType = %request.Get("CONTENTTYPE")
-		Set %response.Expires=10
-        Do %response.SetHeader("content-disposition","attachment; filename="_%request.Get("FILE"))
-   } Else {
-        Set %response.Status="404" ; HTTP file not found
-        Quit 0 
-    }
-
-    Quit $$$OK
-]]></Implementation>
-</Method>
-
-<Method name="OnPage">
-<Description><![CDATA[
-The <method>OnPage()</method> is called by the CSP dispatcher to generate the
-page content. Since the content type is actually a stream, not HTML
-we simply write out the stream data.]]></Description>
-<ClassMethod>1</ClassMethod>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
-    // Write out the Actual Binary Data
-    If %SavedStream'=$$$NULLOREF Do %SavedStream.OutputToDevice()
-    Quit $$$OK
-]]></Implementation>
-</Method>
-</Class>
-
-
-<Class name="%DeepSee.UI.DeepSeeButtonsViewer">
+<Export generator="Cache" version="25" zv="Cache for UNIX (SUSE Linux Enterprise Server for x86-64) 2017.2.1 (Build 801)" ts="2018-04-02 13:58:38">
+<Class name="%DeepSee.UI.DSButtonsViewer">
 <Description>
-DeepSee's DeepSeeButtons Viewer.
-Run DeepSeeButtons and display contents of the DeepSeeButtons html file in the current namespace</Description>
+DeepSee DeepSeeButtons Viewer.
+Display contents of the DeepSeeButtons html file for the current namespace.
+</Description>
 <Super>%DeepSee.UI.standardPage</Super>
 <System>4</System>
-<TimeChanged>64741,56740.343487</TimeChanged>
-<TimeCreated>64741,56740.343487</TimeCreated>
+<TimeChanged>64740,48858.779875</TimeChanged>
+<TimeCreated>64636,45154.455633</TimeCreated>
 
 <Parameter name="PAGENAME">
 <Default>DeepSeeButtons Viewer</Default>
@@ -107,25 +58,10 @@ body {
 	color: rgb(71,72,67);
 	background: rgb(140,221,174);
 }
-
-
-
-
-.table-wrapper {
-  	border: 1px solid grey;
- 	overflow: auto;
-    max-width: 60%;
-    max-height: 350px;
-    /*display:flex;
-    flex-direction: column-reverse;
-    */
-}
 .statusTable {
 	background: white;
 	border: 1px solid #404040;
-	/*width: 720px; width: 500px;*/
-	width: 100%;
-	
+	width: 500px;
 }
 
 .statusTable td {
@@ -390,6 +326,7 @@ object is created.</Description>
 	console.log("this.trackingId:",this.trackingId)
 	if (this.trackingId!='') {
 		zen('timer').timeout = 250;
+		console.log('timer')
 		zen('timer').startTimer();
 	} else {
 		
@@ -410,8 +347,10 @@ Return the tracking id.</Description>
 	Set tJobTimeOut = 10
 	Set pProceed=1
 	Set pTracking=1
+		
 	Set htmlpath = ##class(%Library.File).NormalizeDirectory(htmlpath)
-	Set htmlFullPath = htmlpath_..GetFileName()
+	Set htmlFullPath = htmlpath_"ALE"_..GetFileName()
+ S ^Ale($I(^Ale),"htmlFullPath")=htmlFullPath
 	Job ^DeepSeeButtons(pNameSpace, pCubes, pGetLogs, htmlFullPath, pTracking)::tJobTimeOut
 	If '$Test {
 		&js<alert('Unable to start background job.');>
@@ -435,15 +374,10 @@ Update the status area.</Description>
 		html.setContent(status);
 		zen('timer').timeout = 250;
 		zen('timer').startTimer();
-		//keep scrolling
-		el = document.getElementsByClassName("table-wrapper")[0];
-		el.scrollTop = el.scrollHeight;
-console.log("updateStatus status")
 	} else {
 		this.trackingId = '';
 		zenSetProp("cmdShow","hidden",0)
 		zenSetProp("cmdRun","disabled",0)
-console.log("updateStatus status: done")
 	}
 	return;
 ]]></Implementation>
@@ -461,52 +395,52 @@ ClassMethod CheckStatus(pTrackingId As %String) As %String</Description>
 	Set tIsComplete = 0
 	// status is ($J,step) = $LB(phase,count,pct,errors)
 	Set tStep = $O(^IRIS.Temp.DeepSeeButtonsTrack(pTrackingId,""),1,info)
+	s tErr=""
 	While (tStep'="") {
 		Set tPhase = $LG(info,1)
 		Set:tPhase="complete"!(tPhase="error") tIsComplete = 1
 		Set tMsg = $LG(info,2)
 		Set tDetail = $LG(info,3)
-		Set tErr = $LG(info,4)
 		Set tIsActive = ($O(^IRIS.Temp.DeepSeeButtonsTrack(pTrackingId,""),-1) = tStep)
-		Set tNested = $O(^IRIS.Temp.DeepSeeButtonsTrack(pTrackingId,tStep,""),1,infonested)
-		If tNested'="" {
- 			While (tNested'="") {
- 				Set tIsActiveNested = tIsActive && ($O(^IRIS.Temp.DeepSeeButtonsTrack(pTrackingId,tStep,""),-1) = tNested)
- 				Set tOutput = tOutput _ "<tr style="""_$S(tErr'="":"color:#da4848;",tIsActiveNested:"font-weight:bold;",1:"background:#E0E0F0;")_""">"
- 				Set tMsg = $LG(infonested,2)
-				Set tDetail = $LG(infonested,3)
-				Set tMsg = tNested_": "_tMsg_$ZCVT(tErr,"O","HTML")
-				Set tDetail = "" 			
- 				Set tOutput = tOutput _ "<td align=""left"">"_tMsg_"</td>"
-				Set tOutput = tOutput _ "<td>"_$S(tIsActiveNested:"&nbsp;",tPhase="warning":"&nbsp;",1:$$$Text("Complete"))_"</td>"				
-	 			Set tOutput = tOutput _ "</tr>"
-	 			Set tNested = $O(^IRIS.Temp.DeepSeeButtonsTrack(pTrackingId,tStep,tNested),1,infonested)	 				
- 			}
-		} ElseIf tPhase="save" {
-			Set ..htmlPath = tDetail				
- 			Set tLink = "<a href='"_"_DeepSee.UI.DeepSeeButtonsDownload.cls?FILE="_..htmlPath_"' "
- 			Set tLink = tLink _ "target='_blank' "
- 			Set tLink = tLink _ "title='Open the generated DeepSeeButtons report' "
- 			Set tLink = tLink _ ">"_..htmlPath_"</a>"	
-			Set tOutput = tOutput _ "<tr style="""_$S(tIsActive:"font-weight:bold;",1:"background:#E0E0F0;")_""">"
-			Set tOutput = tOutput _ "<td align=""left"">"_tMsg_"<br>"_tLink_"</td>"
-			Set tOutput = tOutput _ "<td>"_$S(tIsActive:"&nbsp;",1:$$$Text("Complete"))_"</td>"
-			Set tOutput = tOutput _ "</tr>"
-		} ElseIf tPhase="error" { 
-			/// Write out errors
-			Set tOutput = tOutput _ "<tr style=""color:#da4848;"">"
-			Set tOutput = tOutput _ "<td colspan=""2"">"_$ZCVT(tErr,"O","HTML")_"</td>"
-			Set tOutput = tOutput _ "</tr>"
+		If tErr = "" {
+			If (tPhase="cube") {				
+ 				Set cube = $O(^IRIS.Temp.DeepSeeButtonsTrack(pTrackingId,tStep,""),1,infocube)
+ 				While (cube'="") {
+ 					Set tIsActiveCube = tIsActive && ($O(^IRIS.Temp.DeepSeeButtonsTrack(pTrackingId,tStep,""),-1) = cube)
+ 					Set tOutput = tOutput _ "<tr style="""_$S(tErr'="":"color:#da4848;",tIsActiveCube:"font-weight:bold;",1:"background:#E0E0F0;")_""">"
+ 					Set tMsg = $LG(infocube,2)
+					Set tDetail = $LG(infocube,3)
+	 				Set tMsg = tDetail_": "_tMsg
+					Set tDetail = "" 			
+ 					Set tOutput = tOutput _ "<td align=""left"">"_tMsg_"</td>"
+		 			Set tOutput = tOutput _ "<td>"_$S(tIsActiveCube:"&nbsp;",1:$$$Text("Complete"))_"</td>"
+	 				Set tOutput = tOutput _ "</tr>"
+	 				Set cube = $O(^IRIS.Temp.DeepSeeButtonsTrack(pTrackingId,tStep,cube),1,infocube)	 				
+ 				}
+			} ElseIf tPhase="save" {
+				Set ..htmlPath = tDetail				
+				Set tLink = "<a "
+ 				Set tLink = tLink _ "href='"_"_DeepSee.UI.DeepSeeButtonsDownload.cls?FILE="_..htmlPath_"' "
+ 				Set tLink = tLink _ "target='_blank' "
+ 				Set tLink = tLink _ "title='Open the generated DeepSeeButtons report' "
+ 				Set tLink = tLink _ ">"_..htmlPath_"</a>"	
+				Set tOutput = tOutput _ "<tr style="""_$S(tErr'="":"color:#da4848;",tIsActive:"font-weight:bold;",1:"background:#E0E0F0;")_""">"
+				Set tOutput = tOutput _ "<td align=""left"">"_tMsg_"<br>"_tLink_"</td>"
+				Set tOutput = tOutput _ "<td>"_$S(tIsActive:"&nbsp;",1:$$$Text("Complete"))_"</td>"
+				Set tOutput = tOutput _ "</tr>"
+			} Else {
+				Set tOutput = tOutput _ "<tr style="""_$S(tErr'="":"color:#da4848;",tIsActive:"font-weight:bold;",1:"background:#E0E0F0;")_""">"
+				Set tOutput = tOutput _ "<td align=""left"">"_tMsg_"</td>"
+				Set tOutput = tOutput _ "<td>"_$S(tIsActive:"&nbsp;",1:$$$Text("Complete"))_"</td>"
+				Set tOutput = tOutput _ "</tr>"
+			}
 		} Else {
-			Set tOutput = tOutput _ "<tr style="""_$S(tErr'="":"color:#da4848;",tIsActive:"font-weight:bold;",1:"background:#E0E0F0;")_""">"
-			Set tOutput = tOutput _ "<td align=""left"">"_tMsg_"</td>"
-			Set tOutput = tOutput _ "<td>"_$S(tIsActive:"&nbsp;",1:$$$Text("Complete"))_"</td>"
-			Set tOutput = tOutput _ "</tr>"
+			/// Write out errors
+			Set tOutput = tOutput _ "<td colspan=""4"">"_$ZCVT(tErr,"O","HTML")_"</td>"
 		}
-		
 		Set tStep = $O(^IRIS.Temp.DeepSeeButtonsTrack(pTrackingId,tStep),1,info)
 	}
-	Set:tOutput'="" tOutput = "<div>"_$$$Text("Status")_ "</div><div class=""table-wrapper""><table class=""statusTable"" cellspacing=""0"">" _ tOutput _ "</div></table>"
+	Set:(tOutput'="") tOutput = "<div>"_$$$Text("Status")_ "</div><table class=""statusTable"" cellspacing=""0"" width=""100%"">" _ tOutput _ "</table>"
 	Kill:tIsComplete ^IRIS.Temp.DeepSeeButtonsTrack(pTrackingId)
 	Quit tOutput
 ]]></Implementation>
@@ -524,13 +458,63 @@ ClassMethod CheckStatus(pTrackingId As %String) As %String</Description>
 </Class>
 
 
+<Class name="%DeepSee.UI.DeepSeeButtonsDownload">
+<Super>%ZEN.Component.page,%CSP.StreamServer</Super>
+<TimeChanged>64735,54438.891408</TimeChanged>
+<TimeCreated>64735,54438.891408</TimeCreated>
+<Inheritance>right</Inheritance>
+
+<Method name="OnPreHTTP">
+<Description><![CDATA[
+The <method>OnPostHTTP()</method> is called by the CSP dispatcher before the HTTP
+headers have been sent. Here, 
+then we set the appropriate content type and content length values into the %response
+object (see <class>%CSP.Request</class>), in preparation for sending the image data
+in the <method>OnPage()</method>.]]></Description>
+<ClassMethod>1</ClassMethod>
+<ReturnType>%Boolean</ReturnType>
+<Implementation><![CDATA[
+	If %request.Get("FILE")="" Quit 0
+   // Now, the OnPage() method will serve up the actual FILE data
+  	s %SavedStream = ##class(%FileBinaryStream).%New()
+	s %SavedStream.Filename=%request.Get("FILE")
+	
+  If (%SavedStream '= $$$NULLOREF) {
+        //Set %response.ContentType = %request.Get("CONTENTTYPE")
+		Set %response.Expires=10
+        Do %response.SetHeader("content-disposition","attachment; filename="_%request.Get("FILE"))
+   } Else {
+        Set %response.Status="404" ; HTTP file not found
+        Quit 0 
+    }
+
+    Quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="OnPage">
+<Description><![CDATA[
+The <method>OnPage()</method> is called by the CSP dispatcher to generate the
+page content. Since the content type is actually a stream, not HTML
+we simply write out the stream data.]]></Description>
+<ClassMethod>1</ClassMethod>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+    // Write out the Actual Binary Data
+    If %SavedStream'=$$$NULLOREF Do %SavedStream.OutputToDevice()
+    Quit $$$OK
+]]></Implementation>
+</Method>
+</Class>
+
+
 <Class name="%DeepSee.UI.Dialog.GetCubeList">
 <Description><![CDATA[
 This dialog lets the user add or edit cubes and subject areas for DeepSeeButtons.<br>
 An existing list (delimited by comma) may be passed in.]]></Description>
 <Super>%DeepSee.UI.Dialog.standardDialog</Super>
 <System>4</System>
-<TimeChanged>64741,55239.767415</TimeChanged>
+<TimeChanged>64736,32786.023525</TimeChanged>
 <TimeCreated>64727,63621.331352</TimeCreated>
 
 <Parameter name="APPLYBUTTON">
@@ -629,6 +613,7 @@ This should be implemented in a subclass.</Description>
 <Language>javascript</Language>
 <ClientMethod>1</ClientMethod>
 <Implementation><![CDATA[
+	console.log("getDialogValue")
 	try {
 		var values = "";
 		var cubeObj = zen('lstCubes');
@@ -700,25 +685,8 @@ User selected a cube or subject are from the list. Get the cube or SA name for t
 	var cubeObj = zen('lstCubes');
 	if (sourceObj.text == "ALL") {
 		cubeObj.resetOptions()
-	}
-	//Remove ALL if add a cube
-	zenPage.removeALL()
-	
+	}	
 	cubeObj.appendOption(sourceObj.text,sourceObj.text);
-]]></Implementation>
-</Method>
-
-<Method name="removeALL">
-<Language>javascript</Language>
-<ClientMethod>1</ClientMethod>
-<Implementation><![CDATA[
-	var cubeObj = zen('lstCubes');
-	for (i=0; i<cubeObj.getOptionCount(); i++){
-		if (cubeObj.getOptionText(i)=="ALL") {
-			cubeObj.removeOption(i);
-			return
-		}
-	}
 ]]></Implementation>
 </Method>
 
@@ -777,11 +745,11 @@ Provide contents of the data source tree.</Description>
 </Class>
 
 
-<Project name="Project1" LastModified="2018-04-03 15:46:57.011882">
+<Project name="Project1" LastModified="2018-03-30 11:14:18.541154">
   <Items>
+    <ProjectItem name="%DeepSee.UI.DSButtonsViewer" type="CLS"></ProjectItem>
     <ProjectItem name="%DeepSee.UI.DeepSeeButtonsDownload" type="CLS"></ProjectItem>
     <ProjectItem name="%DeepSee.UI.Dialog.GetCubeList" type="CLS"></ProjectItem>
-    <ProjectItem name="%DeepSee.UI.DeepSeeButtonsViewer" type="CLS"></ProjectItem>
   </Items>
 </Project>
 </Export>

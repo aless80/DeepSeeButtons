@@ -74,6 +74,7 @@ StartDialog
 	New (namespace,cubeString,getLogs,LogFile,tracking)
 	Set origNS=$Namespace
 	Try {
+		Do:tracking WriteTrack("setup","Starting DeepSeeButtons","")
 		Set PDev=$Principal
 		Use PDev
 		Write !,"DeepSee Diagnostic Report Evidence Logging Tool"
@@ -167,43 +168,59 @@ ReadLogTypeConfirm
 
 LaunchLogs(namespace,cubeList,getLogs)
  	Try {
-	Set CacheVerNumber=$System.Version.GetNumber()
-	If +CacheVerNumber<5 { //Do  Quit Return
-		Set Message="*** Wrong version of Diagnostic Report utility ! ***"_$Char(13,10)_$Char(13,10)_"You are running on Cache "_CacheVerNumber_" and this is the code for Cache 5.0 and later"
-		Use PDev Write:$X ! Write !,Message
-		Set Return="0|"_Message
-		Quit
-	}
-	Use PDev Write:$X ! 
-	Write "Collecting information, please do not interrupt this process.",!,"Do not close terminal until the process has completed"
- 	Break 0
-	Set EOF=$ZUtil(68,40)	
-	//Start logging with the DeepSee Setup section
-	Set LogFile=$$LogSections(cubeList,getLogs,LogFile)
-	Set rc=$$$OK
-	If $ZUtil(68,40,EOF) //Reset $ZEOF to the original setting
-	Break 1 
-	If LogFile="" { //Do  Quit Return
-		Set Message="*** Log file could not be created in "_LogDirectory_". Check directory permissions. ***"
-		Use PDev Write:$X ! Write !,Message
-		Set Return="0|"_Message
-		Quit
-	}
-	Use PDev
-	Write:$X ! Write !,"DeepSeeButtons report saved to: ",!,LogFile
-	Write !,"Please send the html file above to InterSystems Support."
+		Set CacheVerNumber=$System.Version.GetNumber()
+		If +CacheVerNumber<5 { //Do  Quit Return
+			Set Message="*** Wrong version of Diagnostic Report utility ! ***"_$Char(13,10)_$Char(13,10)_"You are running on Cache "_CacheVerNumber_" and this is the code for Cache 5.0 and later"
+			Use PDev Write:$X ! Write !,Message
+			Set Return="0|"_Message
+			Quit
+		}
+		Use PDev Write:$X ! 
+		Write "Collecting information, please do not interrupt this process.",!,"Do not close terminal until the process has completed"
+ 		Break 0
+		Set EOF=$ZUtil(68,40)	
+		//Start logging with the DeepSee Setup section 
+		Set output=$$LogSections(cubeList,getLogs,LogFile)
+		If $E(output,1,5)="Error" {
+			Do:tracking WriteTrack("error","","",output_". Check your output path and permissions")
+			W !,output," Abort",!
+			Return
+		} Else {
+			Set LogFile = output
+		}
+		Set rc=$$$OK
+		If $ZUtil(68,40,EOF) //Reset $ZEOF to the original setting
+		Break 1 
+		If LogFile="" { //Do  Quit Return
+			Set Message="*** Log file could not be created in "_LogDirectory_". Check directory permissions. ***"
+			Use PDev Write:$X ! Write !,Message
+			Set Return="0|"_Message
+			Quit
+		}
+		Use PDev
+		Write:$X ! Write !,"DeepSeeButtons report saved to: ",!,LogFile
+		Write !,"Please send the html file above to InterSystems Support."
 	} Catch(ex) {
 		Set tSC = ex.AsStatus()
 		W $System.Status.DisplayError(tSC)
 	}
 	Quit
 
+
+OpenLogFile(LogFile,FileOpenTimeOut) {
+	//Compared to ^Buttons the file is opened here, not in NewFile
+	Open LogFile:"RWNSK\UTF8\":FileOpenTimeOut
+	If '$Test Quit "Error opening file "_LogFile
+	Quit LogFile
+}
+
 LogSections(cubeList,getLogs,LogFile)
 	New (LogDirectory,namespace,cubeList,getLogs,LogFile,MgrDir,tracking)
 	Do Init
-	Do InitLogFile
+	Set LogFile = $$InitLogFile
+	Set out = $$OpenLogFile(LogFile,FileOpenTimeOut)
+	If $E(out,1,5)="Error" Quit out
 	If OS?1"***".e Quit ""
-	If LogFile="" Quit ""
 	Do LogHead(cubeList,getLogs)
 	Do LogOpenMainDiv
 	Do LogDeepSeeSetupSection   //Note Ale: here rs.%Execute("") messes up my ZW in DumpToFile
@@ -237,10 +254,10 @@ LogHead(cubeList,getLogs)
 	//Set x=$Text(+1),Build=$Piece(x,";",5),Build=$Piece(Build," ",2)
 	Set colspan=12 If OS="UNIX" Set colspan=13
  	Use LogFile
-	Write "<html>"
+	Do WriteLog("<html>")
+	Do WriteLog("<head>")
 	Do WriteLog("<meta charset=""UTF-8"">")
 	Do WriteLog("<meta http-equiv=""Content-type"" content=""text/html; charset=UTF-8"">")
-	Do WriteLog("<head>")
 	Do WriteLog("<title>",2)
 	Do WriteLog("DeepSee Diagnostic Log for "_CustomerName ,4)
 	Do WriteLog("</title>",2)
@@ -589,7 +606,7 @@ LogDeepSeeSetupSection
 			Do WriteHeader4("Config section of cpf file",8)
 			Open ConfigFile:"R":FileOpenTimeOut
 			If '$Test {
-				Do WriteLog("<p>Error: could not open Caché Configuration File "_ConfigFile_"</p>",10)
+				Do WriteLog("<p>Error: could not open Cach&eacute; Configuration File "_ConfigFile_"</p>",10)
 			} Else {
 				For {
 					Use ConfigFile
@@ -834,13 +851,13 @@ LogServerSetup()
 	//Last Caché Startup
 	Do WriteLog("<tr>",6)
 	Do WriteLog("<td>",8)
-	Do WriteHeader4("Last Caché Startup",10)
+	Do WriteHeader4("Last Cach&eacute; Startup",10)
 	Do WriteLastStartup
 	Do WriteLog("</td>",8)
 	Do WriteLog("</tr>",6)	
 	Do WriteLog("<tr>",6)
 	Do WriteLog("<td>",8)
-	Do WriteHeader4("Caché Version String",10)
+	Do WriteHeader4("Cach&eacute; Version String",10)
 	Do WriteLog("<p>"_CacheVerStr_"</p>",10)
 	//Set isInsight=$$isHealthInsight(namespace) 	//Determine if this is a Health Insight namespace (1 if yes)
 	Do:isInsight WriteLog("<p>"_##class(%ZHSLIB.HealthShareMgr).VersionInfo()_"</p>",8)
@@ -1998,11 +2015,11 @@ LogCPF
 		Do WriteLog("<h4 id=""cpftoggle"" onclick=""javascript:toggle('cpfdiv',this.id);"">&rtrif; Expand</h4>",2)
 		//Do WriteLog("<div id=""cpfdiv"" class=""scrollable"" style=""width:100%;height:400px;"">")
 		Do WriteLog("<div id=""cpfdiv"" style=""display:none;"">",2)
-		Do WriteLog("<p>Caché Configuration File "_ConfigFile_":"_"</p>",4)
+		Do WriteLog("<p>Cach&eacute; Configuration File "_ConfigFile_":"_"</p>",4)
 		Do WriteLog("<pre>",4)
 		Open ConfigFile:"R":FileOpenTimeOut
 		If '$Test Do  Quit
-		.	Do WriteLog("Error: could not open Caché Configuration File "_ConfigFile)
+		.	Do WriteLog("Error: could not open Cach&eacute; Configuration File "_ConfigFile)
 		.	Do WriteLog("</pre>")
 		.	Do WriteLog("</div>")
 		.	Use PDev
@@ -2092,7 +2109,7 @@ LogCConsole
 		} Else {
 			Set SkipSize=0
 		}
-		Do CopyToLog(cconsoleFile,"Caché cconsole.log",SkipSize)
+		Do CopyToLog(cconsoleFile,"Cach&eacute; cconsole.log",SkipSize)
 	} Catch(ex) {
 		Set tSC = ex.AsStatus()
 		Do WriteLog("Error in logging the cconsole.log file")
@@ -2378,7 +2395,7 @@ LogSidePanel(cubeList,getLogs,numalerts)
 		"title=""A log file with cube builds and errors occurred in the system"">DeepSee Logs</a>",2)
 	}
 	Do WriteLog("<a id=""lcpfMainDiv"" href=""#cpf"" onclick=""javascript:toggle('cpfdiv','cpftoggle');"""_
-	            "title=""The Caché Parameter File containing recording the Caché configuration"">cache.cpf</a>",2)
+	            "title=""The Cach&eacute; Parameter File containing recording the Cach&eacute; configuration"">cache.cpf</a>",2)
 	Do:getLogs WriteLog("<a id=""lcconsoleMainDiv"" href=""#cconsole"" onclick=""javascript:toggle('cconsolediv','cconsoletoggle');"""_
 	            "title=""cconsole.log file containing general messages and errors"">cconsole.log</a>",2)
   	Do WriteLog("<a id=""lmappingsDiv"" href=""#Mappings"" title=""Global mapppings defined for the "_namespace_" namespace"">Mappings</a>",2)
@@ -2493,10 +2510,7 @@ InitLogFile()
 	If CustomerName'="" Set LogFilePrefix="DeepSeeButtons_"_$Piece(CustomerName," ",1)_"_"
 	If LogFilePrefix'="",LogFilePrefix?1a.an,$Length(LogFilePrefix)<20
 	Set:LogFile="" LogFile=$$NewFile(LogFilePrefix,"html")
-	//Compared to ^Buttons the file is opened here, not in NewFile
-	Open LogFile:"RWNSK\UTF8\":FileOpenTimeOut
-	If '$Test Quit ""
-	Quit
+	Quit LogFile
 
 ST()
 	//Sets the Manager's Namespace (also hardcoded in %ST)
@@ -2667,8 +2681,8 @@ WriteLastStartup
 		Set osecs=then-(odays*86400)
 		Set oh=odays_","_osecs
 		//Do WriteLog("Started on "_$ZDATETIME(oh))
-		//Write !,"<p>Caché Started on "_$ZDATETIME(oh)_". As of this report Caché has been up for "_days_" days "_hours_" hours "_minutes_" minutes "_seconds_" seconds"_"</p>"
-		Do WriteLog("<p>"_$ZDATETIME(oh,3)_". As of this report Caché has been up for "_days_" days "_hours_" hours "_minutes_" minutes "_seconds_" seconds"_"</p>",8)
+		//Write !,"<p>Cach&eacute; Started on "_$ZDATETIME(oh)_". As of this report Cach&eacute; has been up for "_days_" days "_hours_" hours "_minutes_" minutes "_seconds_" seconds"_"</p>"
+		Do WriteLog("<p>"_$ZDATETIME(oh,3)_". As of this report Cach&eacute; has been up for "_days_" days "_hours_" hours "_minutes_" minutes "_seconds_" seconds"_"</p>",8)
 	} Catch(ex) {
 		Set tSC = ex.AsStatus()
 		Do WriteLog("<p>An error occurred</p>")
@@ -2681,10 +2695,10 @@ isHealthInsight(namespace){
 		//Set x=##class(HSAA.Utils).GetLogDirectory()				//Just testing to see if this method works
 		Set HealthShare=##class(%SYSTEM.License).GetFeature(12) 	//Look in license for HealthShare Foundation
 		ZN "%SYS"
-		return HealthShare
+		Return HealthShare
 	} Catch {
 		ZN "%SYS"
-		return 0						//Method did not work so return 0
+		Return 0						//Method did not work so return 0
 	}
 }
 
@@ -2693,10 +2707,10 @@ isTrak(namespace){
 		ZN namespace
 		Set BitTrakCare = ##class(%SYSTEM.License).GetFeature(6) 	//BitTrakCare
 		ZN "%SYS"
-		return BitTrakCare
+		Return BitTrakCare
 	} Catch {
 		ZN "%SYS"
-		return 0						//Method did not work so return 0
+		Return 0						//Method did not work so return 0
 	}
 }
  
@@ -3155,7 +3169,7 @@ alertDStimeRW(DSTimeMapFrom,alerts) {
 			Set db=##Class(SYS.Database).%OpenId(prop("Directory"))
 			Set readonly = db.ReadOnly
 			If readonly {
-				Set pre="title=""In Caché versions including DevChange DTB422 ^OBJ.DSTIME and ^DeepSee.Update should be mapped to a Read-Write database"">"
+				Set pre="title=""In Cach&eacute; versions including DevChange DTB422 ^OBJ.DSTIME and ^DeepSee.Update should be mapped to a Read-Write database"">"
 				Set alert = "Alert: ^OBJ.DSTIME and/or ^DeepSee.Update are stored in the "_DSTimeMapFrom_" database, which should be Read-Write"
 				Set alerts($I(alerts)) = pre_alert
 				Do WriteLog("<p class=""red"" "_pre_alert_"</p>",8)
