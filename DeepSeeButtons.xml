@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Export generator="Cache" version="25" zv="Cache for UNIX (SUSE Linux Enterprise Server for x86-64) 2017.2.1 (Build 801)" ts="2018-03-30 15:48:34">
-<Routine name="DeepSeeButtons" type="MAC" languagemode="0" timestamp="64737,56900.608835"><![CDATA[
-DeepSeeButtons(namespace="ask",cubeString="ask", getLogs="", LogFile="", tracking="")
+<Export generator="Cache" version="25" zv="Cache for UNIX (SUSE Linux Enterprise Server for x86-64) 2017.2.1 (Build 801)" ts="2018-04-03 10:31:52">
+<Routine name="DeepSeeButtons" type="MAC" languagemode="0" timestamp="64741,37903.041672"><![CDATA[
+DeepSeeButtons(namespace="ask", cubeString="ask", getLogs="", LogFile="", tracking="")
 #include %occConstant
 
 	;DeepSeeButtons: routine to log system and DeepSee information
@@ -83,7 +83,7 @@ StartDialog
 		Write !,"InterSystems Technical Support to analyze DeepSee issues. "
 		Set namespace=$$GetNamespace(namespace)
 		Quit:namespace=""
-		Set cubeList=$$GetCubesToLog(cubeString,namespace)
+		Set cubeList=$$GetCubesToLog(cubeString,namespace,tracking)
 		//Later do not ask to confirm to proceed if anything was passed to getLogs argument
 		Set proceed=(getLogs'="")
 		Do:getLogs="" GetLogsConfirm
@@ -117,7 +117,7 @@ GetNamespace(namespace) {
 	Quit namespace
 }
 
-GetCubesToLog(cubeString,namespace) {
+GetCubesToLog(cubeString,namespace,tracking=0) {
 	If cubeString="ask" {
 		Set allcubeList=$$DialogCubes(namespace)
 	} ElseIf cubeString="" {
@@ -130,7 +130,7 @@ GetCubesToLog(cubeString,namespace) {
 	} Else {
 		Set allcubeList=$LFS(cubeString,",")
 	}
-	Set cubeList=$$VerifyInputCubes(allcubeList,namespace)
+	Set cubeList=$$VerifyInputCubes(allcubeList,namespace,tracking)
 	Quit cubeList
 }
 
@@ -2490,9 +2490,12 @@ Init()
 
 InitLogFile()
 	Set LogFilePrefix=""
-	If CustomerName'="" Set LogFilePrefix="DeepSeeButtons_"_$Piece(CustomerName," ",1)_"_" //e.g. CustomerName = ISC Development
+	Set FileOpenTimeOut=5
+	Set CustomerName=$System.License.KeyCustomerName()
+	If CustomerName'="" Set LogFilePrefix="DeepSeeButtons_"_$Piece(CustomerName," ",1)_"_"
 	If LogFilePrefix'="",LogFilePrefix?1a.an,$Length(LogFilePrefix)<20
 	Set:LogFile="" LogFile=$$NewFile(LogFilePrefix,"html")
+	//Compared to ^Buttons the file is opened here, not in NewFile
 	Open LogFile:"RWNSK\UTF8\":FileOpenTimeOut
 	If '$Test Quit ""
 	Quit
@@ -2552,7 +2555,7 @@ GetAllCubes(namespace)
 	Set cubetmp=""
 	Set cubeString=""			
 	For i=1:1 {
-		Set cubetmp=$order(cubeList(cubetmp))
+		Set cubetmp=$Order(cubeList(cubetmp))
 		Quit:cubetmp=""
 		Set cubeString=cubeString_","_cubetmp
 	}
@@ -2560,18 +2563,19 @@ GetAllCubes(namespace)
 	ZN "%SYS"
 	Quit cubeString
 
-VerifyInputCubes(cubeList,namespace){
+VerifyInputCubes(cubeList,namespace,tracking=0){
 	Set len=$LISTLENGTH(cubeList)
 	For i=1:1:len{
 		Set cube=$LG(cubeList,i)
 		Set cube=$ZCONVERT(cube, "U")
 		ZN namespace
 		If ##class(%DeepSee.Utils).%CubeExists(cube,.status)'=1 {
-			Write !!, cube, " is an invalid cube selection.  It will not be included in report.",!
+			Write !!, cube_" is an invalid cube selection. It will not be included in the report",!
+			Do:tracking WriteTrack("warning","","",cube_" is an invalid cube selection. It was not included in the report")
 			Do $system.OBJ.DisplayError(status)
 			Set cube=""
 		}
-		Set $LIST(cubeList,i)=cube			//Change element in list to uppercase version (or null if it didn't exist)
+		Set $LIST(cubeList,i)=cube	//Change element in list to uppercase version (or null if it didn't exist)
 	}
 	ZN "%SYS"
 	Quit cubeList
@@ -3369,12 +3373,13 @@ WriteUpdate(msg)
 	Use LogFile
 	Quit
 
-WriteTrack(phase,mgs,details,errors)
+WriteTrack(phase,mgs="",details="",errors="")
 	ZN namespace
-	Set tStep = $Case(phase,"setup":1,"cubelog":2,"buildsynch":3,"cube":4,"getlogs":5,"databases":6,"tasks":7,"journal":8,"save":9,"complete":10,"error":12,:11)
+	Set tStep = $Case(phase,"setup":1,"cubelog":2,"buildsynch":3,"cube":4,"getlogs":5,"databases":6,"tasks":7,"journal":8,"save":9,"warning":10,"complete":12,"error":13,:11)
 	Set ^IRIS.Temp.DeepSeeButtonsTrack(+$J,tStep)=$LB(phase,mgs,details,errors)
-	//If logging detail info on cubes, create an additional node for each cubes
+	//If logging detail info on cubes or a warning, create a third node in the global
 	Set:phase="cube" ^IRIS.Temp.DeepSeeButtonsTrack(+$J,tStep,details)=$LB(phase,mgs,details,errors)	
+	Set:phase="warning" ^IRIS.Temp.DeepSeeButtonsTrack(+$J,tStep,"Warning")=$LB(phase,mgs,details,errors)	
 	
 WriteAdhocPatch
 	Try {
@@ -3397,33 +3402,6 @@ WriteAdhocPatch
 	}
 	Quit
 
-NewFile(LogFilePrefix,LogFileSuffix)
-	//Creates a new file with Date and Time added to the filename and opens it for Reading and Writing
-	//File Name can be either "Cache" or "cstat"
-	New Date,Dir,NewFile,Time
-	Set:LogFileSuffix="" LogFileSuffix="html"
-	Set Date=$$CurDate,Time=$$CurTime
-	If (OS?1"Win".e) {
-		Set LogFileSuffix=$ZConvert(LogFileSuffix,"l")
-	} ElseIf (OS="UNIX") {
-		Set LogFileSuffix=$ZConvert(LogFileSuffix,"l")
-	} ElseIf (OS="VMS") {
-		Set LogFileSuffix=$ZConvert(LogFileSuffix,"U")
-	}
-	Set Dir=MgrDir
-	Set LogDirectory=$Get(LogDirectory,"")
-	Set:LogDirectory'="" Dir=LogDirectory
-	If (OS?1"Win".e) {
-		Set NewFile=Dir_DirDelim_LogFilePrefix_Date_"_"_Time_"."_LogFileSuffix
-	} ElseIf (OS="UNIX") {
-		Set NewFile=Dir_DirDelim_LogFilePrefix_Date_"_"_Time_"."_LogFileSuffix
-	} ElseIf (OS="VMS") {
-		Set NewFile=Dir_$ZConvert(LogFilePrefix,"U")_Date_Time_"."_LogFileSuffix_";"
-	}
- 	//	Open NewFile:"RWNSK\UTF8\":FileOpenTimeOut
- 	//	If '$Test Quit ""
-	Quit NewFile
-	
 PrintGlobal(namespace,glob,spaces){
 	ZN namespace
 	Quit:'$D(@glob)
@@ -3467,6 +3445,34 @@ DirError
 	Write ?80,$Case($$$encrypteddbformat(DirInfo),0:0,:$Piece(DirInfo,",",$$$enckeyidpiece))
 	Quit
  */	
+NewFile(LogFilePrefix,LogFileSuffix)
+	//Creates a new file with Date and Time added to the filename and opens it for Reading and Writing
+	//File Name can be either "Cache" or "cstat"
+	New Date,Dir,NewFile,Time
+	Set:LogFileSuffix="" LogFileSuffix="html"
+	Set Date=$TRANSLATE($ZD($H,3),"-","")
+	Set Time=$TRANSLATE($ZT($H,2),":","")
+	If (OS?1"Win".e) {
+		Set LogFileSuffix=$ZConvert(LogFileSuffix,"l")
+	} ElseIf (OS="UNIX") {
+		Set LogFileSuffix=$ZConvert(LogFileSuffix,"l")
+	} ElseIf (OS="VMS") {
+		Set LogFileSuffix=$ZConvert(LogFileSuffix,"U")
+	}
+	Set Dir=MgrDir
+	Set LogDirectory=$Get(LogDirectory,"")
+	Set:LogDirectory'="" Dir=LogDirectory
+	If (OS?1"Win".e) {
+		Set NewFile=Dir_DirDelim_LogFilePrefix_Date_"_"_Time_"."_LogFileSuffix
+	} ElseIf (OS="UNIX") {
+		Set NewFile=Dir_DirDelim_LogFilePrefix_Date_"_"_Time_"."_LogFileSuffix
+	} ElseIf (OS="VMS") {
+		Set NewFile=Dir_$ZConvert(LogFilePrefix,"U")_Date_Time_"."_LogFileSuffix_";"
+	}
+ 	//	Open NewFile:"RWNSK\UTF8\":FileOpenTimeOut
+ 	//	If '$Test Quit ""
+	Quit NewFile
+	
 ExternalCmd(Command)
 	//Executes an external program and adds its output to LogFile
 	//Requires the full specification of the Exe file
@@ -3495,7 +3501,8 @@ ExtCmdPipe
 ExtCmdFile
 	//Only to be executed when OS is Windows or VMS, when either pipes don't work or behave inconsistently
 	New Date,File,Time
-	Set Date=$$CurDate,Time=$$CurTime
+	Set Date=$TRANSLATE($ZD($H,3),"-","")
+	Set Time=$TRANSLATE($ZT($H,2),":","")
 	If OS?1"Win".e Do
 	.	Set File=MgrDir_DirDelim_Date_Time_".$$$"
 	.	Set Command=$Char(34)_Command_" > "_$$LongName(File)_$Char(34) //Cache will call "Cmd /c", which requires quotes surrounding the command
@@ -3573,29 +3580,6 @@ CopyToLog(InputFile,Caption,SkipSize=0)
 	Close InputFile
 	Quit
 	
-CurDate()
-	//Returns Current Date as YYYYMMDD
-	New
-	Do INT^%D
-	Set %DAT=$ZConvert(%DAT,"U")
-	Set MonthName=$Extract(%DAT,1,3)
-	Set Day=+$Piece(%DAT," ",2) If Day?1n Set Day=0_Day
-	Set Year=+$Piece(%DAT," ",3) If Year?2n Set Year=2000+Year
-	Set Month=$Find("JANFEBMARAPRMAYJUNJULAUGSEPOCTNOVDEC",MonthName)\3 If Month?1n Set Month=0_Month
-	Quit Year_Month_Day
 
-CurTime()
-	//Returns Current Time as HHMM
-	New
-	Do INT^%T
-	Set %TIM=$ZConvert(%TIM,"U")    
-	For  Quit:%TIM'?1" ".e  Set %TIM=$Extract(%TIM,2,*)
-	Set Time=$Piece(%TIM," ",1),AMPM=$Piece(%TIM," ",2)
-	Set Hour=+$Piece(Time,":",1),Minutes=+$Piece(Time,":",2)
-	If AMPM="AM",Hour=12 Set Hour=0
-	If AMPM="PM",Hour'=12 Set Hour=Hour+12
-	If Hour?1n Set Hour=0_Hour
-	If Minutes?1n Set Minutes=0_Minutes
-	Quit Hour_Minutes
 ]]></Routine>
 </Export>

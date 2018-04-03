@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Export generator="Cache" version="25" zv="Cache for UNIX (SUSE Linux Enterprise Server for x86-64) 2017.2.1 (Build 801)" ts="2018-04-02 13:58:38">
+<Export generator="Cache" version="25" zv="Cache for UNIX (SUSE Linux Enterprise Server for x86-64) 2017.2.1 (Build 801)" ts="2018-03-30 17:08:49">
 <Class name="%DeepSee.UI.DSButtonsViewer">
 <Description>
 DeepSee DeepSeeButtons Viewer.
@@ -7,7 +7,7 @@ Display contents of the DeepSeeButtons html file for the current namespace.
 </Description>
 <Super>%DeepSee.UI.standardPage</Super>
 <System>4</System>
-<TimeChanged>64740,48858.779875</TimeChanged>
+<TimeChanged>64737,61608.486683</TimeChanged>
 <TimeCreated>64636,45154.455633</TimeCreated>
 
 <Parameter name="PAGENAME">
@@ -321,12 +321,10 @@ object is created.</Description>
 	this.disableCommandButton("cmdRun");	
 	zenSetProp("cmdRun","disabled",1)	
 	var getLogs = zen("getLogs").getValue() * 1;
-	var htmlpath = zen("htmlDirectory").getValue()	
-	this.trackingId = this.RunDeepSeeButtons(this.nameSpace, zen("Cubes").getValue(), htmlpath, getLogs)
-	console.log("this.trackingId:",this.trackingId)
+	this.trackingId = this.RunDeepSeeButtons(this.nameSpace, zen("Cubes").getValue(), "", getLogs)
+	console.log(this.trackingId)
 	if (this.trackingId!='') {
 		zen('timer').timeout = 250;
-		console.log('timer')
 		zen('timer').startTimer();
 	} else {
 		
@@ -339,7 +337,8 @@ object is created.</Description>
 <Description>
 Start the build cube process in the background.
 Return the tracking id.</Description>
-<FormalSpec>pNameSpace:%String,pCubes:%String="",htmlpath:%String="",pGetLogs:%Integer=1</FormalSpec>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pNameSpace:%String,pCubes:%String="",htmlfile:%String="",pGetLogs:%Integer=1</FormalSpec>
 <ReturnType>%String</ReturnType>
 <ZenMethod>1</ZenMethod>
 <Implementation><![CDATA[
@@ -347,11 +346,7 @@ Return the tracking id.</Description>
 	Set tJobTimeOut = 10
 	Set pProceed=1
 	Set pTracking=1
-		
-	Set htmlpath = ##class(%Library.File).NormalizeDirectory(htmlpath)
-	Set htmlFullPath = htmlpath_"ALE"_..GetFileName()
- S ^Ale($I(^Ale),"htmlFullPath")=htmlFullPath
-	Job ^DeepSeeButtons(pNameSpace, pCubes, pGetLogs, htmlFullPath, pTracking)::tJobTimeOut
+	Job ^DeepSeeButtons(pNameSpace,pCubes,pGetLogs,htmlfile,pTracking)::tJobTimeOut
 	If '$Test {
 		&js<alert('Unable to start background job.');>
 		Set tTrackingId = ""
@@ -443,16 +438,6 @@ ClassMethod CheckStatus(pTrackingId As %String) As %String</Description>
 	Set:(tOutput'="") tOutput = "<div>"_$$$Text("Status")_ "</div><table class=""statusTable"" cellspacing=""0"" width=""100%"">" _ tOutput _ "</table>"
 	Kill:tIsComplete ^IRIS.Temp.DeepSeeButtonsTrack(pTrackingId)
 	Quit tOutput
-]]></Implementation>
-</Method>
-
-<Method name="GetFileName">
-<ClassMethod>1</ClassMethod>
-<ReturnType>%String</ReturnType>
-<Implementation><![CDATA[
-	Set CustomerName=$System.License.KeyCustomerName()
-	Set LogFilePrefix="DeepSeeButtons_"_$Piece(CustomerName," ",1)_"_"
-	Quit LogFilePrefix_$TRANSLATE($ZD($H,3),"-","")_$TRANSLATE($ZT($H,2),":","")_".html"
 ]]></Implementation>
 </Method>
 </Class>
@@ -745,10 +730,10 @@ Provide contents of the data source tree.</Description>
 </Class>
 
 
-<Project name="Project1" LastModified="2018-03-30 11:14:18.541154">
+<Project name="Project1" LastModified="2018-03-30 11:14:18.54132">
   <Items>
-    <ProjectItem name="%DeepSee.UI.DSButtonsViewer" type="CLS"></ProjectItem>
     <ProjectItem name="%DeepSee.UI.DeepSeeButtonsDownload" type="CLS"></ProjectItem>
+    <ProjectItem name="%DeepSee.UI.DSButtonsViewer" type="CLS"></ProjectItem>
     <ProjectItem name="%DeepSee.UI.Dialog.GetCubeList" type="CLS"></ProjectItem>
   </Items>
 </Project>
