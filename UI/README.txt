@@ -12,3 +12,4 @@ Adding a permanent link to SMP > DeepSee is easy. Do that by adding the followin
   // ALE's DeepSeeButtons Viewer
   set tText = $$$Text("DeepSeeButtons Viewer")
   set pData(n,$i(n2)) = $lb($$$Text("DeepSeeButtons Viewer"),tText,..Link("_DeepSee.UI.DeepSeeButtonsViewer.cls"),0,..Link("deepsee/lamp_48.gif"),tText)
+
