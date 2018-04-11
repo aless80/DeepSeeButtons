@@ -92,8 +92,10 @@ StartDialog
 		Do LaunchLogs(namespace,cubeList,getLogs)
  	} Catch(ex) {
 		Set tSC = ex.AsStatus()
+		Set msg = $System.Status.GetErrorText(tSC)
+		Do:tracking WriteTrack("error","","",msg)
 		Use $Principal
-		Write !,$System.Status.DisplayError(tSC)
+		Write !,msg
  	}
  	zn origNS
 	Quit
@@ -202,7 +204,8 @@ LaunchLogs(namespace,cubeList,getLogs)
 		Write !,"Please send the html file above to InterSystems Support."
 	} Catch(ex) {
 		Set tSC = ex.AsStatus()
-		W $System.Status.DisplayError(tSC)
+		Do $System.Status.DisplayError(tSC)
+		Do:tracking WriteTrack("error","","",$System.Status.GetErrorText(tSC))
 	}
 	Quit
 
@@ -518,7 +521,7 @@ LogHead(cubeList,getLogs)
 LogOpenMainDiv()
 	Do WriteLog("<div id=""main"">")
 	Do WriteLog("<a name=""top""></a>")
-	Do WriteLog("<h1 title=""Version 0.1.2"">DeepSeeButtons - DeepSee diagnostic report</h1>")
+	Do WriteLog("<h1 title=""Version v0.1.3"">DeepSeeButtons - DeepSee diagnostic report</h1>")
 	Quit
 
 LogDeepSeeSetupSection
@@ -1380,10 +1383,10 @@ LogCubeInfo
 	    	//Get all compiled versions
 			Kill tList
 			Set tVersionNo = $O(^DeepSee.Cubes("versionIndex","versions",cube,""))
-			While (tVersionNo'="")&&(+tVersionNo'=0) {
+			While (tVersionNo'="") {
 				Set tVers = ##class(%DeepSee.CubeVersion.Utils).%GetVersionedCubeName(cube,tVersionNo)
 				Set tStatus = ##class(%DeepSee.CubeVersion.Utils).%GetCubeVersionStatus(cube,tVersionNo)
-				//Skip when version is "", for example deprecated versions
+				//Skip when tVersionNo is not a version and instead it marks "activeVersion", or "pendingVersion"
 				Set:tVers'="" tList(tVers) = tStatus
 				Set tVersionNo = $O(^DeepSee.Cubes("versionIndex","versions",cube,tVersionNo))
 			}
@@ -1572,7 +1575,8 @@ LogCubeInfo
 	    }
 	} Catch(ex) {
 		Set tSC = ex.AsStatus()
-		W $System.Status.DisplayError(tSC)
+		Do $System.Status.DisplayError(tSC)
+		Do:tracking WriteTrack("warning","","LogCubeInfo",$System.Status.GetErrorText(tSC))
 	}
 	ZN "%SYS"
 	Quit
@@ -1680,8 +1684,8 @@ LogCubeDimensions
 	Do WriteLog("</tbody>",2)
 	Do WriteLog("</table>")
 	//Alert if incompatible time levels are found
- 	Set sc = $$alertTimeLevels(.timeLevels,.alerts)
-	//Show calculated members in ^DeepSee.CalcMbrs
+ 	Do alertTimeLevels(.timeLevels,.alerts)
+ 	//Show calculated members in ^DeepSee.CalcMbrs
 	Do WriteLog("<h4>Calculated Members</h4>")
 	If $D(^DeepSee.CalcMbrs(cube)) {
 	Do WriteLog("<table>")
@@ -2002,10 +2006,10 @@ LogQuerylog
  	Do MostRunQueries(numqueries) 
  	//Last Query subsection
  	Do WriteHeader4("Last query",2)
-	Do WriteLog("<pre>")
+	Do WriteLog("<pre>",2)
 	Set lastquery=$g(^[namespace]DeepSee.LastQuery)		//Display last query
 	If lastquery'=""{		
-		Do WriteLog(lastquery)
+		Do WriteLog(lastquery,0)
 		Use PDev
 	}
 	Do WriteLog("</pre>",2)
@@ -2219,6 +2223,19 @@ LogDataBases
 		Do WriteLog("<div id=""LocalDBDiv"" onmouseover=""highlightLink(this,1)"" onmouseout=""highlightLink(this,0)"">")
 		Do WriteParagraph("LocalDB","Local Databases")
 		Do WriteLog("<br>",2)
+		ZN "%SYS"
+		Set Maj=##class(%SYSTEM.Version).GetMajor()
+		If Maj<2009 {
+			Set result=##class(%Library.ResultSet).%New("Config.DataStorage:LocalDatabaseList")
+		} Else {
+			Set result=##class(%Library.ResultSet).%New("Config.Databases:LocalDatabaseList")
+		}
+		Set tSC = result.Execute()
+		If ('tSC) {
+			Do $System.Status.DisplayError(tSC)
+			Do:tracking WriteTrack("warning","","LogDataBases",$System.Status.GetErrorText(tSC))
+			Quit
+		}
 		Do WriteLog("<table id=""databaseTable"" border=""0"" cellpadding=""7"" cellspacing=""3"" class=""zebraStriped"">",2)
 		Do WriteLog("<tbody>",4)
 		Do WriteLog("<tr>",6)		
@@ -2231,15 +2248,8 @@ LogDataBases
 		Do WriteLog("<th onclick=""sortTable('databaseTable',6,1)"">Encrypted</th>",8)
 		Do WriteLog("<th onclick=""sortTable('databaseTable',7,1)"">Journal</th>",8)	
 		Do WriteLog("</tr>",6)
-		Set Maj=##class(%SYSTEM.Version).GetMajor()
-		If Maj<2009 {
-			Set result=##class(%Library.ResultSet).%New("Config.DataStorage:LocalDatabaseList")
-		} Else {
-			Set result=##class(%Library.ResultSet).%New("Config.Databases:LocalDatabaseList")
-		}
-		Set sc=result.Execute() If ('sc) Do DisplayError^%apiOBJ(sc) Quit
-		While result.Next(.sc) {
-			If ('sc) Quit
+		While result.Next(.tSC) {
+			If ('tSC) Quit
 			Do WriteLog("<tr>",6)
 			Do WriteLog("<td>"_result.Data("Name")_"</td>",8)
 			Do WriteLog("<td>"_result.Data("Directory")_"</td>",8)
@@ -2252,12 +2262,17 @@ LogDataBases
 			Do WriteLog("<td>"_result.Data("Journal")_"</td>",8)
 			Do WriteLog("</tr>",6)
 		}
-		If ('sc) Do DisplayError^%apiOBJ(sc)
+		If ('tSC) {
+			Do $System.Status.DisplayError(tSC)
+			Do:tracking WriteTrack("warning","","LogDataBases",$System.Status.GetErrorText(tSC))
+			Quit
+		}
 		Do WriteLog("</tbody>",4)
 		Do WriteLog("</table>",2)
 	} Catch(ex) {
 		Set tSC = ex.AsStatus()
-		Do WriteLog("<p>An error occurred</p>",2)
+		Do $System.Status.DisplayError(tSC)
+		Do:tracking WriteTrack("warning","","LogDataBases",$System.Status.GetErrorText(tSC))
 	}
 	Do WriteLog("</div>")
 	Quit $$$OK
@@ -2599,7 +2614,6 @@ DialogCubes(namespace) {
 				Quit
 			} ElseIf ##class(%DeepSee.Utils).%CubeExists(cube,.status)'=1 {
 				Write !,cube," is an invalid cube selection: "
-				Do $system.OBJ.DisplayError(status)
 				Write !,"Enter '?' to see list of cubes in the "_namespace_" namespace",!
 				Set cube=""
 			} Else {
@@ -2636,9 +2650,9 @@ VerifyInputCubes(cubeList,namespace,tracking=0){
 		Set cube=$ZCONVERT(cube, "U")
 		ZN namespace
 		If ##class(%DeepSee.Utils).%CubeExists(cube,.status)'=1 {
-			Write !!, cube_": invalid cube selection. It will not be included in the report",!
+			Write !!, cube_": invalid cube selection. It will not be included in the report"
+			//Do $system.OBJ.DisplayError(status)
 			Do:tracking WriteTrack("warning","",cube,"invalid cube selection. It was not included in the report")
-			Do $system.OBJ.DisplayError(status)
 			Set cube=""
 		}
 		Set $LIST(cubeList,i)=cube	//Change element in list to uppercase version (or null if it didn't exist)
@@ -2737,9 +2751,10 @@ WriteLastStartup
 		//Do WriteLog("Started on "_$ZDATETIME(oh))
 		//Write !,"<p>Cach&eacute; Started on "_$ZDATETIME(oh)_". As of this report Cach&eacute; has been up for "_days_" days "_hours_" hours "_minutes_" minutes "_seconds_" seconds"_"</p>"
 		Do WriteLog("<p>"_$ZDATETIME(oh,3)_". As of this report Cach&eacute; has been up for "_days_" days "_hours_" hours "_minutes_" minutes "_seconds_" seconds"_"</p>",8)
-	} Catch(ex) {
+	} Catch(ex) {		
 		Set tSC = ex.AsStatus()
-		Do WriteLog("<p>An error occurred</p>")
+		Do WriteLog($System.Status.GetErrorText(tSC),10)
+		Do:tracking WriteTrack("warning","","WriteLastStartup",$System.Status.GetErrorText(tSC))
 	}
 	Quit
 
@@ -2778,8 +2793,10 @@ NLS
 		Else  Set LocCur=oLoc.Name,LocDesc=oLoc.Description		
 		Set LocSrc=$$ComputeFullDBDir^%SYS.API("Locale")
 		Do WriteLog("<p>"_LocCur_" ("_LocDesc_")<p>",8)
-	} Catch(ex) {
-		Do WriteLog("<p>An error occurred</p>",8)
+	} Catch(ex) {		
+		Set tSC = ex.AsStatus()
+		Do WriteLog($System.Status.GetErrorText(tSC),10)
+		Do:tracking WriteTrack("warning","","NLS",$System.Status.GetErrorText(tSC))
 	}
 	Quit
 
@@ -2801,9 +2818,10 @@ OSVer
 			Do ExternalCmd("lsattr -El proc0")
 			//Do ExternalCmd^Buttons("lsattr -El proc0")
 		}
-	} Catch(ex) {
+	} Catch(ex) {		
 		Set tSC = ex.AsStatus()
-		Do WriteLog($System.Status.DisplayError(tSC),8)
+		Do WriteLog($System.Status.GetErrorText(tSC),10)
+		Do:tracking WriteTrack("warning","","OSVer",$System.Status.GetErrorText(tSC))
 	}
 	Do WriteLog("</p>",8)
 	Quit
@@ -2981,7 +2999,7 @@ GetSourceFactCount(sqlclass){
 		Set FactCount = rset.FactCount
 	} Catch(ex) {
 		Set FactCount = ex.AsStatus()
-		W $System.Status.DisplayError(tSC)
+		Do $System.Status.DisplayError(tSC)
 	}
 	Quit FactCount
 }
@@ -3114,41 +3132,41 @@ MostRunQueries(numqueries)
 		Set freqarr(f,c) = crcarr(c)
 	}
 	//Print
-	Do WriteLog("<table id=""FrequentQueriesTable"" cellpadding=""5"" cellspacing=""5"" class=""tableWithBorders"">")
-	Do WriteLog("<tbody>",2)
-	Do WriteLog("<tr>",4)
-	Do WriteLog("<th onclick=""sortTable('FrequentQueriesTable',0,0)"">#</th>",6)
-	Do WriteLog("<th onclick=""sortTable('FrequentQueriesTable',0,0)"">Frequency</th>",6)
-	Do WriteLog("<th onclick=""sortTable('FrequentQueriesTable',1,1)"">Query</th>",6)
-	Do WriteLog("</tr>",4)		
+	Do WriteLog("<table id=""FrequentQueriesTable"" cellpadding=""5"" cellspacing=""5"" class=""tableWithBorders"">",2)
+	Do WriteLog("<tbody>",4)
+	Do WriteLog("<tr>",6)
+	Do WriteLog("<th onclick=""sortTable('FrequentQueriesTable',0,0)"">#</th>",8)
+	Do WriteLog("<th onclick=""sortTable('FrequentQueriesTable',0,0)"">Frequency</th>",8)
+	Do WriteLog("<th onclick=""sortTable('FrequentQueriesTable',1,1)"">Query</th>",8)
+	Do WriteLog("</tr>",6)
 	Set freq = ""
 	For n = 1:1:numqueries {
 		Set freq = $O(freqarr(freq),-1)
 		Quit:freq=""
-		Do WriteLog("<tr>",4)
-		Do WriteLog("<td>"_n_"</td>",6)
-		Do WriteLog("<td>"_freq_"</td>",6)
-		Do WriteLog("<td>",6)
+		Do WriteLog("<tr>",6)
+		Do WriteLog("<td>"_n_"</td>",8)
+		Do WriteLog("<td>"_freq_"</td>",8)
+		Do WriteLog("<td>",8)
 		Set hashed=""
 		Set counter = 0
 		For {
 			Set hashed=$O(freqarr(freq,hashed))
 			Quit:hashed=""
-			Do:counter=7 WriteLog("<p> ... </p>",8) //Show up to 6 queries per frequency
+			Do:counter=7 WriteLog("<p> ... </p>",10) //Show up to 6 queries per frequency
 			Quit:counter=7
 			Set query = freqarr(freq,hashed)
-			Do WriteLog("<p>"_$$encode(query)_"</p>",8)
+			Do WriteLog("<p>"_$$encode(query)_"</p>",10)
 			Set counter= $I(counter)
 		}
-		Do WriteLog("</td>",6)
-		Do WriteLog("</tr>",4)
+		Do WriteLog("</td>",8)
+		Do WriteLog("</tr>",6)
 	}
-	Do WriteLog("</tbody>",2)
- 	Do WriteLog("</table>")
+	Do WriteLog("</tbody>",4)
+ 	Do WriteLog("</table>",2)
  	Quit
  
 lastNQueries(numqueries)
-	Do WriteLog("<pre class=""wrapped"">")
+	Do WriteLog("<pre class=""wrapped"">",4)
 	Set username=""
 	For k=1:1 {
 		Set numqueriesuser = numqueries
@@ -3156,20 +3174,19 @@ lastNQueries(numqueries)
 		If username="" Quit
 		Set totqueries=$O(^DeepSee.QueryLog(username,""),-1)
 		Set:totqueries<numqueriesuser numqueriesuser = totqueries
-		Do WriteLog("Last "_numqueriesuser_" of "_totqueries_" MDX queries by User: "_username)
+		Do WriteLog("Last "_numqueriesuser_" of "_totqueries_" MDX queries by User: "_username,6)
 		Set counter=""
 		For i=1:1:numqueriesuser {
 			Quit:i>totqueries				//User has fewer than 5 queries
 			Set counter=$O(^DeepSee.QueryLog(username,counter),-1)
 			Set query=$Get(^DeepSee.QueryLog(username,counter))
 			If query'=""{
-				Use LogFile  Write ?2  Use PDev
-				Do WriteLog( i_") "_$$encode(query))
+				Do WriteLog( i_") "_$$encode(query),0)
 			}
 		}
-		Use LogFile  Write !  Use PDev		
+		//Do WriteLog("")
 	}
-	Do WriteLog("</pre>")
+	Do WriteLog("</pre>",2)
 	Quit
  
 encode(string) {
@@ -3192,7 +3209,7 @@ alertRoutineSize(RoutineSize,alerts) {
 		Set tSC = 1
 	} Catch (ex) {
 		Set tSC = ex.AsStatus()
-		Set tSC = $System.Status.DisplayError(tSC)
+		Do $System.Status.DisplayError(tSC)
 	}
 	Quit tSC
 }
@@ -3208,7 +3225,7 @@ alertGlobalKSize(GlobalKSize,alerts) {
 		Set tSC = 1
 	} Catch (ex) {
 		Set tSC = ex.AsStatus()
-		Set tSC = $System.Status.DisplayError(tSC)
+		Do $System.Status.DisplayError(tSC)
 	}
 	Quit tSC
 }
@@ -3232,7 +3249,7 @@ alertDStimeRW(DSTimeMapFrom,alerts) {
 		Set tSC = 1
 	} Catch (ex) {
 		Set tSC = ex.AsStatus()
-		Set tSC = $System.Status.DisplayError(tSC)
+		Do $System.Status.DisplayError(tSC)
 	}
 	Quit tSC
 }
@@ -3261,7 +3278,7 @@ alertCacheMappings(ns,alerts) {
 		}
 	} Catch (ex) {
 		Set tSC = ex.AsStatus()
-		Do WriteLog("<p class=""red"" "_tSC_"</p>",8)
+		Do WriteLog("<p class=""red"" "_$System.Status.GetErrorText(tSC)_"----ALE</p>",8)
 	}
 	Quit tSC
 }
@@ -3403,7 +3420,6 @@ alertTimeLevels(timeLevels,alerts) {
 		Set tSC = 1
 	} Catch (ex) {
 		Set tSC = ex.AsStatus()
-		Set tSC = $System.Status.DisplayError(tSC)
 	}
 	Quit tSC
 }
@@ -3417,7 +3433,7 @@ WriteLog(string,spaces)
 	If '$D(spaces) Set spaces=0
 	Write !,?spaces,string
 	Quit
- 
+	
 WriteParagraph(name,title,flag)
 	If '$D(flag) Set flag = 1
 	Do:flag WriteLog("<hr noshade size=""4"" width=""auto"">",2)
@@ -3494,23 +3510,6 @@ PrintGlobal(namespace,glob,spaces){
 	}
 }
 
- /*
-Dir
-	Set $ZTrap="DirError",$ZError=""
-	Set DirInfo=$ZUtil(49,Dir)
-	
-DirError
-	Set $ZTrap=""
-	Set MountStatus=$Get(DirInfo,"")
-	If $ZError'=""!(MountStatus<0) Do  Quit
-	.	Write !,Dir," *** ",$Select(MountStatus<-1:"Doesn't Exist",+MountStatus=-1:"Dismounted",1:$ZError)," ***"
-	Quit
-	If +MountStatus=256 Write !,Dir," *** Not Mounted ***" Quit
-	Set BlockSize=$Piece(DirInfo,",",$$$blksizpiece)
-	Write !,Dir,?49,$Justify(BlockSize,4),?60,$Piece(DirInfo,",",$$$resourcepiece)
-	Write ?80,$Case($$$encrypteddbformat(DirInfo),0:0,:$Piece(DirInfo,",",$$$enckeyidpiece))
-	Quit
- */	
 NewFile(LogFilePrefix,LogFileSuffix)
 	//Creates a new file with Date and Time added to the filename and opens it for Reading and Writing
 	//File Name can be either "Cache" or "cstat"
