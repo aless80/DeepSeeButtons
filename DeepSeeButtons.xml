@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Export generator="Cache" version="25" zv="Cache for UNIX (SUSE Linux Enterprise Server for x86-64) 2017.2.1 (Build 801)" ts="2018-04-11 17:09:33">
-<Routine name="DeepSeeButtons" type="MAC" languagemode="0" timestamp="64749,59557.555373"><![CDATA[
+<Export generator="Cache" version="25" zv="Cache for UNIX (SUSE Linux Enterprise Server for x86-64) 2017.2.1 (Build 801)" ts="2018-04-20 13:35:15">
+<Routine name="DeepSeeButtons" type="MAC" languagemode="0" timestamp="64758,48908.336831"><![CDATA[
 DeepSeeButtons(namespace="ask", cubeString="ask", getLogs="", LogFile="", tracking="")
 #include %occConstant
 
@@ -40,37 +40,39 @@ DeepSeeButtons(namespace="ask", cubeString="ask", getLogs="", LogFile="", tracki
 	;		-Operating system
 	;		-Disk space
 	;		-RAM
-	;	3) Cube List
-	;		-Name
-	;		-Display name
-	;		-Build Time
-	;		-Fact Count
-	;		-Build Rate
-	;		-Last Compile
-	;		-Source Class
-	;		-Subject Area Class
-	;		-Last update
-	;		-Related Cubes
-	;	4) Cube Registry Map
-	;	5) Cube Info: Optional Extra data on a particular cube
-	;		5A) Cube Info- subject area class, fact class, caption, fact count, build restrictions 
-	;			(maxfacts, buildrestriction/filterspec property, %OnProcessFact, and %OnGetFilterSpec), 
-	;			DSTIME & DSINTERVAL, last modified, is compound, is abstract
-	;		5B) Dimensions- dimension list, ^DeepSee.CalcMbrs, %Analyze, FieldNameToSpec, %AnalyzeMissing
-	;		5C) Other Elements- Pivot variables, listing fields, listings
-	;	6) Query Log
+	;	3) Cubes in namespace
+	;		-Cubes table with Cube Name, Display name, Source Class, Cube Class, Related Cubes, Related Cubes	
+	;		-Versioned cubes
+	;		-Abstract cubes
+	;		-Cubes with Source Classes Based on SQL Storage
+	;		-Cubes Based on Data Connectors
+	;		-Build Order for Related Cubes
+	;	4) Build/Synch
+	;		-DSTIME
+	;		-BuildSynchTable Table with Cube Name, Fact Count, Build Time, Build Rate, Build Errors, DSTIME, 
+	;		 Last Compile, Last Build/Synch, Related Cubes
+	;		-Build Errors
+	;	5) Cube Registry Map
+	;	6) Cube Info: Optional Extra data on a particular cube
+	;		6A) Cube Info: display name, cube type, subject area class, inherits from, resource, source class, 
+	;			fact class, caption, fact count, 
+	;			build restrictions (maxfacts, buildrestriction/filterspec property, %OnProcessFact, and %OnGetFilterSpec), 
+	;			last modified, DSTIME & DSINTERVAL, cube registry, build errors
+	;		6B) Dimensions: dimension list, ^DeepSee.CalcMbrs, %Analyze, FieldNameToSpec, %AnalyzeMissing
+	;		6C) Other Elements: Pivot variables, listing fields, listings, resources
+	;	7) Query Log
 	;		-Number of users runnign queries
 	;		-User and Queries run
 	;		-^DeepSee.LastQuery
 	;		-Last 5 queries run by each user
-	;	7) DeepSee Logs
-	;	8) CPF file (includes mappings)
-	;	9) cconsole.log
-	;	10) Mappings - Show global mappings in the namespace
-	;	11) Local Databases
-	;	12) Task schedule
-	;	13) Journaling
-	;	14) Alerts
+	;	8) DeepSee Logs
+	;	9) CPF file (includes mappings)
+	;	10) cconsole.log
+	;	11) Mappings - Show global mappings in the namespace
+	;	12) Local Databases
+	;	13) Task schedule
+	;	14) Journaling
+	;	15) Alerts
 
 StartDialog
 	New (namespace,cubeString,getLogs,LogFile,tracking)
@@ -523,7 +525,7 @@ LogHead(cubeList,getLogs)
 LogOpenMainDiv()
 	Do WriteLog("<div id=""main"">")
 	Do WriteLog("<a name=""top""></a>")
-	Do WriteLog("<h1 title=""Version v0.1.3"">DeepSeeButtons - DeepSee diagnostic report</h1>")
+	Do WriteLog("<h1 title=""Version v0.1.4"">DeepSeeButtons - DeepSee diagnostic report</h1>")
 	Quit
 
 LogDeepSeeSetupSection
@@ -943,14 +945,17 @@ LogCubeSection
 			For {
 				Quit:cubenode=""				//Do the work to get info and write out the table
 				Set cubename=$list(plist(cubenode),1)
-				
-				
-				Set versionedCube = ##class(%DeepSee.CubeVersion.Utils).%GetVersionedCubeName(cubename)
-				
+				Try {
+					Set versionedCube = ##class(%DeepSee.CubeVersion.Utils).%GetVersionedCubeName(cubename)
+					Set isVersioned = ##class(%DeepSee.CubeVersion.Utils).%IsVersion(versionedCube)
+				} Catch {
+					Set versionedCube = cubename
+					Set isVersioned = 0
+				}				
 				If ##class(%DeepSee.Utils).%IsCubeAbstract(cubenode){	//cube is abstract
 					//Don't run if Health insight because there are too many abstract cubes
 					Set:('isInsight) abstractList($I(abstractcount)) = cubenode
-				} ElseIf ##class(%DeepSee.CubeVersion.Utils).%IsVersion(versionedCube) {	//cube is versioned
+				} ElseIf isVersioned {
 					Set versionedList($I(versionedcount)) = versionedCube
 				} ElseIf (cubename'="") {
 					Do WriteLog("<tr>",4)
@@ -1001,6 +1006,54 @@ LogCubeSection
 						Do WriteLog("<p>"_class_"</p>")
 					}
 			}
+			Do WriteHeader4("Build Order for Related Cubes")
+			Do ##class(%DeepSee.CubeManager.Utils).GetCubeGroups(.groups)
+			Set relatedCubesExist = 0
+			//Invert this array from groups(group,cube)=order to groupOrderCube(group,order)=cube
+			Set group = $O(groups(""))
+			While (group'="") {
+				Set cube = $O(groups(group,""))
+				While (cube'="") {
+					Set order = groups(group,cube)
+					Set:('relatedCubesExist && (order > 1)) relatedCubesExist = 1 
+					Set groupOrderCube(group,order) = cube
+					Set cube = $O(groups(group,cube))
+				}
+				Set group = $O(groups(group))
+			}
+			//Print a table with build order for cubes with relationships
+			If relatedCubesExist {
+			Do WriteLog("<table id=""BuildOrderTable"" border=""0"" cellpadding=""7"" cellspacing=""3"" "_"class=""tableWithBorders tableTabbed"">",2)
+		 	Do WriteLog("<tbody>",4)
+		 	Do WriteLog("<tr>",6)
+		 	Do WriteLog("<th>Cube Name</th>",8)
+		 	Do WriteLog("<th>Cube Group</th>",8)
+		 	Do WriteLog("<th>Order</th>",8)		 	
+		 	Do WriteLog("</tr>",6)
+			Set group = $O(groupOrderCube(""))
+			While (group'="") {
+				Set last = $O(groupOrderCube(group,""),-1)
+				If (last=1) {
+					Set group = $O(groupOrderCube(group))
+				} Else {					
+					Set order = $O(groupOrderCube(group,""))
+					While (order'="") {
+						Set cube = groupOrderCube(group,order)
+						Do WriteLog("<tr>",6)	//background-color: #ccc;
+						Do WriteLog("<td>"_cube_"</td>",10)
+						Do WriteLog("<td>"_group_"</td>",10)
+						Do WriteLog("<td>"_order_"</td>",10)
+						Do WriteLog("</tr>",6)
+						Set order = $O(groupOrderCube(group,order))
+					}
+					Set group = $O(groupOrderCube(group))
+				}
+			}
+			Do WriteLog("</tbody>",4)
+			Do WriteLog("</table>",2)
+			} Else {
+				Do WriteLog("No related cubes",4)
+			}
 	 	}
 	 	Do WriteLog("</div>")
  	} catch exc {
@@ -1033,7 +1086,6 @@ LogBuildSynchSection
 		 	} Else {
 			 	Do WriteLog("<p>BuildTime, BuildRate, Build Errors show no values when the cube has not been built from Cube Manager.</p>",2)
 		 	}
-		 	
 		 	//Get the latest DSTIME
 		 	//DTB422 moved ^DeepSee.Cubes to ^DeepSee.Update
 			If ($D(^DeepSee.Update)#10) { //1 (only top node) or 11 (top node and descendants)
@@ -1046,8 +1098,7 @@ LogBuildSynchSection
 				Set lastDataUpdate = 0
 				Set dstime = ""
 				Do WriteLog("<p>Could not find DSTIME</p>",2)
-			}		 	
-		 	
+			}
 		 	Do WriteLog("<table id=""BuildSynchTable"" border=""0"" cellpadding=""7"" cellspacing=""3"" "_"class=""zebraStriped"">",2)
 		 	Do WriteLog("<tbody>",4)
 		 	Do WriteLog("<tr>",6)
@@ -1061,8 +1112,23 @@ LogBuildSynchSection
 				"title=""From ^DeepSeeUpdate (or ^OBJ.DSTIME before DTB422)"">DSTIME</th>",8)
 		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',6,1)"">Last Compile</th>",8)
 		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',7,1)"" title=""As logged in ^DeepSee.Update (or ^OBJ.DSTIME before DTB422)"">Last Build/Synch</th>",8)
-		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',8,1)"" title=""Does not reflect build order"">Related Cubes</th>",8)
+		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',8,0)"">Cube Group</th>",8)
+		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',9,0)"">Build Order</th>",8)
+		 	//Do WriteLog("<th onclick=""sortTable('BuildSynchTable',10,1)"" title=""Does not reflect build order"">Related Cubes</th>",8)
 		 	Do WriteLog("</tr>",6)
+		 	//Cube gorup and build order
+		 	//Invert this array from groups(group,cube)=order to cubeGroupOrder(cube)=$LB(group,order)
+		 	Do ##class(%DeepSee.CubeManager.Utils).GetCubeGroups(.groups)		 	
+			Set group = $O(groups(""))
+			While (group'="") {
+				Set cube = $O(groups(group,""))
+				While (cube'="") {
+					Set order = groups(group,cube)
+					Set cubeGroupOrder(cube) = $LB(group,order)
+					Set cube = $O(groups(group,cube))
+				}
+				Set group = $O(groups(group))
+			}
 		 	Set storageList=""
 			Set dataConnectorList=""			
 			Set abstractcount = 0
@@ -1138,7 +1204,19 @@ LogBuildSynchSection
   					Do WriteLog("<td>"_dstime_"</td>",8)
 					Do WriteLog("<td>"_lastmod_"</td>",8)
 					Do WriteLog("<td>"_lastSync_"</td>",8) 		//LastUpdate = Last time cube was synced or built, "" if not done in Cube Manager
+					//Cube group and order
+ 					If $D(cubeGroupOrder(cubenode)) {
+	 					Set group = $LG(cubeGroupOrder(cubenode),1)
+	 					Set order = $LG(cubeGroupOrder(cubenode),2)
+ 					} Else {
+	 					Set group = ""
+	 					Set order = ""
+ 					}
+					Do WriteLog("<td>"_group_"</td>",8)
+					Do WriteLog("<td>"_order_"</td>",8)
+					/*Relationships
 					Write !,?8,"<td>" Do GetRelationships(cubenode)  Write "</td>"		//RelatedCubes
+					*/
 					Do WriteLog("</tr>",6)
 				} ElseIf ##class(%DeepSee.Utils).%IsCubeAbstract(cubenode){
 					//Don't run if Health insight because there are too many abstract cubes
@@ -1150,7 +1228,7 @@ LogBuildSynchSection
 		 	Do WriteLog("</table>",2)
 		}
 		//Build Errors section
-		Do WriteHeader4("BuildErrors")
+		Do WriteHeader4("Build Errors",2,"From the ^DeepSee.BuildErrors global")
 		Set tCube = $O(^DeepSee.BuildErrors(""))
 		Set errs = 0
 		While (tCube'="") {
@@ -1170,6 +1248,8 @@ LogBuildSynchSection
 				Do WriteLog("<p>"_$FNUMBER(errs(tCube),"O,")_" build error(s) for '"_tCube_"'</p>",2)
 				Set tCube = $O(errs(tCube))
 			}
+		} Else {
+			Do WriteLog("<p>No build errors</p>",2)
 		}
 		Do WriteLog("</div>")
  	} catch exc {
@@ -1281,8 +1361,13 @@ LogCubeInfo
 		            " class=""tableWithBorders tableTabbed"">",0)
 	  	Do WriteLog("<tbody>",2)
 	  	//Check versioned cube
-	    Set versionedcube = ##class(%DeepSee.CubeVersion.Utils).%GetVersionedCubeName(cube,.vn)
-	    Set isversioned = ##class(%DeepSee.CubeVersion.Utils).%IsVersion(versionedcube)
+	  	Try {
+	    	Set versionedcube = ##class(%DeepSee.CubeVersion.Utils).%GetVersionedCubeName(cube,.vn)
+	    	Set isversioned = ##class(%DeepSee.CubeVersion.Utils).%IsVersion(versionedcube)
+	  	} Catch {
+		  	Set versionedcube = cube
+		  	Set isversioned = 0
+		}
 	    If isversioned {
 	    	Do WriteLog("<tr>",4)
 	    	Do WriteLog("<td>",6)

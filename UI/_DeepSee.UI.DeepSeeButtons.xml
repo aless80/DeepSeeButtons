@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Export generator="Cache" version="25" zv="Cache for UNIX (SUSE Linux Enterprise Server for x86-64) 2017.2.1 (Build 801)" ts="2018-04-05 13:53:38">
+<Export generator="Cache" version="25" zv="Cache for UNIX (SUSE Linux Enterprise Server for x86-64) 2017.2.1 (Build 801)" ts="2018-04-18 11:47:07">
 <Class name="%DeepSee.UI.DeepSeeButtonsDownload">
 <Super>%ZEN.Component.page,%CSP.StreamServer</Super>
 <TimeChanged>64735,54438.891408</TimeChanged>
@@ -56,7 +56,7 @@ DeepSee's DeepSeeButtons Viewer.
 Run DeepSeeButtons and display contents of the DeepSeeButtons html file in the current namespace</Description>
 <Super>%DeepSee.UI.standardPage</Super>
 <System>4</System>
-<TimeChanged>64743,49904.035763</TimeChanged>
+<TimeChanged>64749,58302.115199</TimeChanged>
 <TimeCreated>64741,56740.343487</TimeCreated>
 
 <Parameter name="PAGENAME">
@@ -537,7 +537,7 @@ This dialog lets the user add or edit cubes and subject areas for DeepSeeButtons
 An existing list (delimited by comma) may be passed in.]]></Description>
 <Super>%DeepSee.UI.Dialog.standardDialog</Super>
 <System>4</System>
-<TimeChanged>64741,55239.767415</TimeChanged>
+<TimeChanged>64756,42408.018979</TimeChanged>
 <TimeCreated>64727,63621.331352</TimeCreated>
 
 <Parameter name="APPLYBUTTON">
@@ -586,14 +586,16 @@ Contents of the dialog body.</Description>
 label="Create a list of cubes and subject areas on which DeepSeeButtons will gather detailed information. Select a cube or subject are by double clicking a cube or subject area from the list. Selecting ALL for all cubes and subject areas (DeepSeeButtons might take some time)"/>
 <hgroup cellStyle="padding:4px;" cellVAlign="top">
 <group id="dataSourceViewbox" layout="none" >  
-<dynaTree id="dataSource"  label="Cubes and Subject Areas"
+<checkbox id="ALLcubes" caption="All Cubes" label="Cubes and Subject Areas"
+	title="Include detailed information for all cubes in DeepSeeButtons" 
+	enclosingStyle="padding-top:10px;" onchange="zenPage.clickAllCubes(zenThis);" value="0"/>
+<dynaTree id="dataSource" label=""
  imageContracted="images/disclosure-contracted.gif"
  imageExpanded="images/disclosure-expanded.gif"
  imageNode="images/spacer.gif"
- childIndent="10"
+ childIndent="10" enclosingStyle="padding-top:10px;"
  ondblclick="zenPage.selectCube(zenThis);" dragEnabled="false"
-	showLines="false" showFolders="false"
-	OnGetTreeInfo="GetCubeInfo">
+ showLines="false" showFolders="false" OnGetTreeInfo="GetCubeInfo">
 </dynaTree>
 </group>
 <spacer width="5px"/>
@@ -601,7 +603,6 @@ label="Create a list of cubes and subject areas on which DeepSeeButtons will gat
 <listBox id="lstCubes" label="Cube and Subject Area list" width="350px" listHeight="370px" onchange=""/>
 <spacer height="1"/>
 </vgroup>
-
 <vgroup id="idGroupButtons">
 <image src="/csp/broker/images/spacer.gif" width="16" height="16"/>
 <image src="deepsee/close_a_16.png" width="16" height="16" title="Remove the selected cube or subject area" onclick="zenPage.doRemove();"/>
@@ -703,11 +704,7 @@ User selected a cube or subject are from the list. Get the cube or SA name for t
 <Language>javascript</Language>
 <ClientMethod>1</ClientMethod>
 <Implementation><![CDATA[
-	//var propFullValue = sourceObj.getNodeValue(sourceObj.getProperty("selectedIndex")); //"<CUBENAME>"
 	var cubeObj = zen('lstCubes');
-	if (sourceObj.text == "ALL") {
-		cubeObj.resetOptions()
-	}
 	//Remove ALL if add a cube
 	zenPage.removeALL()
 	
@@ -726,6 +723,8 @@ User selected a cube or subject are from the list. Get the cube or SA name for t
 			return
 		}
 	}
+	var ALLcubes = zen('ALLcubes')
+	ALLcubes.setProperty('ALLcubes',0)
 ]]></Implementation>
 </Method>
 
@@ -757,6 +756,21 @@ User selected a cube or subject are from the list. Get the cube or SA name for t
 ]]></Implementation>
 </Method>
 
+<Method name="clickAllCubes">
+<Description>
+User selected a cube or subject are from the list. Get the cube or SA name for the selected value and put it into the list box.</Description>
+<FormalSpec>sourceObj</FormalSpec>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	var cubeObj = zen('lstCubes');
+	cubeObj.resetOptions()
+	if (sourceObj.value) {
+		cubeObj.appendOption("ALL","ALL");
+	}
+]]></Implementation>
+</Method>
+
 <Method name="GetCubeInfo">
 <Description>
 Provide contents of the data source tree.</Description>
@@ -765,16 +779,13 @@ Provide contents of the data source tree.</Description>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
 	Set tSC = $$$OK
-	
 	Set pTree(0,"ch",1)=""
-	Set pTree(1)=$LB("ALL","ALL",0,"",1)
-	
 	Do ##class(%DeepSee.Utils).%GetCubeList(.cubeList,,1)
 	Set cubetmp=""
 	For i=1:1 {
 		Set cubetmp=$order(cubeList(cubetmp))
 		Quit:cubetmp=""
-		Set ind=$I(pTree)+1 //+1 to allow ALL
+		Set ind=$I(pTree)
 		Set pTree(0,"ch",ind)=""
 		Set pTree(ind)=$LB(cubetmp,cubetmp,0,"",1)
 	}
