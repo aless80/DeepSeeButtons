@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Export generator="Cache" version="25" zv="Cache for UNIX (SUSE Linux Enterprise Server for x86-64) 2017.2.1 (Build 801)" ts="2018-04-20 13:35:15">
-<Routine name="DeepSeeButtons" type="MAC" languagemode="0" timestamp="64758,48908.336831"><![CDATA[
+<Export generator="Cache" version="25" zv="Cache for UNIX (SUSE Linux Enterprise Server for x86-64) 2017.2.1 (Build 801)" ts="2018-05-24 10:15:12">
+<Routine name="DeepSeeButtons" type="MAC" languagemode="0" timestamp="64792,36238.924922"><![CDATA[
 DeepSeeButtons(namespace="ask", cubeString="ask", getLogs="", LogFile="", tracking="")
 #include %occConstant
 
@@ -300,9 +300,13 @@ LogHead(cubeList,getLogs)
     Do WriteLog("document.getElementById('l'+obj.id).style.color=color;",6)
     Do WriteLog("}",4)
 	/// sortTable function
-    Do WriteLog("function sortTable(id,n,stringSort) {",4)
+    Do WriteLog("function sortTable(elem,n,stringSort) {",4)
   	Do WriteLog("var table, rows, switching, i, x1, x2, shouldSwitch, dir, switchcount = 0;",6)
-  	Do WriteLog("table = document.getElementById(id);",6)
+    Do WriteLog("//Climb up the table structure to find the <table> element",6)
+    Do WriteLog("table = elem;",6)
+    Do WriteLog("while(table.tagName!=""TABLE"") {",6)
+    Do WriteLog("table = table.parentElement;",8)
+    Do WriteLog("}",6)
   	Do WriteLog("switching = true;",6)
   	Do WriteLog("//Set the sorting direction to ascending:",6)
   	Do WriteLog("dir = 'asc'; ",6)
@@ -313,14 +317,21 @@ LogHead(cubeList,getLogs)
     Do WriteLog("for (i = 1; i < (rows.length - 1); i++) {",8)
     Do WriteLog("shouldSwitch = false;",10)
     Do WriteLog("//Get the two adjacent elements to be compared",10)
-    Do WriteLog("x1 = rows[i].getElementsByTagName('TD')[n];",10)
-    Do WriteLog("x2 = rows[i + 1].getElementsByTagName('TD')[n];",10)
+    Do WriteLog("x1 = rows[i].getElementsByTagName('TD')[n].innerHTML;",10)
+    Do WriteLog("x2 = rows[i+1].getElementsByTagName('TD')[n].innerHTML;",10)
     Do WriteLog("//Get sorting if undefined: string or number?",10)
     Do WriteLog("if (typeof stringSort === 'undefined') {",10)
-    Do WriteLog("var stringSort = isNaN(x1.innerHTML) | isNaN(x2.innerHTML)",12)
+    Do WriteLog("var stringSort = isNaN(x1) | isNaN(x2)",12)
     Do WriteLog("}",10)
-    Do WriteLog("x1val = stringSort ? x1.innerHTML.toLowerCase() : +x1.innerHTML.replace(/,/g, '');",10)
-    Do WriteLog("x2val = stringSort ? x2.innerHTML.toLowerCase() : +x2.innerHTML.replace(/,/g, '');",10)
+    Do WriteLog("x1val = stringSort ? x1.toLowerCase() : +x1.replace(/,/g, '');",10)
+    Do WriteLog("x2val = stringSort ? x2.toLowerCase() : +x2.replace(/,/g, '');",10)
+    Do WriteLog("//When sorting numerically empty string or NA as -Infinity",10)
+	Do WriteLog("if ((!stringSort)&&((x1=='')||(x1=='NA'))) {",10)
+    Do WriteLog("x1val = -Infinity;",12)
+	Do WriteLog("}",10)
+	Do WriteLog("if ((!stringSort)&&((x2=='')||(x2=='NA'))) {",10)
+	Do WriteLog("x2val = -Infinity;",12)
+	Do WriteLog("}",10)
     Do WriteLog("if (dir == 'asc') {",10)
     Do WriteLog("if (x1val > x2val) {",12)
     Do WriteLog("//Mark as a switch and break the loop",14)
@@ -349,7 +360,7 @@ LogHead(cubeList,getLogs)
     Do WriteLog("}",8)
 	Do WriteLog("}",6)
 	Do WriteLog("//Show or remove the triangles",6)
-	Do WriteLog("console.log('Column: ',n,', Sorting: ',dir,stringSort?'string':'numeric')",6)
+	Do WriteLog("console.log('Table: ',table.id,', Column: ',n,', Sorting: ',dir,stringSort?'string':'numeric')",6)
 	Do WriteLog("var ths = table.getElementsByTagName('TH')",6)
 	Do WriteLog("for (i = 0; i < ths.length; i++) {",6)
 	Do WriteLog("ths[i].innerHTML = ths[i].innerHTML.replace(' \u25B4','');",8)
@@ -525,7 +536,7 @@ LogHead(cubeList,getLogs)
 LogOpenMainDiv()
 	Do WriteLog("<div id=""main"">")
 	Do WriteLog("<a name=""top""></a>")
-	Do WriteLog("<h1 title=""Version v0.1.4"">DeepSeeButtons - DeepSee diagnostic report</h1>")
+	Do WriteLog("<h1 title=""Version v0.1.5"">DeepSeeButtons - DeepSee diagnostic report</h1>")
 	Quit
 
 LogDeepSeeSetupSection
@@ -932,11 +943,11 @@ LogCubeSection
 		 	            "class=""zebraStriped"">")
 		 	Do WriteLog("<tbody>",2)
 		 	Do WriteLog("<tr>",4)
-		 	Do WriteLog("<th onclick=""sortTable('CubeTable',0,1)"">Cube Name</th>",6)
-		 	Do WriteLog("<th onclick=""sortTable('CubeTable',1,1)"">Display Name</th>",6)
-		 	Do WriteLog("<th onclick=""sortTable('CubeTable',2,1)"">Source Class</th>",6)
-		 	Do WriteLog("<th onclick=""sortTable('CubeTable',3,1)"">Cube Class</th>",6)
-		 	Do WriteLog("<th onclick=""sortTable('CubeTable',4,1)"" title=""Does not reflect build order"">Related Cubes</th>",6)
+		 	Do WriteLog("<th onclick=""sortTable(this,0,1)"">Cube Name</th>",6)
+		 	Do WriteLog("<th onclick=""sortTable(this,1,1)"">Display Name</th>",6)
+		 	Do WriteLog("<th onclick=""sortTable(this,2,1)"">Source Class</th>",6)
+		 	Do WriteLog("<th onclick=""sortTable(this,3,1)"">Cube Class</th>",6)
+		 	Do WriteLog("<th onclick=""sortTable(this,4,1)"" title=""Does not reflect build order"">Related Cubes</th>",6)
 		 	Do WriteLog("</tr>",4)
 		 	Set storageList=""
 			Set dataConnectorList=""			
@@ -1014,7 +1025,8 @@ LogCubeSection
 			While (group'="") {
 				Set cube = $O(groups(group,""))
 				While (cube'="") {
-					Set order = groups(group,cube)
+					//NB: order can be ""
+					Set order = $S(groups(group,cube)'="":groups(group,cube),1:"-")
 					Set:('relatedCubesExist && (order > 1)) relatedCubesExist = 1 
 					Set groupOrderCube(group,order) = cube
 					Set cube = $O(groups(group,cube))
@@ -1102,28 +1114,30 @@ LogBuildSynchSection
 		 	Do WriteLog("<table id=""BuildSynchTable"" border=""0"" cellpadding=""7"" cellspacing=""3"" "_"class=""zebraStriped"">",2)
 		 	Do WriteLog("<tbody>",4)
 		 	Do WriteLog("<tr>",6)
-		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',0,1)"">Cube Name</th>",8)
-		 	//Do WriteLog("<th onclick=""sortTable('BuildSynchTable',1,0)"">Source Count</th>",8)
-		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',1,0)"">Fact Count</th>",8)
-		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',2,0)"">Build Time [s]</th>",8)
-		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',3,0)"">Build Rate [Facts/s]</th>",8)
-		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',4,0)"">Build Errors</th>",8)
-			Do WriteLog("<th onclick=""sortTable('BuildSynchTable',5,0)"""_
+		 	Do WriteLog("<th onclick=""sortTable(this,0,1)"">Cube Name</th>",8)
+		 	//Do WriteLog("<th onclick=""sortTable(this,1,0)"">Source Count</th>",8)
+		 	Do WriteLog("<th onclick=""sortTable(this,1,0)"""_
+				"title=""From %DeepSee.Utils:%GetCubeFactCount, i.e. does not include restrictions."">Fact Count</th>",8)
+		 	Do WriteLog("<th onclick=""sortTable(this,2,0)"">Build Time [s]</th>",8)
+		 	Do WriteLog("<th onclick=""sortTable(this,3,0)"">Build Rate [Facts/s]</th>",8)
+		 	Do WriteLog("<th onclick=""sortTable(this,4,0)"">Build Errors</th>",8)
+			Do WriteLog("<th onclick=""sortTable(this,5,0)"""_
 				"title=""From ^DeepSeeUpdate (or ^OBJ.DSTIME before DTB422)"">DSTIME</th>",8)
-		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',6,1)"">Last Compile</th>",8)
-		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',7,1)"" title=""As logged in ^DeepSee.Update (or ^OBJ.DSTIME before DTB422)"">Last Build/Synch</th>",8)
-		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',8,0)"">Cube Group</th>",8)
-		 	Do WriteLog("<th onclick=""sortTable('BuildSynchTable',9,0)"">Build Order</th>",8)
-		 	//Do WriteLog("<th onclick=""sortTable('BuildSynchTable',10,1)"" title=""Does not reflect build order"">Related Cubes</th>",8)
+		 	Do WriteLog("<th onclick=""sortTable(this,6,1)"">Last Compile</th>",8)
+		 	Do WriteLog("<th onclick=""sortTable(this,7,1)"" title=""As logged in ^DeepSee.Update (or ^OBJ.DSTIME before DTB422)"">Last Build/Synch</th>",8)
+		 	Do WriteLog("<th onclick=""sortTable(this,8,0)"">Cube Group</th>",8)
+		 	Do WriteLog("<th onclick=""sortTable(this,9,0)"">Build Order</th>",8)
+		 	//Do WriteLog("<th onclick=""sortTable(this,10,1)"" title=""Does not reflect build order"">Related Cubes</th>",8)
 		 	Do WriteLog("</tr>",6)
-		 	//Cube gorup and build order
+		 	//Cube group and build order
 		 	//Invert this array from groups(group,cube)=order to cubeGroupOrder(cube)=$LB(group,order)
 		 	Do ##class(%DeepSee.CubeManager.Utils).GetCubeGroups(.groups)		 	
 			Set group = $O(groups(""))
 			While (group'="") {
 				Set cube = $O(groups(group,""))
 				While (cube'="") {
-					Set order = groups(group,cube)
+					//NB: order can be "" and cause errors
+					Set order = $S(groups(group,cube)'="":groups(group,cube),1:"-")
 					Set cubeGroupOrder(cube) = $LB(group,order)
 					Set cube = $O(groups(group,cube))
 				}
@@ -1148,7 +1162,7 @@ LogBuildSynchSection
 					If (sqlclass="Not available")||('##class(%SYSTEM.SQL).TableExists(sqlclass)) {
 						Do WriteLog("<td></td>",8)
 					} Else {
- 						Set countstar=$$GetSourceFactCount(sqlclass)
+ 						Set countstar=$$GetCountStar(sqlclass)
 						Do WriteLog("<td>"_$FNUMBER(countstar,"O,")_"</td>",8)
 					}
   					*/					
@@ -1214,9 +1228,6 @@ LogBuildSynchSection
  					}
 					Do WriteLog("<td>"_group_"</td>",8)
 					Do WriteLog("<td>"_order_"</td>",8)
-					/*Relationships
-					Write !,?8,"<td>" Do GetRelationships(cubenode)  Write "</td>"		//RelatedCubes
-					*/
 					Do WriteLog("</tr>",6)
 				} ElseIf ##class(%DeepSee.Utils).%IsCubeAbstract(cubenode){
 					//Don't run if Health insight because there are too many abstract cubes
@@ -1498,14 +1509,15 @@ LogCubeInfo
 	    } ElseIf (sqlclass="Not available")||('##class(%SYSTEM.SQL).TableExists(sqlclass)) {
 			Do WriteLog("<p>Not available</p>",8)
 	    } Else {
-		    Set SourceFactCount=$$GetSourceFactCount(sqlclass)
+		    Set SourceFactCount=$$GetCountStar(sqlclass)
 		    Do WriteLog("<p>"_$FNUMBER(SourceFactCount,"O,")_"</p>",8)
 	    }
 	    Do WriteLog("</td>",6)
 	    Do WriteLog("</tr>",4)
 	    Do WriteLog("<tr>",4)
 	    Do WriteLog("<td>",6)
-	    Do WriteLog("<h4>Fact Count</h4>",8)
+	    Do WriteLog("<h4 title=""From %DeepSee.Utils:%GetCubeFactCount, i.e. does not include restrictions."""_
+	    			">Fact Count</h4>",8)
 		Do WriteLog("<p>"_$FNUMBER(factcount,"O,")_"</p>",8)
 		Do WriteLog("</td>",6)
 	    Do WriteLog("</tr>",4)
@@ -2072,8 +2084,8 @@ LogQuerylog
  		Do WriteLog("<table id=""QueryLogTable"" cellpadding=""5"" cellspacing=""5"" class=""tableWithBorders"">",2)
 		Do WriteLog("<tbody>",4)
 		Do WriteLog("<tr>",6)
-		Do WriteLog("<th onclick=""sortTable('QueryLogTable',0,1)"">User ("_usercount_" total) </th>",8)
-		Do WriteLog("<th onclick=""sortTable('QueryLogTable',1,0)"">Queries run</th>",8)
+		Do WriteLog("<th onclick=""sortTable(this,0,1)"">User ("_usercount_" total) </th>",8)
+		Do WriteLog("<th onclick=""sortTable(this,1,0)"">Queries run</th>",8)
 		Do WriteLog("</tr>",6)
 		Set u = $O(userqueries(""))
 		While (u'="") {
@@ -2326,14 +2338,14 @@ LogDataBases
 		Do WriteLog("<table id=""databaseTable"" border=""0"" cellpadding=""7"" cellspacing=""3"" class=""zebraStriped"">",2)
 		Do WriteLog("<tbody>",4)
 		Do WriteLog("<tr>",6)		
-		Do WriteLog("<th onclick=""sortTable('databaseTable',0,1)"">Database</th>",8)
-		Do WriteLog("<th onclick=""sortTable('databaseTable',1,1)"">Directory</th>",8)
-		Do WriteLog("<th onclick=""sortTable('databaseTable',2,0)"">Size [MB]</th>",8)
-		Do WriteLog("<th onclick=""sortTable('databaseTable',3,0)"">Block Size [KB]</th>",8)
-		Do WriteLog("<th onclick=""sortTable('databaseTable',4,1)"">Status</th>",8)
-		Do WriteLog("<th onclick=""sortTable('databaseTable',5,1)"">Resource</th>",8)
-		Do WriteLog("<th onclick=""sortTable('databaseTable',6,1)"">Encrypted</th>",8)
-		Do WriteLog("<th onclick=""sortTable('databaseTable',7,1)"">Journal</th>",8)	
+		Do WriteLog("<th onclick=""sortTable(this,0,1)"">Database</th>",8)
+		Do WriteLog("<th onclick=""sortTable(this,1,1)"">Directory</th>",8)
+		Do WriteLog("<th onclick=""sortTable(this,2,0)"">Size [MB]</th>",8)
+		Do WriteLog("<th onclick=""sortTable(this,3,0)"">Block Size [KB]</th>",8)
+		Do WriteLog("<th onclick=""sortTable(this,4,1)"">Status</th>",8)
+		Do WriteLog("<th onclick=""sortTable(this,5,1)"">Resource</th>",8)
+		Do WriteLog("<th onclick=""sortTable(this,6,1)"">Encrypted</th>",8)
+		Do WriteLog("<th onclick=""sortTable(this,7,1)"">Journal</th>",8)	
 		Do WriteLog("</tr>",6)
 		While result.Next(.tSC) {
 			If ('tSC) Quit
@@ -2378,14 +2390,14 @@ LogTasks
 		Do WriteLog("<table id=""tasksTable"" border=""0"" cellpadding=""7"" cellspacing=""3"" class=""zebraStriped"">",2)
 		Do WriteLog("<tbody>",4)
 		Do WriteLog("<tr>",6)
-		Do WriteLog("<th onclick=""sortTable('tasksTable',0,1)"">Task Name</th>",8)
-		Do WriteLog("<th onclick=""sortTable('tasksTable',1,1)"">Task Type</th>",8)
-		Do WriteLog("<th onclick=""sortTable('tasksTable',2,1)"">Namespace</th>",8)
-		Do WriteLog("<th onclick=""sortTable('tasksTable',3,1)"">Description</th>",8)
-		Do WriteLog("<th onclick=""sortTable('tasksTable',4,0)"">ID</th>",8)
-		Do WriteLog("<th onclick=""sortTable('tasksTable',5,1)"">Suspended</th>",8)
-		Do WriteLog("<th onclick=""sortTable('tasksTable',6,1)"">Last Finished</th>",8)
-		Do WriteLog("<th onclick=""sortTable('tasksTable',7,1)"">NextScheduled</th>",8)
+		Do WriteLog("<th onclick=""sortTable(this,0,1)"">Task Name</th>",8)
+		Do WriteLog("<th onclick=""sortTable(this,1,1)"">Task Type</th>",8)
+		Do WriteLog("<th onclick=""sortTable(this,2,1)"">Namespace</th>",8)
+		Do WriteLog("<th onclick=""sortTable(this,3,1)"">Description</th>",8)
+		Do WriteLog("<th onclick=""sortTable(this,4,0)"">ID</th>",8)
+		Do WriteLog("<th onclick=""sortTable(this,5,1)"">Suspended</th>",8)
+		Do WriteLog("<th onclick=""sortTable(this,6,1)"">Last Finished</th>",8)
+		Do WriteLog("<th onclick=""sortTable(this,7,1)"">NextScheduled</th>",8)
 		Do WriteLog("</tr>",6)
 		While (rs.Next()) {
 			Do WriteLog("<tr>",6)
@@ -2469,10 +2481,10 @@ LogJournal
 			Do WriteLog("<table id=""journalTable"" border=""0"" cellpadding=""7"" cellspacing=""3"" class=""zebraStriped"">",2)
 			Do WriteLog("<tbody>",4)
 			Do WriteLog("<tr>",6)
-			Do WriteLog("<th onclick=""sortTable('journalTable',0,1)"">Name</th>",8)
-			Do WriteLog("<th onclick=""sortTable('journalTable',1,0)"">Size in KB</th>",8)
-			Do WriteLog("<th onclick=""sortTable('journalTable',2,1)"">Creation Time</th>",8)
-			Do WriteLog("<th onclick=""sortTable('journalTable',3,1)"">Reason</th>",8)
+			Do WriteLog("<th onclick=""sortTable(this,0,1)"">Name</th>",8)
+			Do WriteLog("<th onclick=""sortTable(this,1,0)"">Size in KB</th>",8)
+			Do WriteLog("<th onclick=""sortTable(this,2,1)"">Creation Time</th>",8)
+			Do WriteLog("<th onclick=""sortTable(this,3,1)"">Reason</th>",8)
 			Do WriteLog("</tr>",6)
 			Set filen=1
 			While $D(Row(filen)) {			
@@ -3067,7 +3079,7 @@ GetSourceClass(cube,type)[storageList, dataConnectorList]{
 	Quit sourceClass
 }
 
-GetSourceFactCount(sqlclass){
+GetCountStar(sqlclass){
 	Try {
 		Set FactCount=""
 		Set SQLQuery="SELECT COUNT(*) As FactCount FROM "_sqlclass
@@ -3222,7 +3234,7 @@ MostRunQueries(numqueries)
 	Do WriteLog("<table id=""FrequentQueriesTable"" cellpadding=""5"" cellspacing=""5"" class=""tableWithBorders"">",2)
 	Do WriteLog("<tbody>",4)
 	Do WriteLog("<tr>",6)
-	Do WriteLog("<th onclick=""sortTable('FrequentQueriesTable',0,0)"">#</th>",8)
+	Do WriteLog("<th onclick=""sortTable(thi,0,0)"">#</th>",8)
 	Do WriteLog("<th onclick=""sortTable('FrequentQueriesTable',0,0)"">Frequency</th>",8)
 	Do WriteLog("<th onclick=""sortTable('FrequentQueriesTable',1,1)"">Query</th>",8)
 	Do WriteLog("</tr>",6)
