@@ -3,6 +3,7 @@ Script used by the DeepSee support group at InterSystems to gather system inform
 
 ### Installation
 
+Manually download or close this repository.  
 Import DeepSeeButtons.xml or DeepSeeButtons.mac to the %SYS namespace or to any namespace running DeepSee. The DeepSeeButtons.mac file uses the new UDL formatting, which should work on IS IRIS and Caché version above 2016.1. 
 
 ### Running DeepSeeButtons
