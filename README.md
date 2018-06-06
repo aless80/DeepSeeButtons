@@ -18,7 +18,8 @@ Then follow the prompts.
 
 ### Inspecting DeepSeeButtons reports
 
-The script outputs an html file similar to DeepSeeButtonsExample.html included in this repo. You can see DSbuttons.html in your browser at this link: [https://rawgit.com/aless80/DeepSeeButtons/master/DeepSeeButtonsExample.html](https://rawgit.com/aless80/DeepSeeButtons/master/DeepSeeButtonsExample.html)
+The script outputs a a report in html format. You can inspect DeepSeeButtons reports in any browser, though I recommend using Chrome or Firefox. 
+This repository includes an example, DeepSeeButtonsExample.html, which you can open using this link: [https://rawgit.com/aless80/DeepSeeButtons/master/DeepSeeButtonsExample.html](https://rawgit.com/aless80/DeepSeeButtons/master/DeepSeeButtonsExample.html)
 
 ### Notes
 
