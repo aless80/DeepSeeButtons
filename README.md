@@ -14,7 +14,7 @@ Launch DeepSeeButtons from terminal as:
 
 Then follow the prompts. 
 
-![Alt Text](https://github.com/aless80/DeepSeeButtons/blob/master/HowTo.gif =250x)
+![Alt Text](https://github.com/aless80/DeepSeeButtons/blob/master/HowTo.gif)
 
 ### Inspecting DeepSeeButtons reports
 
