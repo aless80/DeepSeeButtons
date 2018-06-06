@@ -1,7 +1,7 @@
 # DeepSeeButtons
 Script used by the DeepSee support group at InterSystems to gather system information. 
 
-Import DeepSeeButtons.mac to the %SYS namespace or to any namespace running DeepSee. If your Caché version does not support the new UDL formatting (Caché 2016.1 and below), import DeepSeeButtons.xml. 
+Import DeepSeeButtons.xml or DeepSeeButtons.mac to the %SYS namespace or to any namespace running DeepSee. The DeepSeeButtons.mac file uses the new UDL formatting, which should work on IS IRIS and Caché version above 2016.1. 
 Launch DeepSeeButtons from terminal as:
 
 `%SYS>Do ^DeepSeeButtons`
@@ -10,5 +10,7 @@ Then follow the prompts.
 
 ![Alt Text](https://github.com/aless80/DeepSeeButtons/blob/master/HowTo.gif)
 
-The script outputs an html file similar to DSbuttons.html included in this repo. You can see DSbuttons.html in your browser at this link: [https://rawgit.com/aless80/DeepSeeButtons/master/DSbuttons.html](https://rawgit.com/aless80/DeepSeeButtons/master/DSbuttons.html)
+The UI folder contains an implementation for the UI. Please ignore it. 
+
+The script outputs an html file similar to DeepSeeButtonsExample.html included in this repo. You can see DSbuttons.html in your browser at this link: [https://rawgit.com/aless80/DeepSeeButtons/master/DeepSeeButtonsExample.html](https://rawgit.com/aless80/DeepSeeButtons/master/DeepSeeButtonsExample.html)
 
