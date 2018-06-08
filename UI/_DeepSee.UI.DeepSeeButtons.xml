@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Export generator="Cache" version="25" zv="Cache for UNIX (SUSE Linux Enterprise Server for x86-64) 2017.2.1 (Build 801)" ts="2018-04-18 11:47:07">
+<Export generator="Cache" version="25" zv="Cache for UNIX (SUSE Linux Enterprise Server for x86-64) 2017.2.1 (Build 801)" ts="2018-06-08 13:42:24">
 <Class name="%DeepSee.UI.DeepSeeButtonsDownload">
 <Super>%ZEN.Component.page,%CSP.StreamServer</Super>
 <TimeChanged>64735,54438.891408</TimeChanged>
@@ -56,7 +56,7 @@ DeepSee's DeepSeeButtons Viewer.
 Run DeepSeeButtons and display contents of the DeepSeeButtons html file in the current namespace</Description>
 <Super>%DeepSee.UI.standardPage</Super>
 <System>4</System>
-<TimeChanged>64749,58302.115199</TimeChanged>
+<TimeChanged>64807,48756.516706</TimeChanged>
 <TimeCreated>64741,56740.343487</TimeCreated>
 
 <Parameter name="PAGENAME">
@@ -172,7 +172,7 @@ title="Use the lens or type in a comma separated list of cubes that will be incl
 <image src="deepsee/ds2_magnify_44.png" label="&#160;" width="16" height="16" onclick="zenPage.editItem('GetCubeList');"/>
 </hgroup>
 <hgroup id="idRemoteFile" cellVAlign="bottom" enclosingStyle="padding-top:20px;">
-<text id="htmlDirectory" size="70" label="Output directory" hint="Output directory for DeepSeebuttons reports"
+<text id="htmlDirectory" size="70" label="Output directory" hint="Output directory for DeepSeeButtons reports"
 onchange="zenPage.setExportDirectory(zenThis.getValue());"/>
 	<spacer width="10"/>
 <button caption="Browse" id="btnBrowse" controlClass="commandButton" title="Browse to Find Directory" 
@@ -311,13 +311,35 @@ This client event is fired when the a popup page launched from this page fires a
 		self.document.location = url;
 		break;
 	case 'GetCubeList':
-		zenSetProp("Cubes","value",value)
+		zenSetProp("Cubes","value",zenPage.removeDuplicates(value))
 		break;
 	case 'fileSelect':
 		zen('htmlDirectory').setValue(value);
 		zenPage.setExportDirectory(value);
 		break;	
 	}
+]]></Implementation>
+</Method>
+
+<Method name="removeDuplicates">
+<Description>
+Helper method to remove duplicates (cubes) from a comma delimited string</Description>
+<FormalSpec>input</FormalSpec>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	var splitted = input.split(',');
+	var collector = {};
+	for (i = 0; i < splitted.length; i++) {
+   		key = splitted[i].replace(/^\s*/, "").replace(/\s*$/, "");
+   		collector[key] = true;
+	}
+	var out = [];
+	for (var key in collector) {
+   		out.push(key);
+	}
+	var output = out.join(',');
+	return output
 ]]></Implementation>
 </Method>
 
@@ -537,7 +559,7 @@ This dialog lets the user add or edit cubes and subject areas for DeepSeeButtons
 An existing list (delimited by comma) may be passed in.]]></Description>
 <Super>%DeepSee.UI.Dialog.standardDialog</Super>
 <System>4</System>
-<TimeChanged>64756,42408.018979</TimeChanged>
+<TimeChanged>64807,48095.657827</TimeChanged>
 <TimeCreated>64727,63621.331352</TimeCreated>
 
 <Parameter name="APPLYBUTTON">
@@ -707,6 +729,7 @@ User selected a cube or subject are from the list. Get the cube or SA name for t
 	var cubeObj = zen('lstCubes');
 	//Remove ALL if add a cube
 	zenPage.removeALL()
+	zenPage.getComponentById("ALLcubes").setValue(0)
 	
 	cubeObj.appendOption(sourceObj.text,sourceObj.text);
 ]]></Implementation>

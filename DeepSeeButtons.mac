@@ -537,7 +537,7 @@ LogOpenMainDiv()
 	Do WriteLog("<body bgcolor=""#FFFFFF"" text=""#000000"">")
 	Do WriteLog("<div id=""main"">")
 	Do WriteLog("<a name=""top""></a>")
-	Do WriteLog("<h1 title=""Version v0.1.6"">DeepSeeButtons - DeepSee diagnostic report</h1>")
+	Do WriteLog("<h1 title=""Version v0.1.7"">DeepSeeButtons - DeepSee diagnostic report</h1>")
 	Quit
 
 LogDeepSeeSetupSection
@@ -602,9 +602,12 @@ LogDeepSeeSetupSection
 		Do rs.Execute()
 		While (rs.Next()) {
 			Set cube=rs.Get("CubeKey")
+			Set state = rs.Get("Disabled")
+			Set state = $S(state="Yes":"disabled",state="No":"enabled",1:"unknown")
 			If ((rs.Get("IsRegistered")="Yes") && (rs.Get("Disabled")="No")) {
 				Set msgbuild=$$GetLastBuild("Build",cube)	//Get last build
 				Set msgrepair=$$GetLastBuild("Repair",cube)	//Get last repair
+				Do:(state="enabled") alertInitialBuildCubeManager(cube,msgrepair,msgbuild,.alerts)
 			}
 		}
 	 	ZN "%SYS"
@@ -1115,19 +1118,20 @@ LogBuildSynchSection
 		 	Do WriteLog("<tbody>",6)
 		 	Do WriteLog("<tr>",8)
 		 	Do WriteLog("<th onclick=""sortTable(this,0,1)"">Cube Name</th>",10)
-		 	//Do WriteLog("<th onclick=""sortTable(this,1,0)"">Source Count</th>",10)
 		 	Do WriteLog("<th onclick=""sortTable(this,1,0)"""_
+				"title=""Empty for large source tables, Subject Areas"">Source Count</th>",10)
+		 	Do WriteLog("<th onclick=""sortTable(this,2,0)"""_
 				"title=""From %DeepSee.Utils:%GetCubeFactCount, i.e. does not include restrictions."">Fact Count</th>",10)
-		 	Do WriteLog("<th onclick=""sortTable(this,2,0)"">Build Time [s]</th>",10)
-		 	Do WriteLog("<th onclick=""sortTable(this,3,0)"">Build Rate [Facts/s]</th>",10)
-		 	Do WriteLog("<th onclick=""sortTable(this,4,0)"">Build Errors</th>",10)
-			Do WriteLog("<th onclick=""sortTable(this,5,0)"""_
+		 	Do WriteLog("<th onclick=""sortTable(this,3,0)"">Build Time [s]</th>",10)
+		 	Do WriteLog("<th onclick=""sortTable(this,4,0)"">Build Rate [Facts/s]</th>",10)
+		 	Do WriteLog("<th onclick=""sortTable(this,5,0)"">Build Errors</th>",10)
+			Do WriteLog("<th onclick=""sortTable(this,6,0)"""_
 				"title=""From ^DeepSeeUpdate (or ^OBJ.DSTIME before DTB422)"">DSTIME</th>",10)
-		 	Do WriteLog("<th onclick=""sortTable(this,6,1)"">Last Compile</th>",10)
-		 	Do WriteLog("<th onclick=""sortTable(this,7,1)"" title=""As logged in ^DeepSee.Update (or ^OBJ.DSTIME before DTB422)"">Last Build/Synch</th>",10)
-		 	Do WriteLog("<th onclick=""sortTable(this,8,0)"">Cube Group</th>",10)
-		 	Do WriteLog("<th onclick=""sortTable(this,9,0)"">Build Order</th>",10)
-		 	//Do WriteLog("<th onclick=""sortTable(this,10,1)"" title=""Does not reflect build order"">Related Cubes</th>",10)
+		 	Do WriteLog("<th onclick=""sortTable(this,7,1)"">Last Compile</th>",10)
+		 	Do WriteLog("<th onclick=""sortTable(this,8,1)"" title=""As logged in ^DeepSee.Update (or ^OBJ.DSTIME before DTB422)"">Last Build/Synch</th>",10)
+		 	Do WriteLog("<th onclick=""sortTable(this,9,0)"">Cube Group</th>",10)
+		 	Do WriteLog("<th onclick=""sortTable(this,10,0)"">Build Order</th>",10)
+		 	//Do WriteLog("<th onclick=""sortTable(this,11,1)"" title=""Does not reflect build order"">Related Cubes</th>",10)
 		 	Do WriteLog("</tr>",8)
 		 	//Cube group and build order
 		 	//Invert this array from groups(group,cube)=order to cubeGroupOrder(cube)=$LB(group,order)
@@ -1152,20 +1156,50 @@ LogBuildSynchSection
 				If (cubename'="" && '##class(%DeepSee.Utils).%IsCubeAbstract(cubenode)) {		//if cube is not abstract
 					Do WriteLog("<tr>",8)
 					Do WriteLog("<td>"_cubename_"</td>",10)	//cubename
-
-					/* //COUNT(*)
- 					Set countstar = ""
-					Set type=$LG(plist(cubenode),4)							//subject area or cube?
-					Set sourceClass = $$GetSourceClass(cubenode,type)
-					Set sqlclass = ##class(%DeepSee.Utils).%GetSQLTableName(sourceClass)
-					//Check the following for abstract cubes and data connectors
+					
+					
+					
+					
+					
+					/// Keep an eye on this. Does it perform well?					
+					// COUNT(*) - Check Extent Size.
+ 					Set cube = $zu(28,cubename,5)
+					Set type = $LG(plist(cube),4)
+					Set sourceclass = $$GetSourceClass(cube,type)
+					Set sqlclass = ##class(%DeepSee.Utils).%GetSQLTableName(sourceclass)
+					Set NewExtentSize = ##Class(%SQL.Manager.Catalog).GetCalcTableExtentSize($P(sqlclass,".",1), $P(sqlclass,".",2))
+					// First exclude abstract cubes and data connectors
 					If (sqlclass="Not available")||('##class(%SYSTEM.SQL).TableExists(sqlclass)) {
-						Do WriteLog("<td></td>",10)
-					} Else {
+						Do WriteLog("<td title='SQL class not available'></td>",10)
+					} ElseIf NewExtentSize>=200000 {
+						Do WriteLog("<td title='Extent Size is large'></td>",8)
+					} ElseIf (NewExtentSize<10000) {
+						Do WriteUpdate("Getting COUNT(*) from source class of "_cube_". ExtentSize="_NewExtentSize)
  						Set countstar=$$GetCountStar(sqlclass)
-						Do WriteLog("<td>"_$FNUMBER(countstar,"O,")_"</td>",10)
+						Do WriteLog("<td>"_$FNUMBER(countstar,"O,")_"</td>",8)
+					} Else {
+						// Check if bitmap or bitmap extent index. 
+						Set tRS=##class(%ResultSet).%New("%SQL.Manager.Catalog:Indices")
+						Set tSC = tRS.Execute($P(sqlclass,".",1),$P(sqlclass,".",2))
+						//SKIP Quit:$$$ISERR(tSC)
+						Set hasBitmap= 0
+						For {
+							Quit:'rs.Next()
+							Set tType = rs.Get("TYPE")
+							Set:$E(tType,1,6)="Bitmap" hasBitmap=1
+						}
+						If hasBitmap {
+							Do WriteUpdate("Getting COUNT(*) from source class of "_cube_". ExtentSize="_NewExtentSize_", Bitmap index found")
+							Set countstar=$$GetCountStar(sqlclass)
+							Do WriteLog("<td>"_$FNUMBER(countstar,"O,")_"</td>",10)
+						} Else {
+							Do WriteLog("<td title='No Bitmap index found in SQL table'></td>",8)
+						}
 					}
-  					*/					
+	
+					
+					
+					
 					
 					Set lastmod=$zdt($LG(plist(cubenode),3),3)				//last cube compile
 					Set facts=##class(%DeepSee.Utils).%GetCubeFactCount(cubename)	//number of facts
@@ -1278,8 +1312,8 @@ LogCubeRegistry
 	Set registry=##class(%DeepSee.CubeManager.Utils).GetActiveRegistry()
 	If registry=""{
 		Do WriteLog("<p>No cube registry defined in this namespace</p>",2)
-	}
-	Else{
+	} Else{
+		Do WriteLog("<p>Cube Registry storage class: "_registry_"</p>",2)
 		Set rs=##class(%ResultSet).%New("%DeepSee.CubeManager.RegistryMap:RegistryMapTableView")
 		Do rs.Execute()
 		Do WriteLog("<table id=""RegistryMapDiv"" cellpadding=""7"" cellspacing=""3"" "_
@@ -1341,7 +1375,7 @@ LogDetailedCubeInfo
 			Do LogCubeDimensions
 			Do LogOtherCubeElements
 			Do WriteLog("</div>")
-			Do:tracking WriteTrack("cube","Detailed information",cube)
+			Do:tracking WriteTrack("cube","Detailed information collected",cube)
 		}
  	}
 	Quit
@@ -1622,7 +1656,7 @@ LogCubeInfo
 				Do WriteLog("<p>Build event: "_msgbuild_"</p>",10)
 				Do WriteLog("<p>Registry Update event: "_msgupdate_"</p>",10)
 				Do WriteLog("<p>Repair event: "_msgrepair_"</p>",10)
-				Do alertInitialBuildCubeManager(cube,msgrepair,msgbuild,.alerts)
+				//Do alertInitialBuildCubeManager(cube,msgrepair,msgbuild,.alerts)
 			} Else {
 				Do WriteLog("<p>Cube is "_state_" in Cube Manager</p>",10)
 			}
@@ -1860,7 +1894,7 @@ LogOtherCubeElements
 	Do:tracking WriteTrack("cube","Other cube elements",cube)
 	ZN namespace
 	Do WriteLog("<hr noshade size=""4"">",2)
-	Do WriteLog("<a name=""otherelements""></a>",2)
+	Do WriteLog("<a name=""otherelements"_cube_"""></a>",2)
 	Do WriteLog("<h2>Other Elements for "_cube_"</h2>",2)
 	If ##class(%DeepSee.Utils).%IsCubeAbstract(cube) {
 		Do WriteLog("<p>Not available because the cube is abstract</p>",0)
@@ -3235,9 +3269,9 @@ MostRunQueries(numqueries)
 	Do WriteLog("<table id=""FrequentQueriesTable"" cellpadding=""5"" cellspacing=""5"" class=""tableWithBorders"">",2)
 	Do WriteLog("<tbody>",4)
 	Do WriteLog("<tr>",6)
-	Do WriteLog("<th onclick=""sortTable(thi,0,0)"">#</th>",8)
-	Do WriteLog("<th onclick=""sortTable('FrequentQueriesTable',0,0)"">Frequency</th>",8)
-	Do WriteLog("<th onclick=""sortTable('FrequentQueriesTable',1,1)"">Query</th>",8)
+	Do WriteLog("<th onclick=""sortTable(this,0,0)"">#</th>",8)
+	Do WriteLog("<th onclick=""sortTable(this,0,0)"">Frequency</th>",8)
+	Do WriteLog("<th onclick=""sortTable(this,1,1)"">Query</th>",8)
 	Do WriteLog("</tr>",6)
 	Set freq = ""
 	For n = 1:1:numqueries {
@@ -3411,6 +3445,7 @@ alertJoinIndexMappings(ns,alerts) {
 
 alertInitialBuildCubeManager(cube,msgrepair,msgbuild,alerts) {
 	Try {
+		Set alert=""
 		Set pre="title=""Before you synchronize cubes from the Cube Manager, it is necessary to build the cubes at least once from the Cube Manager."">"
 		If ((msgrepair="Not found") && (msgbuild="Not found")) {
 			Set alert = "Alert: there is no record for the initial build of "_cube_" from Cube Manager. Check if the cube is updating"
